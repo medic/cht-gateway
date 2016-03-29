@@ -1,0 +1,83 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:1.2.3'
+	}
+}
+
+apply plugin: 'android'
+
+// enable verbose lint warnings
+gradle.projectsEvaluated {
+	tasks.withType(JavaCompile) {
+		// options.compilerArgs << '-Xlint:deprecation'
+	}
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+def isReleaseBuild = {
+	return System.env.JENKINS == 'true' || (System.env.TRAVIS == 'true' &&
+			System.env.TRAVIS_BRANCH == 'master')
+}
+def getVersionCode = {
+	if(isReleaseBuild()) {
+		def code = System.env.TRAVIS == 'true' ?
+			System.env.TRAVIS_BUILD_NUMBER :
+			System.env.VERSION_TO_BUILD.split(/\./)[-1]
+		return Integer.parseInt(code)
+	}
+	return 1
+}
+def getVersionName = {
+	if(isReleaseBuild()) {
+		if(System.env.TRAVIS == 'true') {
+			def v = System.env.COLLECT_VERSION_NAME
+			if(!v) throw new RuntimeException(
+					'Missing required env var: COLLECT_VERSION_NAME')
+			return v
+		} else return System.env.VERSION_TO_BUILD
+	}
+	return 'SNAPSHOT'
+}
+
+android {
+	compileSdkVersion 22
+	buildToolsVersion '22.0.1'
+	packagingOptions {
+		exclude 'META-INF/LICENSE'
+		exclude 'META-INF/NOTICE'
+	}
+
+	defaultConfig {
+		versionCode getVersionCode()
+		versionName getVersionName()
+		archivesBaseName = "${project.name}-${versionName}"
+	}
+
+	applicationVariants.all {
+		buildConfigField "String", "EXAMPLE_ENV_VAR", "\"${System.env.EXAMPLE}\"";
+	}
+
+	signingConfigs {
+		release {
+			storeFile file(System.env.ANDROID_KEYSTORE_PATH ?: signingConfigs.debug.storeFile)
+			storePassword System.env.ANDROID_KEYSTORE_PASSWORD
+			keyAlias System.env.ANDROID_KEY_ALIAS
+			keyPassword System.env.ANDROID_KEY_PASSWORD
+		}
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled true
+			proguardFile getDefaultProguardFile('proguard-android.txt')
+			signingConfig signingConfigs.release
+		}
+	}
+}
