@@ -17,6 +17,8 @@ public class SettingsStore {
 //> ACCESSORS
 	public String getWebappUrl() { return get("app-url"); }
 
+	public long getPollInterval() { return 30 * 1000L; }
+
 	private String get(String key) {
 		return prefs.getString(key, null);
 	}
@@ -46,7 +48,7 @@ public class SettingsStore {
 				"Failed to save to SharedPreferences.");
 	}
 
-	public static SettingsStore in(ContextWrapper ctx) {
+	public static SettingsStore in(Context ctx) {
 		if(DEBUG) log("Loading settings for context %s...", ctx);
 
 		SharedPreferences prefs = ctx.getSharedPreferences(

@@ -70,6 +70,7 @@ public class SettingsDialogActivity extends Activity {
 	private void saveSettings(Settings s) {
 		try {
 			settings.save(s);
+			ServiceManager.restart(this);
 			startActivity(new Intent(this, MessageListsActivity.class));
 			finish();
 		} catch(IllegalSettingsException ex) {

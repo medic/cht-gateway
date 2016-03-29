@@ -9,10 +9,10 @@ import static medic.gateway.BuildConfig.DEBUG;
 public class WtRepo {
 	public static final WtRepo $ = new WtRepo();
 
-	private final List<SmsMessage> messages;
+	private final SortedSet<SmsMessage> messages;
 
 	private WtRepo() {
-		messages = new LinkedList<>();
+		messages = new TreeSet<>();
 	}
 
 	public void save(SmsMessage m) {
