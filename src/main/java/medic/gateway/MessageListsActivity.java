@@ -2,6 +2,7 @@ package medic.gateway;
 
 import android.app.*;
 import android.content.*;
+import android.view.*;
 import android.os.*;
 import android.widget.*;
 
@@ -25,6 +26,26 @@ public class MessageListsActivity extends TabActivity {
 			spec.setContent(new Intent(this, TAB_CLASSES[i]));
 			tabHost.addTab(spec);
 		}
+	}
+
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.message_list_menu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case R.id.mnuSettings:
+				openSettings();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void openSettings() {
+		startActivity(new Intent(this, SettingsDialogActivity.class));
+		finish();
 	}
 
 	private void log(String message, Object...extras) {

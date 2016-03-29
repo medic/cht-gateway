@@ -15,9 +15,10 @@
 	<string name="btnContinue">Continue</string>
 	<string name="btnQuit">Quit</string>
 
+	<string name="mnuSettings">Settings</string>
+
 	<string-array name="message_lists_tabs">
 		<item>From Webapp</item>
 		<item>To Webapp</item>
 	</string-array>
-
 </resources>
