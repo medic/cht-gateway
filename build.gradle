@@ -62,6 +62,7 @@ android {
 
 	applicationVariants.all {
 		buildConfigField "String", "EXAMPLE_ENV_VAR", "\"${System.env.EXAMPLE}\"";
+		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
 	}
 
 	signingConfigs {
