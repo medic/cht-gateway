@@ -7,7 +7,6 @@
 	<string name="errWebappUrl_appNotFound">URL is not a medic-webapp instance</string>
 	<string name="errWebappUrl_apiNotReady">medic-webapp is not ready, please try again soon</string>
 
-
 	<string name="errRequired">required</string>
 	<string name="errInvalidUrl">must be a valid URL</string>
 
@@ -15,4 +14,10 @@
 	<string name="btnCancel">Cancel</string>
 	<string name="btnContinue">Continue</string>
 	<string name="btnQuit">Quit</string>
+
+	<string-array name="message_lists_tabs">
+		<item>From Webapp</item>
+		<item>To Webapp</item>
+	</string-array>
+
 </resources>

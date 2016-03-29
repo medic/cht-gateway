@@ -17,5 +17,7 @@
 		</activity>
 		<activity android:name="SettingsDialogActivity"/>
 		<activity android:name="MessageListsActivity"/>
+		<activity android:name="WoListActivity"/>
+		<activity android:name="WtListActivity"/>
 	</application>
 </manifest>
