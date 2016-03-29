@@ -5,9 +5,9 @@ import android.content.*;
 import android.webkit.*;
 import android.os.*;
 
-public class StartupActivity extends Activity {
-	private static final boolean DEBUG = BuildConfig.DEBUG;
+import static medic.gateway.BuildConfig.DEBUG;
 
+public class StartupActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		if(DEBUG) log("Starting...");
 		super.onCreate(savedInstanceState);
