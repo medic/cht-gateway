@@ -23,9 +23,9 @@ public class SmsSender {
 	}
 
 	private void sendSms(WoMessage m) {
-		System.err.println("#####################");
-		System.err.println("# Sending message: " + m);
-		System.err.println("#####################");
+		if(DEBUG) System.err.println("#####################");
+		if(DEBUG) System.err.println("# Sending message: " + m);
+		if(DEBUG) System.err.println("#####################");
 	}
 
 	private void log(String message, Object...extras) {

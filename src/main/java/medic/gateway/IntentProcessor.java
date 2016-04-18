@@ -13,10 +13,10 @@ public class IntentProcessor extends BroadcastReceiver {
 	public void onReceive(Context ctx, Intent intent) {
 		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
 
-		System.err.println("###############################");
-		System.err.println("# IntentProcessor.onReceive() #");
-		System.err.println("# intent: " + intent);
-		System.err.println("###############################");
+		if(DEBUG) System.err.println("###############################");
+		if(DEBUG) System.err.println("# IntentProcessor.onReceive() #");
+		if(DEBUG) System.err.println("# intent: " + intent);
+		if(DEBUG) System.err.println("###############################");
 
 		try {
 			if(intent.getAction().equals(SMS_RECEIVED_ACTION)) {

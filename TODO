@@ -1,6 +1,5 @@
 TODO 
 
-* wrap system.err calls in if(DEBUG)
 * make sure that AlarmListener.*Alarms() methods are not called on the main thread
 * write demo server which can be deployed easily somewhere public and told do do things
 * implement the JSON API
