@@ -37,7 +37,7 @@ public class DebugLogActivity extends Activity {
 
 	private void refreshList() {
 		list.setAdapter(new SimpleAdapter(this,
-				db.getLogEntries(20),
+				db.getLogEntries(200),
 				R.layout.debug_log_item,
 				DEBUG_LOG_LIST_FROM,
 				DEBUG_LOG_LIST_TO));
