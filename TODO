@@ -11,6 +11,7 @@ TODO
 
 LATER
 
+* include a last-successful-transmission time in case `medic-gateway` has issues reading webapp's response?
 * consider authentication - some kind of shared secret?
 * get list views working on a reload-on-scroll basis
 * tests?
