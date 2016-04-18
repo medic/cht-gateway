@@ -14,7 +14,11 @@ public class StartupActivity extends Activity {
 
 		Class newActivity;
 		if(SettingsStore.in(this).hasSettings()) {
-			new AlarmListener().restart(this);
+			AsyncTask.execute(new Runnable() {
+				public void run() {
+					new AlarmListener().restart(StartupActivity.this);
+				}
+			});
 			newActivity = MessageListsActivity.class;
 		} else {
 			newActivity = SettingsDialogActivity.class;
