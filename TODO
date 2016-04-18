@@ -2,7 +2,6 @@ TODO
 
 * write messages to SQLite database
 * write demo server which can be deployed easily somewhere public and told do do things
-* add support for on-device-power-on support
 * implement the JSON API
 * add the stuff for kit-e-kat support
 * make sure that incoming messages are not processed twice on kit-e-kat
