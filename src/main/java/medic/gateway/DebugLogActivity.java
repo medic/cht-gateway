@@ -17,12 +17,14 @@ public class DebugLogActivity extends Activity {
 		R.id.txtDebugLogDate,
 	};
 
-	ListView list;
+	private Db db;
+	private ListView list;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.debug_log);
 
+		db = Db.getInstance(this);
 		list = (ListView) findViewById(R.id.lstDebugLog);
 
 		((Button) findViewById(R.id.btnRefreshLog))
@@ -35,7 +37,7 @@ public class DebugLogActivity extends Activity {
 
 	private void refreshList() {
 		list.setAdapter(new SimpleAdapter(this,
-				DebugLog.getEntries(20),
+				db.getLogEntries(20),
 				R.layout.debug_log_item,
 				DEBUG_LOG_LIST_FROM,
 				DEBUG_LOG_LIST_TO));

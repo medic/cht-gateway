@@ -15,7 +15,7 @@ public class ServiceManager {
 	}
 
 	public void run() {
-		logEvent("ServiceManager.run()");
+		logEvent(ctx, "ServiceManager.run()");
 
 		ctx.startService(new Intent(ctx, SmsSenderService.class));
 		ctx.startService(new Intent(ctx, WebappPoller.class));
@@ -33,13 +33,13 @@ public class ServiceManager {
 	}
 
 	private static void start(Context ctx) {
-		logEvent("ServiceManager.start()");
+		logEvent(ctx, "ServiceManager.start()");
 
 		getAm(ctx).setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getPollInterval(ctx), getIntent(ctx));
 	}
 
 	private static void stop(Context ctx) {
-		logEvent("ServiceManager.stop()");
+		logEvent(ctx, "ServiceManager.stop()");
 
 		getAm(ctx).cancel(getIntent(ctx));
 	}

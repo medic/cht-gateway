@@ -11,7 +11,7 @@ public class IntentProcessor extends BroadcastReceiver {
 	private WtRepo wtRepo = WtRepo.$;
 
 	public void onReceive(Context ctx, Intent intent) {
-		logEvent("IntentProcessor.onReceive() :: " + intent.getAction());
+		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
 
 		System.err.println("###############################");
 		System.err.println("# IntentProcessor.onReceive() #");

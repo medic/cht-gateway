@@ -14,7 +14,7 @@ import static medic.gateway.DebugLog.logEvent;
 
 public class WebappPoller extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		logEvent("WebappPoller.onStartCommand()");
+		logEvent(this, "WebappPoller.onStartCommand()");
 
 		System.err.println("#################################");
 		System.err.println("# WebappPoller.onStartCommand() #");

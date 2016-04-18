@@ -1,6 +1,5 @@
 TODO 
 
-* write event-log to SQLite database
 * use IntentService for services which process intents (https://github.com/commonsguy/cwac-wakeful)
 * write messages to SQLite database
 * write demo server which can be deployed easily somewhere public and told do do things
@@ -18,6 +17,7 @@ LATER
 * continuous build?!?
 * deploy APK to github on build?!?!
 * use proper android styles/R-predefs for font size, color etc.
+* work out if using a singleton for Db could be problematic
 
 
 TODONT
