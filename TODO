@@ -1,0 +1,33 @@
+TODO 
+
+* write event-log to SQLite database
+* use IntentService for services which process intents (https://github.com/commonsguy/cwac-wakeful)
+* write messages to SQLite database
+* write demo server which can be deployed easily somewhere public and told do do things
+* add support for on-device-power-on support
+* implement the JSON API
+* add the stuff for kit-e-kat support
+* make sure that incoming messages are not processed twice on kit-e-kat
+* get list views working on a reload-on-scroll basis
+* support delivery reports
+
+LATER
+
+* tests?
+* static analysis?!
+* continuous build?!?
+* deploy APK to github on build?!?!
+* use proper android styles/R-predefs for font size, color etc.
+
+
+TODONT
+
+* don't stop trying to sync when battery is low
+* don't stop trying to sync when connectivity is gone
+* don't add support for protocols beyond JSON
+* don't add support for Twitter
+* don't add support for keyword filtering
+* don't add support for whitelists
+* don't add support for blacklists
+* don't add support for reading config from a QR code
+* don't add support for changing the names of variables in the JSON schema
