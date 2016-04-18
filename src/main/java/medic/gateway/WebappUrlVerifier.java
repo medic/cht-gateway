@@ -16,14 +16,12 @@ public class WebappUrlVerifier {
 		}
 
 		try {
-			JSONObject json = new SimpleJsonClient2().get(webappUrl + "/setup/poll");
+			JSONObject json = new SimpleJsonClient2().get(webappUrl);
 
-			if(!json.getString("handler").equals("medic-api"))
-				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_appNotFound);
-			if(!json.getBoolean("ready"))
-				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_apiNotReady);
+			if(json.optBoolean("medic-gateway"))
+				return WebappUrlVerififcation.ok(webappUrl);
 
-			return WebappUrlVerififcation.ok(webappUrl);
+			return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_appNotFound);
 		} catch(MalformedURLException ex) {
 			// seems unlikely, as we should have verified this already
 			return WebappUrlVerififcation.failure(webappUrl,
