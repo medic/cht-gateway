@@ -19,6 +19,11 @@ gradle.projectsEvaluated {
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
+}
+
+dependencies {
+	compile 'com.commonsware.cwac:wakeful:1.0.+'
 }
 
 def isReleaseBuild = {

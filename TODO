@@ -1,6 +1,6 @@
 TODO 
 
-* use IntentService for services which process intents (https://github.com/commonsguy/cwac-wakeful)
+* switch Alarm usage to use WakefulIntentService's alarm manager
 * write messages to SQLite database
 * write demo server which can be deployed easily somewhere public and told do do things
 * add support for on-device-power-on support
@@ -9,6 +9,7 @@ TODO
 * make sure that incoming messages are not processed twice on kit-e-kat
 * get list views working on a reload-on-scroll basis
 * support delivery reports
+* wrap system.err calls in if(DEBUG)
 
 LATER
 

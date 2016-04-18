@@ -6,6 +6,7 @@ import android.os.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
+import static com.commonsware.cwac.wakeful.WakefulIntentService.sendWakefulWork;
 
 public class ServiceManager {
 	private final Context ctx;
@@ -17,8 +18,8 @@ public class ServiceManager {
 	public void run() {
 		logEvent(ctx, "ServiceManager.run()");
 
-		ctx.startService(new Intent(ctx, SmsSenderService.class));
-		ctx.startService(new Intent(ctx, WebappPoller.class));
+		sendWakefulWork(ctx, new Intent(ctx, SmsSenderService.class));
+		sendWakefulWork(ctx, new Intent(ctx, WebappPoller.class));
 	}
 
 //> STATIC API

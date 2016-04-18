@@ -4,35 +4,34 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 
+import com.commonsware.cwac.wakeful.WakefulIntentService;
+
 import java.io.*;
 
 import org.json.*;
 
-import static android.app.Service.*;
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
 
-public class WebappPoller extends Service {
-	public int onStartCommand(Intent intent, int flags, int startId) {
+public class WebappPoller extends WakefulIntentService {
+	public WebappPoller() {
+		super("WebappPoller");
+	}
+
+	public void doWakefulWork(Intent intent) {
 		logEvent(this, "WebappPoller.onStartCommand()");
 
 		System.err.println("#################################");
 		System.err.println("# WebappPoller.onStartCommand() #");
 		System.err.println("#################################");
 
-		new Thread() {
-			public void run() {
-				try {
-					pollWebapp();
-				} catch(Exception ex) {
-					if(DEBUG) ex.printStackTrace();
-				} finally {
-					WebappPoller.this.stopSelf();
-				}
-			}
-		}.start();
-
-		return START_STICKY;
+		try {
+			pollWebapp();
+		} catch(Exception ex) {
+			if(DEBUG) ex.printStackTrace();
+		} finally {
+			WebappPoller.this.stopSelf();
+		}
 	}
 
 	private void pollWebapp() throws IOException, JSONException {
@@ -52,8 +51,6 @@ public class WebappPoller extends Service {
 	private void saveMessage(JSONObject m) throws JSONException {
 		WoRepo.$.save(new WoMessage(m.getString("to"), m.getString("message")));
 	}
-
-	public IBinder onBind(Intent _) { return null; }
 
 	private void log(String message, Object...extras) {
 		if(DEBUG) System.err.println("LOG | WebappPoller :: " +
