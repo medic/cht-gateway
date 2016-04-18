@@ -3,6 +3,7 @@ TODO
 * write demo server which can be deployed easily somewhere public and told do do things
 * implement the JSON API
 * write messages to SQLite database
+* actually send SMS
 * add the stuff for kit-e-kat support
 * make sure that incoming messages are not processed twice on kit-e-kat
 * support delivery reports
