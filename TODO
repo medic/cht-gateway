@@ -10,6 +10,7 @@ TODO
 
 LATER
 
+* consider authentication - some kind of shared secret?
 * get list views working on a reload-on-scroll basis
 * tests?
 * static analysis?!
