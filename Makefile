@@ -16,7 +16,7 @@ prod: clean deploy
 
 clean:
 	rm -rf src/main/assets/
-	rm -rf build/outputs/apk/
+	rm -rf build/
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
