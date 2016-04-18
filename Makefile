@@ -30,3 +30,9 @@ deploy:
 
 kill:
 	pkill -9 emulator64-arm
+
+
+.PHONY: demo-server
+
+demo-server:
+	npm start

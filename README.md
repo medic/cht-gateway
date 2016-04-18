@@ -92,7 +92,29 @@ If the response's `Content-Type` header is set to `application/json`, `medic-gat
 
 The `message` property may be logged and/or displayed to users in the `medic-gateway` UI.
 
-
 ### Other response codes
 
 Treatment of response codes below `200` and between `300` and `399` will _probably_ be handled sensibly by Android.
+
+
+# `demo-server`
+
+To start the demo server locally:
+
+	make demo-server
+
+To list the data stored on the server:
+
+	curl http://localhost:8000
+
+To make the next good request to `/app` return an error:
+
+	curl -X POST http://localhost:8000/error --data '"Something failed!"'
+
+To add a webapp-originating message (to be send by `medic-gateway`):
+
+	curl -vvv -X POST -d '{ "to": "+447123555888", "message": "hi" }' http://localhost:8000
+
+To simulate a request from `medic-gateway`:
+
+	curl -X POST http://localhost:8000/app -H "Accept: application/json" -H "Accept-Charset: utf-8" -H "Accept-Encoding: gzip" -H "Cache-Control: no-cache" -H "Content-Type: application/json" -d'{}'
