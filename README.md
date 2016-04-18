@@ -11,7 +11,15 @@ An SMS gateway for Android.  Send and receive SMS from your webapp via an Androi
 
 # API
 
-All requests are made by `medic-gateway`, to an HTTP(S) endpoint using the `POST` method.
+## GET
+
+Expected response:
+
+	{
+		"medic-gateway": true
+	}
+
+## POST
 
 `medic-gateway` will accept and process any relevant data received in a response.  However, it may choose to only send certain types of information in a particular request (e.g. only provide a webapp-terminating SMS), and will also poll the web service periodically for webapp-originating messages, even if it has no new data to pass to the web service.
 

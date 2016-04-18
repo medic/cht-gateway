@@ -1,6 +1,7 @@
 var Http = require('http'),
     Url = require('url'),
     datastore = {
+      requests: [],
       webapp_terminating: [],
       webapp_originating: {
         waiting: [],
@@ -26,7 +27,6 @@ var Http = require('http'),
         }
       },
       '/error': function(req, res) {
-        if(req.method !== 'POST') throw new Error('Unhandled method.');
         return readBody(req)
           .then(JSON.parse)
           .then(function(requestedError) {
@@ -35,30 +35,43 @@ var Http = require('http'),
           });
       },
       '/app': function(req, res) {
-        // enforce expected headers
-        assertHeader(req, 'Accept', 'application/json');
-        assertHeader(req, 'Accept-Charset', 'utf-8');
-        assertHeader(req, 'Accept-Encoding', 'gzip');
-        assertHeader(req, 'Cache-Control', 'no-cache');
-        assertHeader(req, 'Content-Type', 'application/json');
-
-        if(datastore.errors.length) {
-          throw new Error(datastore.errors.shift());
+        if(req.method === 'GET' || req.method === 'POST') {
+          datastore.requests.unshift({
+            time: new Date().toString(),
+            method: req.method,
+          });
         }
 
-        return readBody(req)
-          .then(JSON.parse)
-          .then(function(json) {
-            push(datastore.webapp_terminating, json.messages);
-            push(datastore.delivery_reports, json.deliveries);
+        switch(req.method) {
+          case 'GET':
+            return res.end(ok({ 'medic-gateway': true }));
+          case 'POST':
+            // enforce expected headers
+            assertHeader(req, 'Accept', 'application/json');
+            assertHeader(req, 'Accept-Charset', 'utf-8');
+            assertHeader(req, 'Accept-Encoding', 'gzip');
+            assertHeader(req, 'Cache-Control', 'no-cache');
+            assertHeader(req, 'Content-Type', 'application/json');
 
-            res.end(JSON.stringify({
-              messages: datastore.webapp_originating.waiting,
-            }));
-            push(datastore.webapp_originating.passed_to_gateway,
-                datastore.webapp_originating.waiting);
-            datastore.webapp_originating.waiting.length = 0;
-          });
+            if(datastore.errors.length) {
+              throw new Error(datastore.errors.shift());
+            }
+
+            return readBody(req)
+              .then(JSON.parse)
+              .then(function(json) {
+                push(datastore.webapp_terminating, json.messages);
+                push(datastore.delivery_reports, json.deliveries);
+
+                res.end(JSON.stringify({
+                  messages: datastore.webapp_originating.waiting,
+                }));
+                push(datastore.webapp_originating.passed_to_gateway,
+                    datastore.webapp_originating.waiting);
+                datastore.webapp_originating.waiting.length = 0;
+              });
+          default: throw new Error('Unhandled method.');
+        }
       },
     };
 
