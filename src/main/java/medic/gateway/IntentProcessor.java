@@ -4,12 +4,15 @@ import android.content.*;
 import android.telephony.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.DebugLog.logEvent;
 import static android.provider.Telephony.Sms.Intents.*;
 
 public class IntentProcessor extends BroadcastReceiver {
 	private WtRepo wtRepo = WtRepo.$;
 
 	public void onReceive(Context ctx, Intent intent) {
+		logEvent("IntentProcessor.onReceive() :: " + intent.getAction());
+
 		System.err.println("###############################");
 		System.err.println("# IntentProcessor.onReceive() #");
 		System.err.println("# intent: " + intent);

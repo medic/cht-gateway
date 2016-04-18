@@ -10,7 +10,7 @@ import static medic.gateway.BuildConfig.DEBUG;
 
 public class MessageListsActivity extends TabActivity {
 	private static final Class[] TAB_CLASSES = {
-		WoListActivity.class, WtListActivity.class,
+		DebugLogActivity.class, WoListActivity.class, WtListActivity.class,
 	};
 
 	public void onCreate(Bundle savedInstanceState) {

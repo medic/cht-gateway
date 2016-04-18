@@ -10,9 +10,12 @@ import org.json.*;
 
 import static android.app.Service.*;
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.DebugLog.logEvent;
 
 public class WebappPoller extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		logEvent("WebappPoller.onStartCommand()");
+
 		System.err.println("#################################");
 		System.err.println("# WebappPoller.onStartCommand() #");
 		System.err.println("#################################");

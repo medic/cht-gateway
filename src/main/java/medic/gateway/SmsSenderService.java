@@ -6,9 +6,12 @@ import android.os.*;
 
 import static android.app.Service.*;
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.DebugLog.logEvent;
 
 public class SmsSenderService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		logEvent("SmsSenderService.onStartCommand()");
+
 		System.err.println("#####################################");
 		System.err.println("# SmsSenderService.onStartCommand() #");
 		System.err.println("#####################################");
