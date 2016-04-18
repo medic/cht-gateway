@@ -4,31 +4,11 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 
-import com.commonsware.cwac.wakeful.WakefulIntentService;
-
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
 
-public class SmsSenderService extends WakefulIntentService {
-	public SmsSenderService() {
-		super("SmsSenderService");
-	}
-
-	public void doWakefulWork(Intent intent) {
-		logEvent(this, "SmsSenderService.onStartCommand()");
-
-		System.err.println("#####################################");
-		System.err.println("# SmsSenderService.onStartCommand() #");
-		System.err.println("#####################################");
-
-		try {
-			sendUnsentSmses();
-		} finally {
-			SmsSenderService.this.stopSelf();
-		}
-	}
-
-	private void sendUnsentSmses() {
+public class SmsSender {
+	public void sendUnsentSmses() {
 		for(WoMessage m : WoRepo.$.getUnsent()) {
 			try {
 				sendSms(m);
@@ -49,7 +29,7 @@ public class SmsSenderService extends WakefulIntentService {
 	}
 
 	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | SmsSenderService :: " +
+		if(DEBUG) System.err.println("LOG | SmsSender :: " +
 				String.format(message, extras));
 	}
 }

@@ -21,8 +21,6 @@ public class IntentProcessor extends BroadcastReceiver {
 		try {
 			if(intent.getAction().equals(SMS_RECEIVED_ACTION)) {
 				handleSmsReceived(intent);
-			} else if(intent.getAction().equals("medic.gateway.ACTION_POLL")) {
-				new ServiceManager(ctx).run();
 			} else throw new IllegalStateException("Unexpected intent: " + intent);
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();

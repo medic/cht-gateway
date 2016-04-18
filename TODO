@@ -1,6 +1,5 @@
 TODO 
 
-* switch Alarm usage to use WakefulIntentService's alarm manager
 * write messages to SQLite database
 * write demo server which can be deployed easily somewhere public and told do do things
 * add support for on-device-power-on support
@@ -10,6 +9,8 @@ TODO
 * get list views working on a reload-on-scroll basis
 * support delivery reports
 * wrap system.err calls in if(DEBUG)
+* update proguard config for alarm listener: "For production use, ProGuard may rename your AlarmListener class, which will foul up access to your metadata. To stop this from happening, you will need to add a -keep line to your ProGuard configuration file (e.g., proguard.cfg) to stop ProGuard from renaming it."
+* make sure that AlarmListener.*Alarms() methods are not called on the main thread
 
 LATER
 

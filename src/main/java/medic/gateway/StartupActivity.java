@@ -14,7 +14,7 @@ public class StartupActivity extends Activity {
 
 		Class newActivity;
 		if(SettingsStore.in(this).hasSettings()) {
-			ServiceManager.restart(this);
+			new AlarmListener().restart(this);
 			newActivity = MessageListsActivity.class;
 		} else {
 			newActivity = SettingsDialogActivity.class;

@@ -1,0 +1,1 @@
+<WakefulIntentService listener="medic.gateway.AlarmListener"/>
