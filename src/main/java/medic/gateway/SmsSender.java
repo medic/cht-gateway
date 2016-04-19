@@ -8,14 +8,20 @@ import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
 
 public class SmsSender {
+	private final Context ctx;
+
+	public SmsSender(Context ctx) {
+		this.ctx = ctx;
+	}
+
 	public void sendUnsentSmses() {
 		for(WoMessage m : WoRepo.$.getUnsent()) {
 			try {
 				sendSms(m);
-				m.status = "pending";
+				m.status = WoMessage.Status.PENDING;
 			} catch(Exception ex) {
 				if(DEBUG) ex.printStackTrace();
-				m.status = "failed";
+				m.status = WoMessage.Status.FAILED;
 			} finally {
 				WoRepo.$.save(m);
 			}
@@ -26,6 +32,8 @@ public class SmsSender {
 		if(DEBUG) System.err.println("#####################");
 		if(DEBUG) System.err.println("# Sending message: " + m);
 		if(DEBUG) System.err.println("#####################");
+
+		logEvent(ctx, "sendSms() :: [" + m.to + "] '" + m.content + "'");
 	}
 
 	private void log(String message, Object...extras) {

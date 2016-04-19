@@ -22,7 +22,7 @@ public class WakefulService extends WakefulIntentService {
 		if(DEBUG) System.err.println("#####################################");
 
 		try {
-			new SmsSender().sendUnsentSmses();
+			new SmsSender(this).sendUnsentSmses();
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();
 			logEvent(this, "Exception caught trying to send SMSes: " + ex.getMessage());

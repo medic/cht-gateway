@@ -5,11 +5,13 @@ import android.content.*;
 import android.os.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.json.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
+import static medic.gateway.JsonUtils.json;
 
 public class WebappPoller {
 	private final Context ctx;
@@ -19,10 +21,25 @@ public class WebappPoller {
 	}
 
 	public void pollWebapp() throws IOException, JSONException {
+		JSONObject request = buildRequest();
+
 		SettingsStore settings = SettingsStore.in(ctx);
-		JSONObject res = new SimpleJsonClient2().get(settings.getWebappUrl() + "/api/v1/messages"); // TODO check proper URL
-		if(DEBUG) log(res.toString());
-		JSONArray messages = res.getJSONArray("messages");
+		SimpleResponse response = new SimpleJsonClient2().post(settings.getWebappUrl(), request);
+		if(DEBUG) log(response.toString());
+
+		if(response.isError()) {
+			handleError(response);
+		} else {
+			handleJsonResponse(((JsonResponse) response).json);
+		}
+	}
+
+	private void handleJsonResponse(JSONObject response) throws JSONException {
+		if(!response.has("messages")) {
+			return;
+		}
+
+		JSONArray messages = response.getJSONArray("messages");
 		for(int i=0; i<messages.length(); ++i) {
 			try {
 				saveMessage(messages.getJSONObject(i));
@@ -32,8 +49,55 @@ public class WebappPoller {
 		}
 	}
 
+	private JSONObject buildRequest() throws JSONException {
+		JSONObject request = new JSONObject();
+		request.put("messages", getWebappTerminatingMessages());
+		request.put("deliveries", getDeliveryReports());
+		return request;
+	}
+
+	private JSONArray getWebappTerminatingMessages() {
+		JSONArray messages = new JSONArray();
+
+		List<WtMessage> waitingMessages = WtRepo.$.getWaiting();
+		for(WtMessage m : waitingMessages) {
+			try {
+				messages.put(json(
+					"id", m.id,
+					"from", m.from,
+					"content", m.content
+				));
+				m.status = WtMessage.Status.FORWARDED;
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+				logEvent(ctx, "Failed to create json for message: " + m);
+				m.status = WtMessage.Status.FAILED;
+			}
+		}
+		WtRepo.$.updateAll(waitingMessages);
+
+		return messages;
+	}
+
+	private JSONArray getDeliveryReports() {
+		// TODO we'll handle this when we actually support delivery reports
+		return new JSONArray();
+	}
+
+	private void handleError(SimpleResponse response) throws JSONException {
+		String description = "unknown";
+
+		if(response instanceof JsonResponse) {
+			JsonResponse jsonResponse = (JsonResponse) response;
+			if(jsonResponse.json.has("message")) description = jsonResponse.json.getString("message");
+		}
+
+		logEvent(ctx, "Received error from server: " + response.status + ": " + description);
+	}
+
 	private void saveMessage(JSONObject m) throws JSONException {
-		WoRepo.$.save(new WoMessage(m.getString("to"), m.getString("message")));
+		logEvent(ctx, "Saving WO message: " + m);
+		WoRepo.$.save(new WoMessage(m.getString("to"), m.getString("content")));
 	}
 
 	private void log(String message, Object...extras) {

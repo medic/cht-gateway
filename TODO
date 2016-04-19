@@ -1,6 +1,6 @@
 TODO 
 
-* implement the JSON API
+* display lists of messages on the appropriate tabs
 * write messages to SQLite database
 * actually send SMS
 * add the stuff for kit-e-kat support
@@ -12,6 +12,7 @@ TODO
 
 LATER
 
+* add timestamps to messages
 * include a last-successful-transmission time in case `medic-gateway` has issues reading webapp's response?
 * consider authentication - some kind of shared secret?
 * get list views working on a reload-on-scroll basis

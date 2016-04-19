@@ -67,6 +67,74 @@ public class SimpleJsonClient2 {
 		}
 	}
 
+	public SimpleResponse post(String url, JSONObject content) {
+		if(DEBUG) traceMethod("post", "url", url);
+		try {
+			return post(new URL(url), content);
+		} catch(MalformedURLException ex) {
+			return new ExceptionResponse(-1, ex);
+		}
+	}
+
+	public SimpleResponse post(URL url, JSONObject content) {
+		if(DEBUG) traceMethod("post", "url", url);
+		HttpURLConnection conn = null;
+		OutputStream outputStream = null;
+		InputStream inputStream = null;
+		try {
+			conn = (HttpURLConnection) url.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Accept", "application/json");
+			conn.setRequestProperty("Accept-Charset", "utf-8");
+			conn.setRequestProperty("Cache-Control", "no-cache");
+			conn.setRequestProperty("Content-Type", "application/json");
+
+			outputStream = conn.getOutputStream();
+			outputStream.write(content.toString().getBytes("UTF-8"));
+
+			if(conn.getResponseCode() < 400) {
+				inputStream = conn.getInputStream();
+			} else {
+				inputStream = conn.getErrorStream();
+			}
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
+			StringBuilder bob = new StringBuilder();
+
+			String line = null;
+			while((line = reader.readLine()) != null) {
+				bob.append(line + "\n");
+			}
+			String jsonString = bob.toString();
+			if(DEBUG) log("post", "Retrieved JSON: " + jsonString);
+
+			return new JsonResponse(conn.getResponseCode(),
+					new JSONObject(jsonString));
+		} catch (IOException | JSONException ex) {
+			int responseCode = -1;
+			try {
+				responseCode = conn.getResponseCode();
+			} catch(Exception ignore) {}
+			return new ExceptionResponse(responseCode, ex);
+		} finally {
+			if(outputStream != null) try {
+				outputStream.close();
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+			}
+			if(inputStream != null) try {
+				inputStream.close();
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+			}
+			if(conn != null) try {
+				conn.disconnect();
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+			}
+		}
+	}
+
 	private static void traceMethod(String methodName, Object...args) {
 		StringBuilder bob = new StringBuilder();
 		for(int i=0; i<args.length; i+=2) {
@@ -82,5 +150,35 @@ public class SimpleJsonClient2 {
 		if(DEBUG) System.err.println("LOG | SimpleJsonClient2." +
 				methodName + "()" +
 				message);
+	}
+}
+
+abstract class SimpleResponse {
+	final int status;
+
+	SimpleResponse(int status) {
+		this.status = status;
+	}
+
+	boolean isError() {
+		return this.status >= 400;
+	}
+}
+
+class ExceptionResponse extends SimpleResponse {
+	final Exception ex;
+
+	ExceptionResponse(int status, Exception ex) {
+		super(status);
+		this.ex = ex;
+	}
+}
+
+class JsonResponse extends SimpleResponse {
+	final JSONObject json;
+
+	JsonResponse(int status, JSONObject json) {
+		super(status);
+		this.json = json;
 	}
 }
