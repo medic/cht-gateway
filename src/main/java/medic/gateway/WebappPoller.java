@@ -14,10 +14,14 @@ import static medic.gateway.DebugLog.logEvent;
 import static medic.gateway.Utils.json;
 
 public class WebappPoller {
+	private static final int MAX_WT_MESSAGES = 10;
+
 	private final Context ctx;
+	private final Db db;
 
 	public WebappPoller(Context ctx) {
 		this.ctx = ctx;
+		this.db = Db.getInstance(ctx);
 	}
 
 	public void pollWebapp() throws IOException, JSONException {
@@ -59,7 +63,7 @@ public class WebappPoller {
 	private JSONArray getWebappTerminatingMessages() {
 		JSONArray messages = new JSONArray();
 
-		List<WtMessage> waitingMessages = WtRepo.$.getWaiting();
+		List<WtMessage> waitingMessages = db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING);
 		for(WtMessage m : waitingMessages) {
 			try {
 				messages.put(json(
@@ -74,7 +78,7 @@ public class WebappPoller {
 				m.setStatus(WtMessage.Status.FAILED);
 			}
 		}
-		WtRepo.$.updateAll(waitingMessages);
+		db.update(waitingMessages);
 
 		return messages;
 	}
@@ -101,7 +105,7 @@ public class WebappPoller {
 				json.getString("id"),
 				json.getString("to"),
 				json.getString("content"));
-		WoRepo.$.save(m);
+		db.store(m);
 	}
 
 	private void log(String message, Object...extras) {

@@ -1,6 +1,5 @@
 TODO 
 
-* write messages to SQLite database
 * actually send SMS
 * add the stuff for kit-e-kat support
 * make sure that incoming messages are not processed twice on kit-e-kat
@@ -8,6 +7,7 @@ TODO
 * update proguard config for alarm listener: "For production use, ProGuard may rename your AlarmListener class, which will foul up access to your metadata. To stop this from happening, you will need to add a -keep line to your ProGuard configuration file (e.g., proguard.cfg) to stop ProGuard from renaming it."
 * make sure that repeatedly passing the same messages to `medic-gateway` will not result in them being processed multiple times
 * don't cancel-and-restart in StartupActivity if not necessary
+* use save-or-update when writing to database to make message saving idempotent
 
 LATER
 

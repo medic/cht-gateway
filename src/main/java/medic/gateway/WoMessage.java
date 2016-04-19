@@ -18,12 +18,22 @@ class WoMessage implements Map<String, String>, Comparable<WoMessage> {
 		this.content = content;
 	}
 
+	public WoMessage(String id, Status status, long lastAction, String to, String content) {
+		this.id = id;
+		this.status = status;
+		this.lastAction = lastAction;
+		this.to = to;
+		this.content = content;
+	}
+
 //> ACCESSORS
 	public Status getStatus() { return status; }
 	public void setStatus(Status status) {
 		this.lastAction = System.currentTimeMillis();
 		this.status = status;
 	}
+
+	public long getLastAction() { return lastAction; }
 
 //> java.lang.Comparable methods
 	public int compareTo(WoMessage that) {

@@ -8,14 +8,18 @@ import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
 
 public class SmsSender {
+	private static final int MAX_WO_MESSAGES = 10;
+
 	private final Context ctx;
+	private final Db db;
 
 	public SmsSender(Context ctx) {
 		this.ctx = ctx;
+		this.db = Db.getInstance(ctx);
 	}
 
 	public void sendUnsentSmses() {
-		for(WoMessage m : WoRepo.$.getUnsent()) {
+		for(WoMessage m : db.getWoMessages(MAX_WO_MESSAGES, WoMessage.Status.UNSENT)) {
 			try {
 				sendSms(m);
 				m.setStatus(WoMessage.Status.PENDING);
@@ -23,7 +27,7 @@ public class SmsSender {
 				if(DEBUG) ex.printStackTrace();
 				m.setStatus(WoMessage.Status.FAILED);
 			} finally {
-				WoRepo.$.save(m);
+				db.update(m);
 			}
 		}
 	}

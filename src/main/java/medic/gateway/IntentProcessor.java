@@ -8,8 +8,6 @@ import static medic.gateway.DebugLog.logEvent;
 import static android.provider.Telephony.Sms.Intents.*;
 
 public class IntentProcessor extends BroadcastReceiver {
-	private WtRepo wtRepo = WtRepo.$;
-
 	public void onReceive(Context ctx, Intent intent) {
 		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
 
@@ -20,16 +18,16 @@ public class IntentProcessor extends BroadcastReceiver {
 
 		try {
 			if(intent.getAction().equals(SMS_RECEIVED_ACTION)) {
-				handleSmsReceived(intent);
+				handleSmsReceived(Db.getInstance(ctx), intent);
 			} else throw new IllegalStateException("Unexpected intent: " + intent);
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();
 		}
 	}
 
-	private void handleSmsReceived(Intent intent) {
+	private void handleSmsReceived(Db db, Intent intent) {
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
-			wtRepo.save(m);
+			db.store(m);
 		}
 	}
 

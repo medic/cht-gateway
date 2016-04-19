@@ -8,8 +8,8 @@ class WtMessage implements Map<String, String>, Comparable<WtMessage> {
 	public enum Status { WAITING, FORWARDED, FAILED }
 
 	public final String id;
-	private long lastAction;
 	private Status status;
+	private long lastAction;
 	public final String from;
 	public final String content;
 
@@ -20,12 +20,22 @@ class WtMessage implements Map<String, String>, Comparable<WtMessage> {
 		this.content = content;
 	}
 
+	public WtMessage(String id, Status status, long lastAction, String from, String content) {
+		this.id = id;
+		this.status = status;
+		this.lastAction = lastAction;
+		this.from = from;
+		this.content = content;
+	}
+
 //> ACCESSORS
 	public Status getStatus() { return status; }
 	public void setStatus(Status status) {
 		this.lastAction = System.currentTimeMillis();
 		this.status = status;
 	}
+
+	public long getLastAction() { return lastAction; }
 
 //> java.lang.Comparable methods
 	public int compareTo(WtMessage that) {
