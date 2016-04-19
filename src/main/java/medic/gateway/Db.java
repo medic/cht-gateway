@@ -125,9 +125,10 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 //> WoMessage HANDLERS
-	void store(WoMessage m) {
+	boolean store(WoMessage m) {
 		if(DEBUG) log("store() :: storing WoMessage :: %s", m);
-		db.insert(tblWO_MESSAGE, null, getContentValues(m));
+		long id = db.insert(tblWO_MESSAGE, null, getContentValues(m));
+		return id != -1;
 	}
 
 	void update(WoMessage m) {
@@ -184,16 +185,17 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 //> WtMessage HANDLERS
-	void store(SmsMessage sms) {
+	boolean store(SmsMessage sms) {
 		WtMessage m = new WtMessage(
 				sms.getOriginatingAddress(),
 				sms.getMessageBody());
-		store(m);
+		return store(m);
 	}
 
-	void store(WtMessage m) {
+	boolean store(WtMessage m) {
 		if(DEBUG) log("store() :: storing WtMessage :: %s", m);
-		db.insert(tblWT_MESSAGE, null, getContentValues(m));
+		long id = db.insert(tblWT_MESSAGE, null, getContentValues(m));
+		return id != -1;
 	}
 
 	void update(Collection<WtMessage> messages) {

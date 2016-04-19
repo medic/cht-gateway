@@ -105,7 +105,8 @@ public class WebappPoller {
 				json.getString("id"),
 				json.getString("to"),
 				json.getString("content"));
-		db.store(m);
+		boolean success = db.store(m);
+		if(!success) logEvent(ctx, "Failed to save WO message: " + json);
 	}
 
 	private void log(String message, Object...extras) {

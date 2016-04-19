@@ -18,16 +18,18 @@ public class IntentProcessor extends BroadcastReceiver {
 
 		try {
 			if(intent.getAction().equals(SMS_RECEIVED_ACTION)) {
-				handleSmsReceived(Db.getInstance(ctx), intent);
+				handleSmsReceived(ctx, intent);
 			} else throw new IllegalStateException("Unexpected intent: " + intent);
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();
 		}
 	}
 
-	private void handleSmsReceived(Db db, Intent intent) {
+	private void handleSmsReceived(Context ctx, Intent intent) {
+		Db db = Db.getInstance(ctx);
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
-			db.store(m);
+			boolean success = db.store(m);
+			if(!success) logEvent(ctx, "Failed to save received SMS to db: " + m);
 		}
 	}
 
