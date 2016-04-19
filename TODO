@@ -11,6 +11,7 @@ TODO
 
 LATER
 
+* consider if we should be reporting WoMessage.Status.REJECTED, or if this reference should be removed from the API
 * include a last-successful-transmission time in case `medic-gateway` has issues reading webapp's response?
 * consider authentication - some kind of shared secret?
 * get list views working on a reload-on-scroll basis
