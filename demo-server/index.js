@@ -125,6 +125,7 @@ Http.createServer(function(req, res) {
     }
     res.writeHead(500);
     res.end(JSON.stringify(body, null, 2));
+    console.log('    ERROR: ' + message);
   }
 
   if(!handler) {
