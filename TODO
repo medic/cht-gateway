@@ -1,6 +1,7 @@
 TODO 
 
 * actually send SMS
+* delete incoming SMS from the device's inbox (pre 4.4?)
 * add the stuff for kit-e-kat support
 * make sure that incoming messages are not processed twice on kit-e-kat
 * support delivery reports
