@@ -1,15 +1,6 @@
 var Http = require('http'),
     Url = require('url'),
-    datastore = {
-      requests: [],
-      webapp_terminating: [],
-      webapp_originating: {
-        waiting: [],
-        passed_to_gateway: [],
-      },
-      delivery_reports: [],
-      errors: [],
-    },
+    datastore,
     handlers = {
       '/': function(req, res) {
         var response;
@@ -23,6 +14,9 @@ var Http = require('http'),
                 datastore.webapp_originating.waiting.push(message);
                 res.end(ok({ added_message: message }));
               });
+          case 'DELETE':
+            resetDatastore();
+            return res.end(ok());
           default: throw new Error('Unhandled method.');
         }
       },
@@ -75,6 +69,19 @@ var Http = require('http'),
       },
     };
 
+function resetDatastore() {
+  datastore = {
+    requests: [],
+    webapp_terminating: [],
+    webapp_originating: {
+      waiting: [],
+      passed_to_gateway: [],
+    },
+    delivery_reports: [],
+    errors: [],
+  };
+}
+
 function ok(r) {
   if(!r) r = {};
   r.ok = true;
@@ -106,6 +113,9 @@ function assertHeader(req, key, expected) {
         'expected "' + expected + '", ' +
         'but got "' + actual + '"');
 }
+
+
+resetDatastore();
 
 Http.createServer(function(req, res) {
   var url = Url.parse(req.url),

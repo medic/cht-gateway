@@ -126,3 +126,7 @@ To add a webapp-originating message (to be send by `medic-gateway`):
 To simulate a request from `medic-gateway`:
 
 	curl -X POST http://localhost:8000/app -H "Accept: application/json" -H "Accept-Charset: utf-8" -H "Accept-Encoding: gzip" -H "Cache-Control: no-cache" -H "Content-Type: application/json" -d'{}'
+
+To clear the data stored on the server:
+
+	curl -X DELETE http://localhost:8000
