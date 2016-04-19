@@ -131,7 +131,7 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	void update(WoMessage m) {
-		if(DEBUG) log("store() :: updating WoMessage :: %s", m);
+		if(DEBUG) log("update() :: updating WoMessage :: %s", m);
 		ContentValues v = getContentValues(m);
 		db.update(tblWO_MESSAGE, v, "id=?", args(m.id));
 	}
@@ -201,7 +201,7 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	void update(WtMessage m) {
-		if(DEBUG) log("store() :: updating WtMessage :: %s", m);
+		if(DEBUG) log("update() :: updating WtMessage :: %s", m);
 		ContentValues v = getContentValues(m);
 		db.update(tblWT_MESSAGE, v, "id=?", args(m.id));
 	}
