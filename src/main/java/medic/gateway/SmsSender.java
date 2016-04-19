@@ -18,10 +18,10 @@ public class SmsSender {
 		for(WoMessage m : WoRepo.$.getUnsent()) {
 			try {
 				sendSms(m);
-				m.status = WoMessage.Status.PENDING;
+				m.setStatus(WoMessage.Status.PENDING);
 			} catch(Exception ex) {
 				if(DEBUG) ex.printStackTrace();
-				m.status = WoMessage.Status.FAILED;
+				m.setStatus(WoMessage.Status.FAILED);
 			} finally {
 				WoRepo.$.save(m);
 			}

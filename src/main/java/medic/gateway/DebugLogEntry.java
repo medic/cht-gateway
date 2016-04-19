@@ -14,6 +14,7 @@ public class DebugLogEntry implements Map<String, String> {
 		this.message = message;
 	}
 
+//> java.util.Map methods - implemented to provide easy display in a ListView
 	public String get(Object key) {
 		if("message".equals(key)) return message;
 		if("date".equals(key)) return DATE_FORMAT.format(new Date(timestamp));

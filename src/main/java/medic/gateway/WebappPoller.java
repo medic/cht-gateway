@@ -11,7 +11,7 @@ import org.json.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
-import static medic.gateway.JsonUtils.json;
+import static medic.gateway.Utils.json;
 
 public class WebappPoller {
 	private final Context ctx;
@@ -67,11 +67,11 @@ public class WebappPoller {
 					"from", m.from,
 					"content", m.content
 				));
-				m.status = WtMessage.Status.FORWARDED;
+				m.setStatus(WtMessage.Status.FORWARDED);
 			} catch(Exception ex) {
 				if(DEBUG) ex.printStackTrace();
 				logEvent(ctx, "Failed to create json for message: " + m);
-				m.status = WtMessage.Status.FAILED;
+				m.setStatus(WtMessage.Status.FAILED);
 			}
 		}
 		WtRepo.$.updateAll(waitingMessages);
@@ -95,9 +95,13 @@ public class WebappPoller {
 		logEvent(ctx, "Received error from server: " + response.status + ": " + description);
 	}
 
-	private void saveMessage(JSONObject m) throws JSONException {
-		logEvent(ctx, "Saving WO message: " + m);
-		WoRepo.$.save(new WoMessage(m.getString("to"), m.getString("content")));
+	private void saveMessage(JSONObject json) throws JSONException {
+		logEvent(ctx, "Saving WO message: " + json);
+		WoMessage m = new WoMessage(
+				json.getString("id"),
+				json.getString("to"),
+				json.getString("content"));
+		WoRepo.$.save(m);
 	}
 
 	private void log(String message, Object...extras) {

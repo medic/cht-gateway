@@ -2,13 +2,47 @@ package medic.gateway;
 
 import android.app.*;
 import android.os.*;
+import android.view.*;
+import android.widget.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
 
 public class WtListActivity extends Activity {
+	private static final String[] WT_LIST_FROM = {
+		"from",
+		"status",
+		"content",
+		"lastAction",
+	};
+	private static final int[] WT_LIST_TO = {
+		R.id.txtWtFrom,
+		R.id.txtWtStatus,
+		R.id.txtWtContent,
+		R.id.txtWtLastAction,
+	};
+
+	private ListView list;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message_list_wt);
+
+		list = (ListView) findViewById(R.id.lstWtMessages);
+
+		((Button) findViewById(R.id.btnRefreshWtMessageList))
+				.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) { refreshList(); }
+		});
+
+		refreshList();
+	}
+
+	private void refreshList() {
+		list.setAdapter(new SimpleAdapter(this,
+				WtRepo.$.getAll(),
+				R.layout.wt_list_item,
+				WT_LIST_FROM,
+				WT_LIST_TO));
 	}
 
 	private void log(String message, Object...extras) {
