@@ -36,3 +36,9 @@ kill:
 
 demo-server:
 	npm start
+
+
+.PHONY: stats
+
+stats:
+	./scripts/project_stats
