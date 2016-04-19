@@ -69,7 +69,7 @@ Requests and responses may be sent with `Content-Encoding` set to `gzip`.
 
 ### Success
 
-#### Http Status: `2xx`
+#### HTTP Status: `2xx`
 
 Clients may respond with any status code in the `200`-`299` range, as they feel is
 appropriate.  `medic-gateway` will treat all of these statuses the same.
@@ -87,7 +87,7 @@ appropriate.  `medic-gateway` will treat all of these statuses the same.
 		],
 	}
 
-### Error
+### HTTP Status `400`+
 
 Response codes of `400` and above will be treated as errors.
 
