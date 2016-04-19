@@ -121,7 +121,7 @@ To make the next good request to `/app` return an error:
 
 To add a webapp-originating message (to be send by `medic-gateway`):
 
-	curl -vvv -X POST -d '{ "to": "+447123555888", "message": "hi" }' http://localhost:8000
+	curl -vvv -X POST -d '{ "id": "3E105262-070C-4913-949B-E7ACA4F42B71", "to": "+447123555888", "content": "hi" }' http://localhost:8000
 
 To simulate a request from `medic-gateway`:
 
