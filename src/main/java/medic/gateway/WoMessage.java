@@ -3,7 +3,7 @@ package medic.gateway;
 import java.util.*;
 
 class WoMessage implements Map<String, String>, Comparable<WoMessage> {
-	public enum Status { UNSENT, PENDING, FAILED }
+	public enum Status { UNSENT, PENDING, FAILED, REJECTED }
 
 	public final String id;
 	private long lastAction;

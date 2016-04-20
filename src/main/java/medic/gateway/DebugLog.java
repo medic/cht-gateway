@@ -6,7 +6,8 @@ import java.text.*;
 import java.util.*;
 
 public class DebugLog {
-	public static void logEvent(Context ctx, String message) {
+	public static void logEvent(Context ctx, String message, Object... messageArgs) {
+		message = String.format(message, messageArgs);
 		Db.getInstance(ctx).store(new DebugLogEntry(System.currentTimeMillis(), message));
 	}
 }

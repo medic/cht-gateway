@@ -281,10 +281,6 @@ public class Db extends SQLiteOpenHelper {
 		return args;
 	}
 
-	private static String[] args(String... args) {
-		return args;
-	}
-
 	private void log(String message, Object... args) {
 		if(DEBUG) {
 			System.err.println("LOG | Db." + String.format(message, args));

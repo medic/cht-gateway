@@ -82,4 +82,17 @@ public class Utils {
 		long years = diff / ONE_YEAR;
 		return years + " years ago";
 	}
+
+	public static String[] args(String... args) {
+		return args;
+	}
+
+	public static String[] args(Object... args) {
+		String[] strings = new String[args.length];
+		for(int i=args.length-1; i>=0; --i) {
+			strings[i] = args[i] == null? null: args[i].toString();
+		}
+		return strings;
+	}
+
 }
