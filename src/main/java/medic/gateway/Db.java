@@ -148,6 +148,12 @@ public class Db extends SQLiteOpenHelper {
 		return v;
 	}
 
+	WoMessage getWoMessage(String id) {
+		List<WoMessage> matches = getWoMessages("id=?", args(id), null, 1);
+		if(matches.size() == 0) return null;
+		return matches.get(0);
+	}
+
 	List<WoMessage> getWoMessages(int maxCount) {
 		return getWoMessages(null, null, SortDirection.DESC, maxCount);
 	}
@@ -163,7 +169,7 @@ public class Db extends SQLiteOpenHelper {
 					cols(WO_clmID, WO_clmSTATUS, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT),
 					selection, selectionArgs,
 					NO_GROUP, NO_GROUP,
-					sort.apply(WO_clmLAST_ACTION),
+					sort == null? null: sort.apply(WO_clmLAST_ACTION),
 					Integer.toString(maxCount));
 
 			int count = c.getCount();

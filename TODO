@@ -1,12 +1,11 @@
 TODO 
 
-* actually send SMS
 * add the stuff for kit-e-kat support
 * make sure that incoming messages are not processed twice on kit-e-kat
-* support delivery reports
 * update proguard config for alarm listener: "For production use, ProGuard may rename your AlarmListener class, which will foul up access to your metadata. To stop this from happening, you will need to add a -keep line to your ProGuard configuration file (e.g., proguard.cfg) to stop ProGuard from renaming it."
 * don't cancel-and-restart in StartupActivity if not necessary
 * look at using cursor-adapters for lists
+* resolve TODOs in code, or create proper items for them
 
 LATER
 

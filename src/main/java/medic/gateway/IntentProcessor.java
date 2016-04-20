@@ -4,6 +4,7 @@ import android.content.*;
 import android.net.*;
 import android.telephony.*;
 
+import static android.app.Activity.RESULT_OK;
 import static android.provider.Telephony.Sms.Intents.*;
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.DebugLog.logEvent;
@@ -11,6 +12,8 @@ import static medic.gateway.Utils.*;
 
 public class IntentProcessor extends BroadcastReceiver {
 	private static final Uri SMS_INBOX = Uri.parse("content://sms/inbox");
+	static final String SENDING_REPORT = "medic.gateway.SENDING_REPORT";
+	static final String DELIVERY_REPORT = "medic.gateway.DELIVERY_REPORT";
 
 	public void onReceive(Context ctx, Intent intent) {
 		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
@@ -21,9 +24,19 @@ public class IntentProcessor extends BroadcastReceiver {
 		if(DEBUG) System.err.println("###############################");
 
 		try {
-			if(intent.getAction().equals(SMS_RECEIVED_ACTION)) {
-				handleSmsReceived(ctx, intent);
-			} else throw new IllegalStateException("Unexpected intent: " + intent);
+			switch(intent.getAction()) {
+				case SMS_RECEIVED_ACTION:
+					handleSmsReceived(ctx, intent);
+					break;
+				case SENDING_REPORT:
+					handleSendingReport(ctx, intent);
+					break;
+				case DELIVERY_REPORT:
+					handleDeliveryReport(ctx, intent);
+					break;
+				default:
+					throw new IllegalStateException("Unexpected intent: " + intent);
+			}
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();
 		}
@@ -53,6 +66,51 @@ public class IntentProcessor extends BroadcastReceiver {
 		int rowsDeleted = ctx.getContentResolver().delete(SMS_INBOX, "address=? AND date=? AND body=?",
 				args(sms.getOriginatingAddress(), sms.getTimestampMillis(), sms.getMessageBody()));
 		logEvent(ctx, "Attempted to delete %s; %s messages deleted.", sms, rowsDeleted);
+	}
+
+	// TODO should be within a DB transaction to avoid mis-updating a message
+	private void handleSendingReport(Context ctx, Intent intent) {
+		String id = intent.getStringExtra("id");
+		int part = intent.getIntExtra("part", -1);
+		logEvent(ctx, "Received delivery report for message %s part %s.", id, part);
+
+		Db db = Db.getInstance(ctx);
+		WoMessage m = db.getWoMessage(id);
+		if(m == null) {
+			logEvent(ctx, "Could not find SMS %s in database for sending report.", id);
+		} else if(m.getStatus() == WoMessage.Status.PENDING) {
+			int resultCode = getResultCode();
+			switch(resultCode) {
+				case RESULT_OK:
+					m.setStatus(WoMessage.Status.SENT);
+					break;
+				default:
+					m.setStatus(WoMessage.Status.FAILED);
+			}
+			logEvent(ctx, "Updating SMS %s to status %s (result code %s).", id, m.getStatus(), resultCode);
+			db.update(m);
+		} else {
+			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
+		}
+	}
+
+	// TODO should be within a DB transaction to avoid mis-updating a message
+	private void handleDeliveryReport(Context ctx, Intent intent) {
+		String id = intent.getStringExtra("id");
+		int part = intent.getIntExtra("part", -1);
+		logEvent(ctx, "Received delivery report for message %s part %s.", id, part);
+
+		Db db = Db.getInstance(ctx);
+		WoMessage m = db.getWoMessage(id);
+		if(m == null) {
+			logEvent(ctx, "Could not find SMS %s in database for delivery report.", id);
+		} else if(m.getStatus() == WoMessage.Status.SENT) {
+			m.setStatus(WoMessage.Status.DELIVERED);
+			logEvent(ctx, "Updating SMS %s to status %s.", id, m.getStatus());
+			db.update(m);
+		} else {
+			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
+		}
 	}
 
 	private void log(String message, Object...extras) {
