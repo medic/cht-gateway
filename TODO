@@ -1,5 +1,6 @@
 TODO 
 
+* transmit delivery reports to the webapp
 * add the stuff for kit-e-kat support
 * update proguard config for alarm listener: "For production use, ProGuard may rename your AlarmListener class, which will foul up access to your metadata. To stop this from happening, you will need to add a -keep line to your ProGuard configuration file (e.g., proguard.cfg) to stop ProGuard from renaming it."
 * don't cancel-and-restart in StartupActivity if not necessary
@@ -8,7 +9,6 @@ TODO
 
 LATER
 
-* consider if we should be reporting WoMessage.Status.REJECTED, or if this reference should be removed from the API
 * include a last-successful-transmission time in case `medic-gateway` has issues reading webapp's response?
 * consider authentication - some kind of shared secret?
 * get list views working on a reload-on-scroll basis
