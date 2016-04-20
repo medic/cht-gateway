@@ -28,11 +28,21 @@
 		<activity android:name="DebugLogActivity"/>
 		<activity android:name="WoListActivity"/>
 		<activity android:name="WtListActivity"/>
-		<receiver android:name="IntentProcessor" android:label="@string/app_name">
+		<receiver android:name="IntentProcessor" android:label="@string/app_name"
+				android:permission="android.permission.BROADCAST_SMS">
 			<intent-filter>
+				<action android:name="android.provider.Telephony.SMS_DELIVER"/>
 				<action android:name="android.provider.Telephony.SMS_RECEIVED"/>
 				<action android:name="medic.gateway.SENDING_REPORT"/>
 				<action android:name="medic.gateway.DELIVERY_REPORT"/>
+			</intent-filter>
+		</receiver>
+		<!-- Android 4.4+ (kitkat) SMS support -->
+		<receiver android:name="MmsIntentProcessor" android:label="@string/app_name"
+				android:permission="android.permission.BROADCAST_WAP_PUSH">
+			<intent-filter>
+				<action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+				<data android:mimeType="application/vnd.wap.mms-message" />
 			</intent-filter>
 		</receiver>
 		<receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver">
@@ -43,5 +53,37 @@
 					android:resource="@xml/wakeful"/>
 		</receiver>
 		<service android:name="WakefulService"/>
+
+		<!-- Android 4.4+ (kitkat) SMS support
+		     I think this refers to an external Activity, although it may just be that it doesn't work currently.
+		     Activity that allows the user to send new SMS/MMS messages -->
+		<activity android:name=".ComposeSmsActivity" >
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<action android:name="android.intent.action.SENDTO" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="sms" />
+				<data android:scheme="smsto" />
+				<data android:scheme="mms" />
+				<data android:scheme="mmsto" />
+			</intent-filter>
+		</activity>
+
+		<!-- Android 4.4+ (kitkat) SMS support
+		     I think this refers to an external Service, although it may just be that it doesn't work currently.
+		     Service that delivers messages from the phone "quick response" -->
+		<service android:name=".HeadlessSmsSendService"
+				 android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
+				 android:exported="true" >
+			<intent-filter>
+				<action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:scheme="sms" />
+				<data android:scheme="smsto" />
+				<data android:scheme="mms" />
+				<data android:scheme="mmsto" />
+			</intent-filter>
+		</service>
 	</application>
 </manifest>

@@ -40,11 +40,6 @@ public class IntentProcessor extends BroadcastReceiver {
 				case DELIVERY_REPORT:
 					handleDeliveryReport(ctx, intent);
 					break;
-				case WAP_PUSH_DELIVER_ACTION:
-					// We will receive WAP_PUSH_DELIVER_ACTION on Android 4.4+ if set as the
-					// default SMS application.
-					// TODO store MMS/WAP Push to the normal inbox
-					break;
 				default:
 					throw new IllegalStateException("Unexpected intent: " + intent);
 			}
