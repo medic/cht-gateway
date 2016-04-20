@@ -33,8 +33,6 @@ public class SettingsStore {
 		return s;
 	}
 
-	public boolean allowsConfiguration() { return true; }
-
 	public boolean hasSettings() {
 		return get() != null;
 	}
