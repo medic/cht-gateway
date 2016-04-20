@@ -26,6 +26,12 @@ public class IntentProcessor extends BroadcastReceiver {
 		try {
 			switch(intent.getAction()) {
 				case SMS_RECEIVED_ACTION:
+					if(!isDefaultSmsProvider(ctx)) {
+						// on Android 4.4+ (kitkat), we will receive both SMS_RECEIVED_ACTION
+						// _and_ SMS_DELIVER_ACTION if we are the default SMS app.  Ignoring
+						break;
+					}
+				case SMS_DELIVER_ACTION:
 					handleSmsReceived(ctx, intent);
 					break;
 				case SENDING_REPORT:

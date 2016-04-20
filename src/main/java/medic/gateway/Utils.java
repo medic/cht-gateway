@@ -1,5 +1,8 @@
 package medic.gateway;
 
+import android.content.*;
+import android.provider.*;
+
 import java.util.*;
 
 import org.json.*;
@@ -93,5 +96,9 @@ public class Utils {
 			strings[i] = args[i] == null? null: args[i].toString();
 		}
 		return strings;
+	}
+
+	public static boolean isDefaultSmsProvider(Context ctx) {
+		return Utils.class.getPackage().getName().equals(Telephony.Sms.getDefaultSmsPackage(ctx));
 	}
 }
