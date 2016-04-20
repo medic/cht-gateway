@@ -31,6 +31,7 @@ public class Db extends SQLiteOpenHelper {
 	private static final String tblWO_MESSAGE = "mo_message";
 	private static final String WO_clmID = "id";
 	private static final String WO_clmSTATUS = "status";
+	private static final String WO_clmSTATUS_FORWARDED = "status_forwarded";
 	private static final String WO_clmLAST_ACTION = "last_action";
 	private static final String WO_clmTO = "_to";
 	private static final String WO_clmCONTENT = "content";
@@ -74,9 +75,10 @@ public class Db extends SQLiteOpenHelper {
 					"%s TEXT NOT NULL PRIMARY KEY, " +
 					"%s TEXT NOT NULL, " +
 					"%s INTEGER NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
-				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
+				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_FORWARDED, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
 	}
 
 	public void init() {
@@ -142,6 +144,7 @@ public class Db extends SQLiteOpenHelper {
 		ContentValues v = new ContentValues();
 		v.put(WO_clmID, m.id);
 		v.put(WO_clmSTATUS, m.getStatus().toString());
+		v.put(WO_clmSTATUS_FORWARDED, m.statusForwarded? TRUE: FALSE);
 		v.put(WO_clmLAST_ACTION, m.getLastAction());
 		v.put(WO_clmTO, m.to);
 		v.put(WO_clmCONTENT, m.content);
@@ -159,7 +162,11 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	List<WoMessage> getWoMessages(int maxCount, WoMessage.Status status) {
-		return getWoMessages("status=?", args(status.toString()), SortDirection.ASC, maxCount);
+		return getWoMessages("?=?", args(WO_clmSTATUS, status), SortDirection.ASC, maxCount);
+	}
+
+	List<WoMessage> getWoMessagesWithStatusChanges(int maxCount) {
+		return getWoMessages("?=?", args(WO_clmSTATUS_FORWARDED, FALSE), SortDirection.ASC, maxCount);
 	}
 
 	private List<WoMessage> getWoMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
@@ -205,10 +212,6 @@ public class Db extends SQLiteOpenHelper {
 		return id != -1;
 	}
 
-	void update(Collection<WtMessage> messages) {
-		for(WtMessage m : messages) update(m);
-	}
-
 	void update(WtMessage m) {
 		if(DEBUG) log("update() :: updating WtMessage :: %s", m);
 		ContentValues v = getContentValues(m);
@@ -230,7 +233,7 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	List<WtMessage> getWtMessages(int maxCount, WtMessage.Status status) {
-		return getWtMessages("status=?", args(status.toString()), SortDirection.ASC, maxCount);
+		return getWtMessages("status=?", args(status), SortDirection.ASC, maxCount);
 	}
 
 	private List<WtMessage> getWtMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {

@@ -8,6 +8,8 @@ class WoMessage implements Map<String, String>, Comparable<WoMessage> {
 	public final String id;
 	private long lastAction;
 	private Status status;
+	/** Indicates if this status has been forwarded to the webapp yet. */
+	public boolean statusForwarded;
 	public final String to;
 	public final String content;
 
@@ -31,6 +33,7 @@ class WoMessage implements Map<String, String>, Comparable<WoMessage> {
 	public void setStatus(Status status) {
 		this.lastAction = System.currentTimeMillis();
 		this.status = status;
+		this.statusForwarded = false;
 	}
 
 	public long getLastAction() { return lastAction; }

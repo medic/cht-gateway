@@ -15,6 +15,7 @@ import static medic.gateway.Utils.json;
 
 public class WebappPoller {
 	private static final int MAX_WT_MESSAGES = 10;
+	private static final int MAX_WO_MESSAGES = 10;
 
 	private final Context ctx;
 	private final Db db;
@@ -25,20 +26,40 @@ public class WebappPoller {
 	}
 
 	public void pollWebapp() throws IOException, JSONException {
-		JSONObject request = buildRequest();
+		GatewayRequest request = new GatewayRequest(
+				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
+				db.getWoMessagesWithStatusChanges(MAX_WO_MESSAGES));
 
 		SettingsStore settings = SettingsStore.in(ctx);
-		SimpleResponse response = new SimpleJsonClient2().post(settings.getWebappUrl(), request);
+		SimpleResponse response = new SimpleJsonClient2().post(settings.getWebappUrl(), request.getJson());
 		if(DEBUG) log(response.toString());
 
 		if(response.isError()) {
 			handleError(response);
 		} else {
-			handleJsonResponse(((JsonResponse) response).json);
+			handleJsonResponse(request, ((JsonResponse) response).json);
 		}
 	}
 
-	private void handleJsonResponse(JSONObject response) throws JSONException {
+	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
+		for(WtMessage m : request.messages) {
+			try {
+				db.update(m);
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+				logEvent(ctx, "WebappPoller::Error updating WT message %s status: %s", m.id, ex.getMessage());
+			}
+		}
+
+		for(WoMessage m : request.statusUpdates) {
+			try {
+				db.update(m);
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+				logEvent(ctx, "WebappPoller::Error updating WO message %s status_forwarded value: %s", m.id, ex.getMessage());
+			}
+		}
+
 		if(!response.has("messages")) {
 			return;
 		}
@@ -51,44 +72,6 @@ public class WebappPoller {
 				if(DEBUG) ex.printStackTrace();
 			}
 		}
-	}
-
-	private JSONObject buildRequest() throws JSONException {
-		JSONObject request = new JSONObject();
-		request.put("messages", getWebappTerminatingMessages());
-		request.put("deliveries", getDeliveryReports());
-		return request;
-	}
-
-	private JSONArray getWebappTerminatingMessages() {
-		JSONArray messages = new JSONArray();
-
-		List<WtMessage> waitingMessages = db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING);
-		for(WtMessage m : waitingMessages) {
-			try {
-				messages.put(json(
-					"id", m.id,
-					"from", m.from,
-					"content", m.content
-				));
-				m.setStatus(WtMessage.Status.FORWARDED);
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-				logEvent(ctx, "Failed to create json for message: " + m);
-				m.setStatus(WtMessage.Status.FAILED);
-			}
-		}
-
-		// TODO we should only update these messages in the DB if the
-		// request to webapp was successful
-		db.update(waitingMessages);
-
-		return messages;
-	}
-
-	private JSONArray getDeliveryReports() {
-		// TODO we'll handle this when we actually support delivery reports
-		return new JSONArray();
 	}
 
 	private void handleError(SimpleResponse response) throws JSONException {
@@ -115,5 +98,60 @@ public class WebappPoller {
 	private void log(String message, Object...extras) {
 		if(DEBUG) System.err.println("LOG | WebappPoller :: " +
 				String.format(message, extras));
+	}
+}
+
+class GatewayRequest {
+	final List<WtMessage> messages;
+	final List<WoMessage> statusUpdates;
+
+	GatewayRequest(List<WtMessage> messages, List<WoMessage> statusUpdates) {
+		this.messages = messages;
+		this.statusUpdates = statusUpdates;
+	}
+
+	public JSONObject getJson() throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("messages", getMessagesJson());
+		json.put("deliveries", getStatusUpdateJson());
+		return json;
+	}
+
+	private JSONArray getMessagesJson() {
+		JSONArray json = new JSONArray();
+
+		for(WtMessage m : messages) {
+			try {
+				json.put(json(
+					"id", m.id,
+					"from", m.from,
+					"content", m.content
+				));
+				m.setStatus(WtMessage.Status.FORWARDED);
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+				m.setStatus(WtMessage.Status.FAILED);
+			}
+		}
+
+		return json;
+	}
+
+	private JSONArray getStatusUpdateJson() {
+		JSONArray json = new JSONArray();
+
+		for(WoMessage m : statusUpdates) {
+			try {
+				json.put(json(
+					"id", m.id,
+					"status", m.getStatus().toString()
+				));
+				m.statusForwarded = true;
+			} catch(Exception ex) {
+				if(DEBUG) ex.printStackTrace();
+			}
+		}
+
+		return json;
 	}
 }
