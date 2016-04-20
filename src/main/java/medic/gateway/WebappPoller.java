@@ -78,6 +78,9 @@ public class WebappPoller {
 				m.setStatus(WtMessage.Status.FAILED);
 			}
 		}
+
+		// TODO we should only update these messages in the DB if the
+		// request to webapp was successful
 		db.update(waitingMessages);
 
 		return messages;
