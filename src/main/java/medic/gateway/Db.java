@@ -88,6 +88,7 @@ public class Db extends SQLiteOpenHelper {
 			int newVersion) {
 	}
 
+//> DebugLogEntry HANDLERS
 	void store(DebugLogEntry e) {
 		if(DEBUG) log("store() :: storing DebugLogEntry :: %s", e.message);
 
@@ -277,6 +278,7 @@ public class Db extends SQLiteOpenHelper {
 		}
 	}
 
+//> STATIC HELPERS
 	private static String[] cols(String... args) {
 		return args;
 	}
