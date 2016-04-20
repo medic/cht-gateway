@@ -27,7 +27,7 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 
 	public long getMaxAge() {
 		// TODO return poll frequency in ms from config
-		return 30000L;
+		return 60000L;
 	}
 
 //> STATIC HELPERS
