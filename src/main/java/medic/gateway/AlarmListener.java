@@ -16,6 +16,7 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 	}
 
 	public void scheduleAlarms(AlarmManager am, PendingIntent pendingIntent, Context ctx) {
+		logEvent(ctx, "AlarmManager.scheduleAlarms()");
 		am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getPollInterval(ctx), pendingIntent);
 	}
 
