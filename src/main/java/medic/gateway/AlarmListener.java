@@ -10,14 +10,14 @@ import static medic.gateway.DebugLog.logEvent;
 public class AlarmListener implements WakefulIntentService.AlarmListener {
 	public AlarmListener() {}
 
-	public void restart(Context ctx) {
-		WakefulIntentService.cancelAlarms(ctx); // this may not be necessary - check docs
-		WakefulIntentService.scheduleAlarms(this, ctx);
-	}
-
 	public void scheduleAlarms(AlarmManager am, PendingIntent pendingIntent, Context ctx) {
-		logEvent(ctx, "AlarmManager.scheduleAlarms()");
-		am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getPollInterval(ctx), pendingIntent);
+		if(SettingsStore.in(ctx).isPollingEnabled()) {
+			logEvent(ctx, "AlarmManager.scheduleAlarms() :: polling enabled - setting alarms");
+			am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getPollInterval(ctx), pendingIntent);
+		} else {
+			logEvent(ctx, "AlarmManager.scheduleAlarms() :: polling disabled - cancelling alarms");
+			WakefulIntentService.cancelAlarms(ctx);
+		}
 	}
 
 	public void sendWakefulWork(Context ctx) {
@@ -28,6 +28,12 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 	public long getMaxAge() {
 		// TODO return poll frequency in ms from config
 		return 60000L;
+	}
+
+//> PUBLIC STATIC
+	public static void restart(Context ctx) {
+		WakefulIntentService.cancelAlarms(ctx);
+		WakefulIntentService.scheduleAlarms(new AlarmListener(), ctx);
 	}
 
 //> STATIC HELPERS

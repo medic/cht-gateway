@@ -6,6 +6,8 @@
 	<string name="errWebappUrl_serverNotFound">unable to contact server</string>
 	<string name="errWebappUrl_appNotFound">URL is not responding in the expected way</string>
 
+	<string name="cbxEnablePolling">Enable polling</string>
+
 	<string name="errRequired">required</string>
 	<string name="errInvalidUrl">must be a valid URL</string>
 

@@ -28,6 +28,7 @@ public class SettingsDialogActivity extends Activity {
 		}
 
 		text(R.id.txtWebappUrl, settings.getWebappUrl());
+		check(R.id.cbxEnablePolling, settings.isPollingEnabled());
 	}
 
 //> EVENT HANDLERS
@@ -38,6 +39,7 @@ public class SettingsDialogActivity extends Activity {
 		cancelButton().setEnabled(false);
 
 		String webappUrl = text(R.id.txtWebappUrl);
+		final boolean syncEnabled = checked(R.id.cbxEnablePolling);
 
 		new AsyncTask<String, Void, WebappUrlVerififcation>() {
 			protected WebappUrlVerififcation doInBackground(String... webappUrl) {
@@ -46,7 +48,8 @@ public class SettingsDialogActivity extends Activity {
 			}
 			protected void onPostExecute(WebappUrlVerififcation result) {
 				if(result.isOk) {
-					saveSettings(new Settings(result.webappUrl));
+					boolean savedOk = saveSettings(new Settings(result.webappUrl, syncEnabled));
+					if(savedOk) start();
 				} else {
 					showError(R.id.txtWebappUrl, result.failure);
 					submitButton().setEnabled(true);
@@ -67,21 +70,31 @@ public class SettingsDialogActivity extends Activity {
 		finish();
 	}
 
-	private void saveSettings(Settings s) {
+	private boolean saveSettings(Settings s) {
 		try {
 			settings.save(s);
-			new AlarmListener().restart(this);
-			startActivity(new Intent(this, MessageListsActivity.class));
-			finish();
+			return true;
 		} catch(IllegalSettingsException ex) {
 			if(DEBUG) ex.printStackTrace();
 			for(IllegalSetting error : ex.errors) {
 				showError(error);
 			}
+			return false;
 		} catch(SettingsException ex) {
 			if(DEBUG) ex.printStackTrace();
 			submitButton().setError(ex.getMessage());
+			return false;
 		}
+	}
+
+	private void start() {
+		AsyncTask.execute(new Runnable() {
+			public void run() {
+				AlarmListener.restart(SettingsDialogActivity.this);
+			}
+		});
+		startActivity(new Intent(this, MessageListsActivity.class));
+		finish();
 	}
 
 	private Button cancelButton() {
@@ -90,6 +103,16 @@ public class SettingsDialogActivity extends Activity {
 
 	private Button submitButton() {
 		return (Button) findViewById(R.id.btnSaveSettings);
+	}
+
+	private boolean checked(int componentId) {
+		CheckBox field = (CheckBox) findViewById(componentId);
+		return field.isChecked();
+	}
+
+	private void check(int componentId, boolean checked) {
+		CheckBox field = (CheckBox) findViewById(componentId);
+		field.setChecked(checked);
 	}
 
 	private String text(int componentId) {

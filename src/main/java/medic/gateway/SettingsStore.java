@@ -19,12 +19,14 @@ public class SettingsStore {
 
 	public long getPollInterval() { return 30 * 1000L; }
 
+	public boolean isPollingEnabled() { return prefs.getBoolean("polling-enabled", true); }
+
 	private String get(String key) {
 		return prefs.getString(key, null);
 	}
 
 	public Settings get() {
-		Settings s = new Settings(getWebappUrl());
+		Settings s = new Settings(getWebappUrl(), isPollingEnabled());
 		try {
 			s.validate();
 		} catch(IllegalSettingsException ex) {
@@ -42,6 +44,7 @@ public class SettingsStore {
 
 		SharedPreferences.Editor ed = prefs.edit();
 		ed.putString("app-url", s.webappUrl);
+		ed.putBoolean("polling-enabled", s.pollingEnabled);
 		if(!ed.commit()) throw new SettingsException(
 				"Failed to save to SharedPreferences.");
 	}
@@ -67,10 +70,12 @@ class Settings {
 			"http[s]?://([^/:]*)(:\\d*)?(.*)");
 
 	public final String webappUrl;
+	public final boolean pollingEnabled;
 
-	public Settings(String webappUrl) {
+	public Settings(String webappUrl, boolean pollingEnabled) {
 		if(DEBUG) log("Settings() webappUrl=%s", webappUrl);
 		this.webappUrl = webappUrl;
+		this.pollingEnabled = pollingEnabled;
 	}
 
 	public void validate() throws IllegalSettingsException {
