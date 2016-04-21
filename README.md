@@ -21,6 +21,23 @@ Where a list of values is expected but there are no values provided, it is accep
 
 Bar array behaviour specified above, `medic-gateway` _must_ include fields specified in this document, and the web server _must_ include all expected fields in its responses.  Either party _may_ include extra fields as they see fit.
 
+## Idempotence
+
+N.B. messages are cosidered duplicate by `medic-gateway` if they have identical values for `id`.  The webapp is expected to do the same.
+
+`medic-gateway` will not re-process duplicate webapp-originating messages.
+
+`medic-gateway` may forward a webapp-terminating message to the webapp multiple times.
+
+`medic-gateway` may forward a delivery status report to the webapp multiple times for the same message.  This should indicate a change of state, but duplicate delivery reports may be delivered in some circumstances, including:
+
+* the phone receives multiple delivery status reports from the mobile network for the same message
+* `medic-gateway` failed to process the webapp's response when the delivery report was last forwarded from `medic-gateway` to webapp
+
+## Messages
+
+THe entire API should be implemented by a webapp at a single endpoint, e.g. https://exmaple.com/medic-gateway-api-endpoint
+
 ## GET
 
 Expected response:
