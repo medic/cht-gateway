@@ -74,7 +74,6 @@ public class IntentProcessor extends BroadcastReceiver {
 		logEvent(ctx, "Attempted to delete %s; %s messages deleted.", sms, rowsDeleted);
 	}
 
-	// TODO should be within a DB transaction to avoid mis-updating a message
 	private void handleSendingReport(Context ctx, Intent intent) {
 		String id = intent.getStringExtra("id");
 		int part = intent.getIntExtra("part", -1);
@@ -94,13 +93,14 @@ public class IntentProcessor extends BroadcastReceiver {
 					m.setStatus(WoMessage.Status.FAILED);
 			}
 			logEvent(ctx, "Updating SMS %s to status %s (result code %s).", id, m.getStatus(), resultCode);
+			// TODO should use a more specific update, where we match the id, status and lastAction when
+			// choosing which row to update, and only changing status and lastAction fields
 			db.update(m);
 		} else {
 			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
 		}
 	}
 
-	// TODO should be within a DB transaction to avoid mis-updating a message
 	private void handleDeliveryReport(Context ctx, Intent intent) {
 		String id = intent.getStringExtra("id");
 		int part = intent.getIntExtra("part", -1);
@@ -113,6 +113,8 @@ public class IntentProcessor extends BroadcastReceiver {
 		} else if(m.getStatus() == WoMessage.Status.SENT) {
 			m.setStatus(WoMessage.Status.DELIVERED);
 			logEvent(ctx, "Updating SMS %s to status %s.", id, m.getStatus());
+			// TODO should use a more specific update, where we match the id, status and lastAction when
+			// choosing which row to update, and only changing status and lastAction fields
 			db.update(m);
 		} else {
 			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
