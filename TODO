@@ -2,6 +2,7 @@ TODO
 
 * pressing HBB on settings screen should do the same as Cancel if it's available
 * consider where DB transactions may be necessary
+* use https://developer.android.com/reference/android/provider/Telephony.Sms.Inbox.html to access sms inbox
 
 LATER
 
