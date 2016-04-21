@@ -5,11 +5,9 @@ import android.content.*;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
-import static medic.gateway.DebugLog.logEvent;
+import static medic.gateway.GatewayLog.*;
 
 public class AlarmListener implements WakefulIntentService.AlarmListener {
-	public AlarmListener() {}
-
 	public void scheduleAlarms(AlarmManager am, PendingIntent pendingIntent, Context ctx) {
 		if(SettingsStore.in(ctx).isPollingEnabled()) {
 			logEvent(ctx, "AlarmManager.scheduleAlarms() :: polling enabled - setting alarms");

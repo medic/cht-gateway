@@ -8,6 +8,7 @@ import static medic.gateway.R.string.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.BuildConfig.DISABLE_APP_URL_VALIDATION;
+import static medic.gateway.GatewayLog.*;
 
 public class WebappUrlVerifier {
 	public WebappUrlVerififcation verify(String webappUrl) {
@@ -51,12 +52,12 @@ public class WebappUrlVerifier {
 	}
 
 	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | WebappUrlVerifier::" +
-				String.format(message, extras));
+		trace(this, message, extras);
 	}
 }
 
-class WebappUrlVerififcation {
+@SuppressWarnings("PMD")
+final class WebappUrlVerififcation {
 	public final String webappUrl;
 	public final boolean isOk;
 	public final int failure;

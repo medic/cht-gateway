@@ -9,7 +9,7 @@ ifdef ComSpec	 # Windows
   GRADLEW := $(subst /,\,${GRADLEW})
 endif
 
-.PHONY: default assets clean deploy emulator kill logs prod
+.PHONY: default assets clean test deploy emulator kill logs prod
 
 default: clean deploy logs
 prod: clean deploy
@@ -18,12 +18,15 @@ clean:
 	rm -rf src/main/assets/
 	rm -rf build/
 
+test:
+	${GRADLEW} check
+
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
 	${ADB} wait-for-device
 
 logs:
-	${ADB} shell logcat | tee android.log
+	${ADB} logcat MedicGateway:V *:S | tee android.log
 
 deploy:
 	${GRADLEW} --daemon --parallel installDebug

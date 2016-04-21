@@ -37,6 +37,10 @@ class WtMessage implements Map<String, String>, Comparable<WtMessage> {
 
 	public long getLastAction() { return lastAction; }
 
+	public String toString() {
+		return String.format("%s@%s-%s", getClass().getSimpleName(), id, status);
+	}
+
 //> java.lang.Comparable methods
 	public int compareTo(WtMessage that) {
 		if(that == null) return -1;

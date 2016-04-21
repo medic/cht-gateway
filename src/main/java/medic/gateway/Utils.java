@@ -7,7 +7,9 @@ import java.util.*;
 
 import org.json.*;
 
-public class Utils {
+import static medic.gateway.BuildConfig.DEBUG;
+
+public final class Utils {
 	private static final String[] RANDOM_WORDS = {
 		"I", "a", "action", "admirable", "air", "all", "an", "and", "angel", "animals", "appears", "apprehension", "beauty", "brave", "but", "canopy", "congregation", "custom", "delights", "disposition", "dust", "earth", "excellent", "exercises", "express", "faculty", "fire", "firmament", "forgone", "form", "foul", "frame", "fretted", "god", "goes", "golden", "goodly", "have", "heavily", "how", "in", "indeed", "infinite", "is", "it", "know", "late", "like", "look", "lost", "majestical", "man", "me", "mirth", "most", "moving", "my", "neither", "no", "noble", "nor", "not", "of", "other", "overhanging", "paragon", "pestilential", "piece", "promontory", "quintessence", "reason", "roof", "seems", "so", "sterile", "than", "that", "the", "thing", "this", "to", "vapours", "what", "wherefore", "why", "with", "woman", "work", "world", "yet", "you",
 	};
@@ -15,13 +17,16 @@ public class Utils {
 	private static final long ONE_MINUTE = 1000 * 60;
 	private static final long ONE_HOUR = ONE_MINUTE * 60;
 	private static final long ONE_DAY = ONE_HOUR * 24;
+
 	private static final long TWO_DAYS = ONE_DAY * 2;
 	private static final long ONE_WEEK = ONE_DAY * 7;
 	private static final long ONE_MONTH = ONE_WEEK * 4;
 	private static final long ONE_YEAR = ONE_MONTH * 12;
 
+	private Utils() {}
+
 	public static JSONObject json(Object... keyVals) throws JSONException {
-		assert keyVals.length % 2 == 0;
+		if(DEBUG && keyVals.length % 2 != 0) throw new AssertionError();
 		JSONObject o = new JSONObject();
 		for(int i=keyVals.length-1; i>0; i-=2) {
 			o.put(keyVals[i-1].toString(), keyVals[i].toString());

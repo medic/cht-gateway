@@ -11,7 +11,7 @@ import java.util.*;
 import org.json.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
-import static medic.gateway.DebugLog.logEvent;
+import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.json;
 
 public class WebappPoller {
@@ -27,6 +27,8 @@ public class WebappPoller {
 	}
 
 	public void pollWebapp() throws JSONException, MalformedURLException {
+		trace(this, "pollWebapp()");
+
 		GatewayRequest request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
 				db.getWoMessagesWithStatusChanges(MAX_WO_MESSAGES));
@@ -45,21 +47,23 @@ public class WebappPoller {
 	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
 			try {
-				// TODO be more careful updating these messages - ideally they would only be updated if the current Status in the DB matches what was initially fetched (WAITING, at the time of writing)
+				// TODO be more careful updating these messages - ideally they would only
+				// be updated if the current Status in the DB matches what was initially
+				// fetched (WAITING, at the time of writing)
 				db.update(m);
 			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-				logEvent(ctx, "WebappPoller::Error updating WT message %s status: %s", m.id, ex.getMessage());
+				logException(ctx, ex, "WebappPoller::Error updating WT message %s status: %s", m.id, ex.getMessage());
 			}
 		}
 
 		for(WoMessage m : request.statusUpdates) {
 			try {
-				// TODO be more careful updating these messages - ideally they would only be updated if we are changing statusForwarded from `false` to `true` - once they're forwarded, there's no going back
+				// TODO be more careful updating these messages - ideally they would only
+				// be updated if we are changing statusForwarded from `false` to `true` -
+				// once they're forwarded, there's no going back
 				db.update(m);
 			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-				logEvent(ctx, "WebappPoller::Error updating WO message %s status_forwarded value: %s", m.id, ex.getMessage());
+				logException(ctx, ex, "WebappPoller::Error updating WO message %s status_forwarded value: %s", m.id, ex.getMessage());
 			}
 		}
 
@@ -72,7 +76,7 @@ public class WebappPoller {
 			try {
 				saveMessage(messages.getJSONObject(i));
 			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
+				logException(ex, "WebappPoller.handleJsonResponse()");
 			}
 		}
 	}
@@ -99,8 +103,7 @@ public class WebappPoller {
 	}
 
 	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | WebappPoller :: " +
-				String.format(message, extras));
+		trace("WebappPoller", message, extras);
 	}
 }
 
@@ -132,7 +135,7 @@ class GatewayRequest {
 				));
 				m.setStatus(WtMessage.Status.FORWARDED);
 			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
+				logException(ex, "GatewayRequest.getMessagesJson()");
 				m.setStatus(WtMessage.Status.FAILED);
 			}
 		}
@@ -151,7 +154,7 @@ class GatewayRequest {
 				));
 				m.statusForwarded = true;
 			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
+				logException(ex, "GatewayRequest.getStatusUpdateJson()");
 			}
 		}
 

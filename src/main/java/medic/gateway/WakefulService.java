@@ -6,8 +6,7 @@ import android.os.*;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
-import static medic.gateway.BuildConfig.DEBUG;
-import static medic.gateway.DebugLog.logEvent;
+import static medic.gateway.GatewayLog.*;
 
 public class WakefulService extends WakefulIntentService {
 	public WakefulService() {
@@ -20,14 +19,12 @@ public class WakefulService extends WakefulIntentService {
 		try {
 			new SmsSender(this).sendUnsentSmses();
 		} catch(Exception ex) {
-			if(DEBUG) ex.printStackTrace();
-			logEvent(this, "Exception caught trying to send SMSes: " + ex.getMessage());
+			logException(this, ex, "Exception caught trying to send SMSes: " + ex.getMessage());
 		}
 		try {
 			new WebappPoller(this).pollWebapp();
 		} catch(Exception ex) {
-			if(DEBUG) ex.printStackTrace();
-			logEvent(this, "Exception caught trying to poll webapp: " + ex.getMessage());
+			logException(this, ex, "Exception caught trying to poll webapp: " + ex.getMessage());
 		}
 	}
 }

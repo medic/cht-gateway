@@ -38,6 +38,10 @@ class WoMessage implements Map<String, String>, Comparable<WoMessage> {
 
 	public long getLastAction() { return lastAction; }
 
+	public String toString() {
+		return String.format("%s@%s-%s", getClass().getSimpleName(), id, status);
+	}
+
 //> java.lang.Comparable methods
 	public int compareTo(WoMessage that) {
 		if(that == null) return -1;

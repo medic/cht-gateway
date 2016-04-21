@@ -8,6 +8,7 @@ import java.net.*;
 import org.json.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.BuildConfig.LOG_TAG;
 
 /**
  * <p>New and improved - SimpleJsonClient2 is SimpleJsonClient, but using <code>
@@ -17,6 +18,7 @@ import static medic.gateway.BuildConfig.DEBUG;
  * @see java.net.HttpURLConnection
  * @see org.apache.http.impl.client.DefaultHttpClient
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class SimpleJsonClient2 {
 	static {
 		// HTTP connection reuse which was buggy pre-froyo
@@ -26,6 +28,7 @@ public class SimpleJsonClient2 {
 //		}
 	}
 
+//> PUBLIC METHODS
 	public SimpleResponse get(String url) throws MalformedURLException {
 		if(DEBUG) traceMethod("get", "url", url);
 		return get(new URL(url));
@@ -44,34 +47,14 @@ public class SimpleJsonClient2 {
 			} else {
 				inputStream = conn.getErrorStream();
 			}
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
-			StringBuilder bob = new StringBuilder();
 
-			String line = null;
-			while((line = reader.readLine()) != null) {
-				bob.append(line + "\n");
-			}
-			String jsonString = bob.toString();
-			if(DEBUG) log("get", "Retrieved JSON: " + jsonString);
 			return new JsonResponse(conn.getResponseCode(),
-					new JSONObject(jsonString));
+					jsonResponseFrom("get", inputStream));
 		} catch (JSONException | IOException ex) {
-			int responseCode = -1;
-			try {
-				responseCode = conn.getResponseCode();
-			} catch(Exception ignore) {}
-			return new ExceptionResponse(responseCode, ex);
+			return exceptionResponseFor(conn, ex);
 		} finally {
-			if(inputStream != null) try {
-				inputStream.close();
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-			}
-			if(conn != null) try {
-				conn.disconnect();
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-			}
+			closeSafely("get", inputStream);
+			closeSafely("get", conn);
 		}
 	}
 
@@ -102,40 +85,58 @@ public class SimpleJsonClient2 {
 			} else {
 				inputStream = conn.getErrorStream();
 			}
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
+
+			return new JsonResponse(conn.getResponseCode(),
+					jsonResponseFrom("post", inputStream));
+		} catch (IOException | JSONException ex) {
+			return exceptionResponseFor(conn, ex);
+		} finally {
+			closeSafely("post", outputStream);
+			closeSafely("post", inputStream);
+			closeSafely("post", conn);
+		}
+	}
+
+//> INSTANCE HELPERS
+	private JSONObject jsonResponseFrom(String method, InputStream in) throws IOException, JSONException {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new InputStreamReader(in, "UTF-8"), 8);
 			StringBuilder bob = new StringBuilder();
 
 			String line = null;
 			while((line = reader.readLine()) != null) {
-				bob.append(line + "\n");
+				bob.append(line).append('\n');
 			}
 			String jsonString = bob.toString();
-			if(DEBUG) log("post", "Retrieved JSON: " + jsonString);
-
-			return new JsonResponse(conn.getResponseCode(),
-					new JSONObject(jsonString));
-		} catch (IOException | JSONException ex) {
-			int responseCode = -1;
-			try {
-				responseCode = conn.getResponseCode();
-			} catch(Exception ignore) {}
-			return new ExceptionResponse(responseCode, ex);
+			if(DEBUG) log(method, "Retrieved JSON: %s", jsonString);
+			return new JSONObject(jsonString);
 		} finally {
-			if(outputStream != null) try {
-				outputStream.close();
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-			}
-			if(inputStream != null) try {
-				inputStream.close();
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-			}
-			if(conn != null) try {
-				conn.disconnect();
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-			}
+			closeSafely(method, reader);
+		}
+	}
+
+	private ExceptionResponse exceptionResponseFor(HttpURLConnection conn, Exception ex) {
+		int responseCode = -1;
+		try {
+			responseCode = conn.getResponseCode();
+		} catch(Exception ignore) {} // NOPMD
+		return new ExceptionResponse(responseCode, ex);
+	}
+
+	private void closeSafely(String method, Closeable c) {
+		if(c != null) try {
+			c.close();
+		} catch(Exception ex) {
+			log(ex, "SimpleJsonClient2.%s()", method);
+		}
+	}
+
+	private void closeSafely(String method, HttpURLConnection conn) {
+		if(conn != null) try {
+			conn.disconnect();
+		} catch(Exception ex) {
+			log(ex, "SimpleJsonClient2.%s()", method);
 		}
 	}
 
@@ -161,20 +162,23 @@ public class SimpleJsonClient2 {
 		StringBuilder bob = new StringBuilder();
 		for(int i=0; i<args.length; i+=2) {
 			bob.append(args[i]);
-			bob.append("=");
+			bob.append('=');
 			bob.append(args[i+1]);
-			bob.append(";");
+			bob.append(';');
 		}
 		log(methodName, bob.toString());
 	}
 
-	private static void log(String methodName, String message) {
-		if(DEBUG) System.err.println("LOG | SimpleJsonClient2." +
-				methodName + "()" +
-				message);
+	private static void log(String methodName, String message, Object... extras) {
+		Log.d(LOG_TAG, "SimpleJsonClient2." + methodName + "() :: " + String.format(message, extras));
+	}
+
+	private static void log(Exception ex, String message, Object... extras) {
+		Log.i(LOG_TAG, String.format(message, extras), ex);
 	}
 }
 
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 abstract class SimpleResponse {
 	final int status;
 

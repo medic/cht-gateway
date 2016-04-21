@@ -6,7 +6,7 @@ import android.view.*;
 import android.os.*;
 import android.widget.*;
 
-import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.GatewayLog.*;
 
 public class MessageListsActivity extends TabActivity {
 	private static final Class[] TAB_CLASSES = {
@@ -14,7 +14,7 @@ public class MessageListsActivity extends TabActivity {
 	};
 
 	public void onCreate(Bundle savedInstanceState) {
-		if(DEBUG) log("Starting...");
+		log("Starting...");
 		super.onCreate(savedInstanceState);
 
 		TabHost tabHost = getTabHost();
@@ -49,7 +49,6 @@ public class MessageListsActivity extends TabActivity {
 	}
 
 	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | MessageListsActivity :: " +
-				String.format(message, extras));
+		trace(this, message, extras);
 	}
 }

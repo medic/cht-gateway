@@ -5,19 +5,18 @@ import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
-import android.widget.AdapterView.OnItemClickListener;
 
 import java.util.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
-import static android.view.View.GONE;
+import static medic.gateway.GatewayLog.*;
 
 public class SettingsDialogActivity extends Activity {
 	private SettingsStore settings;
 
 	public void onCreate(Bundle savedInstanceState) {
-		if(DEBUG) log("Starting...");
 		super.onCreate(savedInstanceState);
+		log("Starting...");
 
 		this.settings = SettingsStore.in(this);
 
@@ -33,7 +32,7 @@ public class SettingsDialogActivity extends Activity {
 
 //> EVENT HANDLERS
 	public void verifyAndSave(View view) {
-		if(DEBUG) log("verifyAndSave");
+		log("verifyAndSave");
 
 		submitButton().setEnabled(false);
 		cancelButton().setEnabled(false);
@@ -43,7 +42,7 @@ public class SettingsDialogActivity extends Activity {
 
 		new AsyncTask<String, Void, WebappUrlVerififcation>() {
 			protected WebappUrlVerififcation doInBackground(String... webappUrl) {
-				assert webappUrl.length == 1;
+				if(DEBUG && webappUrl.length != 1) throw new AssertionError();
 				return new WebappUrlVerifier().verify(webappUrl[0]);
 			}
 			protected void onPostExecute(WebappUrlVerififcation result) {
@@ -60,7 +59,7 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 	public void cancelSettingsEdit(View view) {
-		if(DEBUG) log("cancelSettingsEdit");
+		log("cancelSettingsEdit");
 		backToMessageListsView();
 	}
 
@@ -83,13 +82,13 @@ public class SettingsDialogActivity extends Activity {
 			settings.save(s);
 			return true;
 		} catch(IllegalSettingsException ex) {
-			if(DEBUG) ex.printStackTrace();
+			logException(ex, "SettingsDialogActivity.saveSettings()");
 			for(IllegalSetting error : ex.errors) {
 				showError(error);
 			}
 			return false;
 		} catch(SettingsException ex) {
-			if(DEBUG) ex.printStackTrace();
+			logException(ex, "SettingsDialogActivity.saveSettings()");
 			submitButton().setError(ex.getMessage());
 			return false;
 		}
@@ -133,11 +132,6 @@ public class SettingsDialogActivity extends Activity {
 		field.setText(value);
 	}
 
-	private void removeError(int componentId) {
-		EditText field = (EditText) findViewById(componentId);
-		field.setError(null);
-	}
-
 	private void showError(IllegalSetting error) {
 		showError(error.componentId, error.errorStringId);
 	}
@@ -147,8 +141,7 @@ public class SettingsDialogActivity extends Activity {
 		field.setError(getString(stringId));
 	}
 
-	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | SettingsDialogActivity :: " +
-				String.format(message, extras));
+	private void log(String message, Object... extras) {
+		trace(this, message, extras);
 	}
 }

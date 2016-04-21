@@ -5,12 +5,12 @@ import android.content.*;
 import android.webkit.*;
 import android.os.*;
 
-import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.GatewayLog.*;
 
 public class StartupActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
-		if(DEBUG) log("Starting...");
 		super.onCreate(savedInstanceState);
+		log("Starting...");
 
 		Class newActivity;
 		if(SettingsStore.in(this).hasSettings()) {
@@ -19,14 +19,13 @@ public class StartupActivity extends Activity {
 			newActivity = SettingsDialogActivity.class;
 		}
 
-		if(DEBUG) log("Starting new activity with class %s", newActivity);
+		log("Starting new activity with class %s", newActivity);
 		startActivity(new Intent(this, newActivity));
 
 		finish();
 	}
 
 	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | StartupActivity :: " +
-				String.format(message, extras));
+		trace(this, message, extras);
 	}
 }

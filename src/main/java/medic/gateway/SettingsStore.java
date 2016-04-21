@@ -1,12 +1,16 @@
 package medic.gateway;
 
 import android.content.*;
+import android.util.*;
 
 import java.util.*;
 import java.util.regex.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.BuildConfig.LOG_TAG;
+import static medic.gateway.GatewayLog.*;
 
+@SuppressWarnings("PMD.ShortMethodName")
 public class SettingsStore {
 	private final SharedPreferences prefs;
 
@@ -50,18 +54,13 @@ public class SettingsStore {
 	}
 
 	public static SettingsStore in(Context ctx) {
-		if(DEBUG) log("Loading settings for context %s...", ctx);
+		Log.d(LOG_TAG, String.format("SettingStore :: loading for context: %s", ctx));
 
 		SharedPreferences prefs = ctx.getSharedPreferences(
 				SettingsStore.class.getName(),
 				Context.MODE_PRIVATE);
 
 		return new SettingsStore(prefs);
-	}
-
-	private static void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | SettingsStore :: " +
-				String.format(message, extras));
 	}
 }
 
@@ -73,7 +72,7 @@ class Settings {
 	public final boolean pollingEnabled;
 
 	public Settings(String webappUrl, boolean pollingEnabled) {
-		if(DEBUG) log("Settings() webappUrl=%s", webappUrl);
+		log("Settings() webappUrl=%s", webappUrl);
 		this.webappUrl = webappUrl;
 		this.pollingEnabled = pollingEnabled;
 	}
@@ -89,7 +88,7 @@ class Settings {
 					R.string.errInvalidUrl));
 		}
 
-		if(errors.size() > 0) {
+		if(!errors.isEmpty()) {
 			throw new IllegalSettingsException(errors);
 		}
 	}
@@ -99,8 +98,7 @@ class Settings {
 	}
 
 	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | Settings :: " +
-				String.format(message, extras));
+		trace(this, message, extras);
 	}
 }
 

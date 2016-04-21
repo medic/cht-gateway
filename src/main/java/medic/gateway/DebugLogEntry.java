@@ -4,8 +4,6 @@ import java.text.*;
 import java.util.*;
 
 public class DebugLogEntry implements Map<String, String> {
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
-
 	public final long timestamp;
 	public final String message;
 
@@ -17,7 +15,10 @@ public class DebugLogEntry implements Map<String, String> {
 //> java.util.Map methods - implemented to provide easy display in a ListView
 	public String get(Object key) {
 		if("message".equals(key)) return message;
-		if("date".equals(key)) return DATE_FORMAT.format(new Date(timestamp));
+		if("date".equals(key)) {
+			return SimpleDateFormat.getDateTimeInstance()
+					.format(new Date(timestamp));
+		}
 		throw new IllegalStateException();
 	}
 

@@ -5,7 +5,7 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 
-import static medic.gateway.BuildConfig.DEBUG;
+import static android.util.Log.*;
 
 public class DebugLogActivity extends Activity {
 	private static final String[] DEBUG_LOG_LIST_FROM = {
@@ -41,10 +41,5 @@ public class DebugLogActivity extends Activity {
 				R.layout.debug_log_item,
 				DEBUG_LOG_LIST_FROM,
 				DEBUG_LOG_LIST_TO));
-	}
-
-	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | DebugLogList :: " +
-				String.format(message, extras));
 	}
 }

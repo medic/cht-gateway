@@ -6,8 +6,7 @@ import android.telephony.*;
 
 import static android.app.Activity.RESULT_OK;
 import static android.provider.Telephony.Sms.Intents.*;
-import static medic.gateway.BuildConfig.DEBUG;
-import static medic.gateway.DebugLog.logEvent;
+import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
 public class IntentProcessor extends BroadcastReceiver {
@@ -39,8 +38,8 @@ public class IntentProcessor extends BroadcastReceiver {
 					throw new IllegalStateException("Unexpected intent: " + intent);
 			}
 		} catch(Exception ex) {
-			if(DEBUG) ex.printStackTrace();
-			logEvent(ctx, "IntentProcessor threw exception '%s' when processing intent: %s",
+			logException(ctx, ex,
+					"IntentProcessor threw exception '%s' when processing intent: %s",
 					ex.getClass(), ex.getMessage());
 		}
 	}
@@ -90,8 +89,9 @@ public class IntentProcessor extends BroadcastReceiver {
 					m.setStatus(WoMessage.Status.FAILED);
 			}
 			logEvent(ctx, "Updating SMS %s to status %s (result code %s).", id, m.getStatus(), resultCode);
-			// TODO should use a more specific update, where we match the id, status and lastAction when
-			// choosing which row to update, and only changing status and lastAction fields
+			// TODO should use a more specific update, where we match the id,
+			// status and lastAction when choosing which row to update, and only
+			// changing status and lastAction fields
 			db.update(m);
 		} else {
 			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
@@ -110,16 +110,12 @@ public class IntentProcessor extends BroadcastReceiver {
 		} else if(m.getStatus() == WoMessage.Status.SENT) {
 			m.setStatus(WoMessage.Status.DELIVERED);
 			logEvent(ctx, "Updating SMS %s to status %s.", id, m.getStatus());
-			// TODO should use a more specific update, where we match the id, status and lastAction when
-			// choosing which row to update, and only changing status and lastAction fields
+			// TODO should use a more specific update, where we match the id,
+			// status and lastAction when choosing which row to update, and only
+			// changing status and lastAction fields
 			db.update(m);
 		} else {
 			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
 		}
-	}
-
-	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | IntentProcessor :: " +
-				String.format(message, extras));
 	}
 }

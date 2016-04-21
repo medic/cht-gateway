@@ -5,8 +5,6 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 
-import static medic.gateway.BuildConfig.DEBUG;
-
 public class WtListActivity extends Activity {
 	private static final int MAX_WT_MESSAGES = 100;
 
@@ -47,10 +45,5 @@ public class WtListActivity extends Activity {
 				R.layout.wt_list_item,
 				WT_LIST_FROM,
 				WT_LIST_TO));
-	}
-
-	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | WtListActivity :: " +
-				String.format(message, extras));
 	}
 }

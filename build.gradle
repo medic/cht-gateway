@@ -1,18 +1,21 @@
 buildscript {
 	repositories {
 		mavenCentral()
+		jcenter()
 	}
 	dependencies {
 		classpath 'com.android.tools.build:gradle:1.2.3'
+		classpath 'com.noveogroup.android:check:1.2.3'
 	}
 }
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
+apply plugin: 'com.noveogroup.android.check'
 
 // enable verbose lint warnings
 gradle.projectsEvaluated {
 	tasks.withType(JavaCompile) {
-		// options.compilerArgs << '-Xlint:deprecation'
+		options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
 	}
 }
 
@@ -23,7 +26,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.commonsware.cwac:wakeful:1.0.+'
+	compile 'com.commonsware.cwac:wakeful:1.0.5'
 }
 
 def isReleaseBuild = {
@@ -42,9 +45,9 @@ def getVersionCode = {
 def getVersionName = {
 	if(isReleaseBuild()) {
 		if(System.env.TRAVIS == 'true') {
-			def v = System.env.COLLECT_VERSION_NAME
+			def v = System.env.GATEWAY_VERSION_NAME
 			if(!v) throw new RuntimeException(
-					'Missing required env var: COLLECT_VERSION_NAME')
+					'Missing required env var: GATEWAY_VERSION_NAME')
 			return v
 		} else return System.env.VERSION_TO_BUILD
 	}
@@ -68,14 +71,16 @@ android {
 	applicationVariants.all {
 		buildConfigField "String", "EXAMPLE_ENV_VAR", "\"${System.env.EXAMPLE}\"";
 		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
+		buildConfigField "String", "LOG_TAG", '"MedicGateway"'
+
 	}
 
 	signingConfigs {
 		release {
 			storeFile file(System.env.ANDROID_KEYSTORE_PATH ?: signingConfigs.debug.storeFile)
-			storePassword System.env.ANDROID_KEYSTORE_PASSWORD
-			keyAlias System.env.ANDROID_KEY_ALIAS
-			keyPassword System.env.ANDROID_KEY_PASSWORD
+			storePassword System.env.ANDROID_KEYSTORE_PASSWORD ?: signingConfigs.debug.storePassword
+			keyAlias System.env.ANDROID_KEY_ALIAS ?: signingConfigs.debug.keyAlias
+			keyPassword System.env.ANDROID_KEY_PASSWORD ?: signingConfigs.debug.keyPassword
 		}
 	}
 
@@ -85,5 +90,14 @@ android {
 			proguardFile getDefaultProguardFile('proguard-android.txt')
 			signingConfig signingConfigs.release
 		}
+	}
+
+	check {
+		abortOnError true
+	}
+
+	lintOptions {
+		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
+		disable 'IconMissingDensityFolder' // we don't care about nice icons at the moment
 	}
 }

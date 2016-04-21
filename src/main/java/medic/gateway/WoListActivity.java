@@ -5,8 +5,6 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 
-import static medic.gateway.BuildConfig.DEBUG;
-
 public class WoListActivity extends Activity {
 	private static final int MAX_WO_MESSAGES = 100;
 
@@ -47,10 +45,5 @@ public class WoListActivity extends Activity {
 				R.layout.wo_list_item,
 				WO_LIST_FROM,
 				WO_LIST_TO));
-	}
-
-	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | WoListActivity :: " +
-				String.format(message, extras));
 	}
 }

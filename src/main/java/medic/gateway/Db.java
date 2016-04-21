@@ -9,9 +9,11 @@ import java.util.*;
 
 import static java.util.UUID.randomUUID;
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
-public class Db extends SQLiteOpenHelper {
+@SuppressWarnings("PMD.GodClass")
+public final class Db extends SQLiteOpenHelper {
 	private static final int VERSION = 1;
 
 	private static final String ALL = null, NO_GROUP = null;
@@ -39,17 +41,17 @@ public class Db extends SQLiteOpenHelper {
 	private static final String TRUE = "1";
 	private static final String FALSE = "0";
 
-	private static Db INSTANCE;
-	public static synchronized Db getInstance(Context ctx) {
-		if(INSTANCE == null) {
-			INSTANCE = new Db(ctx);
-			INSTANCE.init();
-			if(DEBUG) INSTANCE.seed();
+	private static Db _instance;
+	public static synchronized Db getInstance(Context ctx) { // NOPMD
+		if(_instance == null) {
+			_instance = new Db(ctx);
+			_instance.init();
+			if(DEBUG) _instance.seed();
 		}
-		return INSTANCE;
+		return _instance;
 	}
 
-	private SQLiteDatabase db;
+	private SQLiteDatabase db; // NOPMD
 
 	private Db(Context ctx) {
 		super(ctx, "medic_gateway", null, VERSION);
@@ -85,15 +87,15 @@ public class Db extends SQLiteOpenHelper {
 		if(db == null) db = getWritableDatabase();
 	}
 
+	@Override
 	public void onUpgrade(SQLiteDatabase db,
 			int oldVersion,
 			int newVersion) {
+		// Handle DB upgrades here, once we start supporting released versions
 	}
 
 //> DebugLogEntry HANDLERS
 	void store(DebugLogEntry e) {
-		if(DEBUG) log("store() :: storing DebugLogEntry :: %s", e.message);
-
 		ContentValues v = new ContentValues();
 		v.put(LOG_clmTIMESTAMP, e.timestamp);
 		v.put(LOG_clmMESSAGE, e.message);
@@ -112,8 +114,8 @@ public class Db extends SQLiteOpenHelper {
 					Integer.toString(maxCount));
 
 			int count = c.getCount();
-			if(DEBUG) log("getLogEntries() :: item fetch count: %s", count);
-			ArrayList<DebugLogEntry> list = new ArrayList(count);
+			log("getLogEntries() :: item fetch count: %s", count);
+			ArrayList<DebugLogEntry> list = new ArrayList<>(count);
 			c.moveToFirst();
 			while(count-- > 0) {
 				list.add(new DebugLogEntry(
@@ -129,15 +131,15 @@ public class Db extends SQLiteOpenHelper {
 
 //> WoMessage HANDLERS
 	boolean store(WoMessage m) {
-		if(DEBUG) log("store() :: storing WoMessage :: %s", m);
+		log("store() :: %s", m);
 		long id = db.insert(tblWO_MESSAGE, null, getContentValues(m));
 		return id != -1;
 	}
 
 	void update(WoMessage m) {
-		if(DEBUG) log("update() :: updating WoMessage :: %s", m);
+		log("update() :: %s", m);
 		ContentValues v = getContentValues(m);
-		db.update(tblWO_MESSAGE, v, "id=?", args(m.id));
+		db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id));
 	}
 
 	private ContentValues getContentValues(WoMessage m) {
@@ -152,8 +154,8 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	WoMessage getWoMessage(String id) {
-		List<WoMessage> matches = getWoMessages("id=?", args(id), null, 1);
-		if(matches.size() == 0) return null;
+		List<WoMessage> matches = getWoMessages(eq(WO_clmID), args(id), null, 1);
+		if(matches.isEmpty()) return null;
 		return matches.get(0);
 	}
 
@@ -162,11 +164,11 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	List<WoMessage> getWoMessages(int maxCount, WoMessage.Status status) {
-		return getWoMessages("?=?", args(WO_clmSTATUS, status), SortDirection.ASC, maxCount);
+		return getWoMessages(eq(WO_clmSTATUS), args(status), SortDirection.ASC, maxCount);
 	}
 
 	List<WoMessage> getWoMessagesWithStatusChanges(int maxCount) {
-		return getWoMessages("?=?", args(WO_clmSTATUS_FORWARDED, FALSE), SortDirection.ASC, maxCount);
+		return getWoMessages(eq(WO_clmSTATUS_FORWARDED), args(FALSE), SortDirection.ASC, maxCount);
 	}
 
 	private List<WoMessage> getWoMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
@@ -180,8 +182,8 @@ public class Db extends SQLiteOpenHelper {
 					Integer.toString(maxCount));
 
 			int count = c.getCount();
-			if(DEBUG) log("getWoMessages() :: item fetch count: %s", count);
-			ArrayList<WoMessage> list = new ArrayList(count);
+			log("getWoMessages() :: item fetch count: %s", count);
+			ArrayList<WoMessage> list = new ArrayList<>(count);
 			c.moveToFirst();
 			while(count-- > 0) {
 				list.add(new WoMessage(
@@ -207,15 +209,15 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	boolean store(WtMessage m) {
-		if(DEBUG) log("store() :: storing WtMessage :: %s", m);
+		log("store() :: %s", m);
 		long id = db.insert(tblWT_MESSAGE, null, getContentValues(m));
 		return id != -1;
 	}
 
 	void update(WtMessage m) {
-		if(DEBUG) log("update() :: updating WtMessage :: %s", m);
+		log("update() :: %s", m);
 		ContentValues v = getContentValues(m);
-		db.update(tblWT_MESSAGE, v, "id=?", args(m.id));
+		db.update(tblWT_MESSAGE, v, eq(WT_clmID), args(m.id));
 	}
 
 	private ContentValues getContentValues(WtMessage m) {
@@ -233,7 +235,7 @@ public class Db extends SQLiteOpenHelper {
 	}
 
 	List<WtMessage> getWtMessages(int maxCount, WtMessage.Status status) {
-		return getWtMessages("status=?", args(status), SortDirection.ASC, maxCount);
+		return getWtMessages(eq(WT_clmSTATUS), args(status), SortDirection.ASC, maxCount);
 	}
 
 	private List<WtMessage> getWtMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
@@ -247,8 +249,8 @@ public class Db extends SQLiteOpenHelper {
 					Integer.toString(maxCount));
 
 			int count = c.getCount();
-			if(DEBUG) log("getWtMessages() :: item fetch count: %s", count);
-			ArrayList<WtMessage> list = new ArrayList(count);
+			log("getWtMessages() :: item fetch count: %s", count);
+			ArrayList<WtMessage> list = new ArrayList<>(count);
 			c.moveToFirst();
 			while(count-- > 0) {
 				list.add(new WtMessage(
@@ -292,10 +294,18 @@ public class Db extends SQLiteOpenHelper {
 		return args;
 	}
 
-	private void log(String message, Object... args) {
-		if(DEBUG) {
-			System.err.println("LOG | Db." + String.format(message, args));
+	private static String eq(String... cols) { // NOPMD
+		StringBuilder bob = new StringBuilder();
+		for(String col : cols) {
+			bob.append(" AND ")
+				.append(col)
+				.append("=?");
 		}
+		return bob.substring(5);
+	}
+
+	private void log(String message, Object... extras) {
+		trace(this, message, extras);
 	}
 }
 

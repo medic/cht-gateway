@@ -8,12 +8,12 @@ import android.telephony.*;
 import java.util.*;
 
 import static android.telephony.PhoneNumberUtils.isGlobalPhoneNumber;
-import static medic.gateway.BuildConfig.DEBUG;
-import static medic.gateway.DebugLog.logEvent;
+import static medic.gateway.GatewayLog.*;
 import static medic.gateway.IntentProcessor.DELIVERY_REPORT;
 import static medic.gateway.IntentProcessor.SENDING_REPORT;
 import static medic.gateway.Utils.*;
 
+@SuppressWarnings("PMD.LooseCoupling")
 public class SmsSender {
 	private static final int MAX_WO_MESSAGES = 10;
 	private static final String DEFAULT_SMSC = null;
@@ -32,14 +32,25 @@ public class SmsSender {
 	}
 
 	public void sendUnsentSmses() {
+		trace(this, "sendUnsentSmses()");
 		for(WoMessage m : db.getWoMessages(MAX_WO_MESSAGES, WoMessage.Status.UNSENT)) {
 			try {
+				trace(this, "sendUnsentSmses() :: attempting to send %s", m);
+
+				// TODO be more careful updating these messages - ideally they would only
+				// be updated if the current Status in the DB matches what was initially
+				// fetched (UNSENT, at the time of writing)
+				m.setStatus(WoMessage.Status.PENDING);
+				db.update(m);
+
 				sendSms(m);
 			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
+				logException(ex, "SmsSender.sendUnsentSmses()");
+
+				// TODO be more careful updating these messages - ideally they would only
+				// be updated if the current Status in the DB matches what was initially
+				// fetched (UNSENT, at the time of writing)
 				m.setStatus(WoMessage.Status.FAILED);
-			} finally {
-				// TODO be more careful updating these messages - ideally they would only be updated if the current Status in the DB matches what was initially fetched (UNSENT, at the time of writing)
 				db.update(m);
 			}
 		}
@@ -49,8 +60,6 @@ public class SmsSender {
 		logEvent(ctx, "sendSms() :: [" + m.to + "] '" + m.content + "'");
 
 		if(isGlobalPhoneNumber(m.to)) {
-			m.setStatus(WoMessage.Status.PENDING);
-
 			ArrayList<String> parts = smsManager.divideMessage(m.content);
 			smsManager.sendMultipartTextMessage(m.to, DEFAULT_SMSC,
 					parts,
@@ -59,7 +68,11 @@ public class SmsSender {
 		} else {
 			logEvent(ctx, "Not sending SMS to '%s' because number appears invalid ('%s')",
 					m.to, m.content);
+			// TODO be more careful updating these messages - ideally they would only
+			// be updated if the current Status in the DB matches what was initially
+			// fetched (UNSENT, at the time of writing)
 			m.setStatus(WoMessage.Status.REJECTED);
+			db.update(m);
 		}
 	}
 
@@ -85,10 +98,5 @@ public class SmsSender {
 		int requestCode = r.nextInt();
 
 		return PendingIntent.getBroadcast(ctx, requestCode, intent, NO_FLAGS);
-	}
-
-	private void log(String message, Object...extras) {
-		if(DEBUG) System.err.println("LOG | SmsSender :: " +
-				String.format(message, extras));
 	}
 }
