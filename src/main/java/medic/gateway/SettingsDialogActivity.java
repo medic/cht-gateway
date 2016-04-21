@@ -64,6 +64,14 @@ public class SettingsDialogActivity extends Activity {
 		backToMessageListsView();
 	}
 
+	public void onBackPressed() {
+		if(this.settings.hasSettings()) {
+			backToMessageListsView();
+		} else {
+			super.onBackPressed();
+		}
+	}
+
 //> PRIVATE HELPERS
 	private void backToMessageListsView() {
 		startActivity(new Intent(this, MessageListsActivity.class));
