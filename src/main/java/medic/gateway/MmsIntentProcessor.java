@@ -26,6 +26,8 @@ public class MmsIntentProcessor extends BroadcastReceiver {
 			}
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();
+			logEvent(ctx, "MmsIntentProcessor threw exception %s when processing intent: %s",
+					ex.getClass(), ex.getMessage());
 		}
 	}
 

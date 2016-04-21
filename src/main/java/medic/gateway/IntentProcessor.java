@@ -40,6 +40,8 @@ public class IntentProcessor extends BroadcastReceiver {
 			}
 		} catch(Exception ex) {
 			if(DEBUG) ex.printStackTrace();
+			logEvent(ctx, "IntentProcessor threw exception '%s' when processing intent: %s",
+					ex.getClass(), ex.getMessage());
 		}
 	}
 

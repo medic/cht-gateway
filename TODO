@@ -1,8 +1,6 @@
 TODO 
 
 * consider where DB transactions may be necessary
-* make sure that failed incoming SMS are logged
-* make sure that incoming MMS are logged
 
 LATER
 
