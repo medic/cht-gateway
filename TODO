@@ -3,7 +3,6 @@ TODO
 * consider where DB transactions may be necessary
 * make sure that failed incoming SMS are logged
 * make sure that incoming MMS are logged
-* remove all System.out/System.err calls, except in event logger
 
 LATER
 

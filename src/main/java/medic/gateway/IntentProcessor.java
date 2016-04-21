@@ -18,11 +18,6 @@ public class IntentProcessor extends BroadcastReceiver {
 	public void onReceive(Context ctx, Intent intent) {
 		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
 
-		if(DEBUG) System.err.println("###############################");
-		if(DEBUG) System.err.println("# IntentProcessor.onReceive() #");
-		if(DEBUG) System.err.println("# intent: " + intent);
-		if(DEBUG) System.err.println("###############################");
-
 		try {
 			switch(intent.getAction()) {
 				case SMS_RECEIVED_ACTION:

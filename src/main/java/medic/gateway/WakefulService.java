@@ -17,10 +17,6 @@ public class WakefulService extends WakefulIntentService {
 	public void doWakefulWork(Intent intent) {
 		logEvent(this, "WakefulService.doWakefulWork()");
 
-		if(DEBUG) System.err.println("#####################################");
-		if(DEBUG) System.err.println("# WakefulService.onStartCommand() #");
-		if(DEBUG) System.err.println("#####################################");
-
 		try {
 			new SmsSender(this).sendUnsentSmses();
 		} catch(Exception ex) {

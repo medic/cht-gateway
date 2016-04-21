@@ -14,11 +14,6 @@ public class MmsIntentProcessor extends BroadcastReceiver {
 	public void onReceive(Context ctx, Intent intent) {
 		logEvent(ctx, "MmsIntentProcessor.onReceive() :: " + intent.getAction());
 
-		if(DEBUG) System.err.println("###############################");
-		if(DEBUG) System.err.println("# MmsIntentProcessor.onReceive() #");
-		if(DEBUG) System.err.println("# intent: " + intent);
-		if(DEBUG) System.err.println("###############################");
-
 		try {
 			switch(intent.getAction()) {
 				case WAP_PUSH_DELIVER_ACTION:

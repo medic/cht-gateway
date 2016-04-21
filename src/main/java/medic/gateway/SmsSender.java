@@ -45,10 +45,6 @@ public class SmsSender {
 	}
 
 	private void sendSms(WoMessage m) {
-		if(DEBUG) System.err.println("#####################");
-		if(DEBUG) System.err.println("# Sending message: " + m);
-		if(DEBUG) System.err.println("#####################");
-
 		logEvent(ctx, "sendSms() :: [" + m.to + "] '" + m.content + "'");
 
 		if(isGlobalPhoneNumber(m.to)) {
