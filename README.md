@@ -34,11 +34,17 @@ N.B. messages are cosidered duplicate by `medic-gateway` if they have identical 
 * the phone receives multiple delivery status reports from the mobile network for the same message
 * `medic-gateway` failed to process the webapp's response when the delivery report was last forwarded from `medic-gateway` to webapp
 
+## Authorisation
+
+`medic-gateway` supports [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication).  Just include the username and password for your web endpoint when configuring `medic-gateway`, e.g.:
+
+	https://username:password@example.com/medic-gateway-api-endpoint
+
 ## Messages
 
 THe entire API should be implemented by a webapp at a single endpoint, e.g. https://exmaple.com/medic-gateway-api-endpoint
 
-## GET
+### GET
 
 Expected response:
 
@@ -46,13 +52,13 @@ Expected response:
 		"medic-gateway": true
 	}
 
-## POST
+### POST
 
 `medic-gateway` will accept and process any relevant data received in a response.  However, it may choose to only send certain types of information in a particular request (e.g. only provide a webapp-terminating SMS), and will also poll the web service periodically for webapp-originating messages, even if it has no new data to pass to the web service.
 
-## Request
+### Request
 
-### Headers
+#### Headers
 
 The following headers will be set by requests:
 
@@ -66,7 +72,7 @@ header           | value
 
 Requests and responses may be sent with `Content-Encoding` set to `gzip`.
 
-### Content
+#### Content
 
 	{
 		messages: [
@@ -86,16 +92,16 @@ Requests and responses may be sent with `Content-Encoding` set to `gzip`.
 		],
 	}
 
-## Response
+### Response
 
-### Success
+#### Success
 
-#### HTTP Status: `2xx`
+##### HTTP Status: `2xx`
 
 Clients may respond with any status code in the `200`-`299` range, as they feel is
 appropriate.  `medic-gateway` will treat all of these statuses the same.
 
-#### Content
+##### Content
 
 	{
 		messages: [
@@ -108,7 +114,7 @@ appropriate.  `medic-gateway` will treat all of these statuses the same.
 		],
 	}
 
-### HTTP Status `400`+
+#### HTTP Status `400`+
 
 Response codes of `400` and above will be treated as errors.
 
@@ -121,12 +127,14 @@ If the response's `Content-Type` header is set to `application/json`, `medic-gat
 
 The `message` property may be logged and/or displayed to users in the `medic-gateway` UI.
 
-### Other response codes
+#### Other response codes
 
 Treatment of response codes below `200` and between `300` and `399` will _probably_ be handled sensibly by Android.
 
 
 # `demo-server`
+
+## Local
 
 To start the demo server locally:
 
@@ -151,3 +159,19 @@ To simulate a request from `medic-gateway`:
 To clear the data stored on the server:
 
 	curl -X DELETE http://localhost:8000
+
+To set a username and password on the demo server:
+
+	curl -X POST -d'{"username":"alice", "password":"secret"}' http://localhost:8000/auth
+
+## Remote
+
+It's simple to deploy the demo server to remote NodeJS hosts.
+
+### Heroku
+
+TODO walkthrough
+
+### Modulus
+
+TODO walkthrough

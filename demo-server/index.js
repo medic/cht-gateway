@@ -28,7 +28,24 @@ var Http = require('http'),
             res.end(ok({ added_error: requestedError }));
           });
       },
+      '/auth': function(req, res) {
+        switch(req.method) {
+          case 'DELETE':
+            delete datastore.auth;
+            return res.end(ok());
+          case 'POST':
+            return readBody(req)
+              .then(JSON.parse)
+              .then(function(json) {
+                datastore.auth = json;
+                res.end(ok());
+              });
+          default: throw new Error('Unhandled method.');
+        }
+      },
       '/app': function(req, res) {
+        if(!handleAuth(req, res, datastore.auth)) return;
+
         if(req.method === 'GET' || req.method === 'POST') {
           datastore.requests.unshift({
             time: new Date().toString(),
@@ -68,6 +85,31 @@ var Http = require('http'),
         }
       },
     };
+
+function handleAuth(req, res, options) {
+  var error, header;
+
+  if(!options) return true;
+
+  try {
+    header = req.headers.authorization;
+    header = header.split(' ').pop();
+    header = new Buffer(header, 'base64').toString().split(':');
+
+    if(header[0] === options.username &&
+        header[1] === options.password) {
+      return true;
+    }
+    error = 'username or password did not match';
+  } catch(e) {
+    error = e;
+  }
+  console.log('    Auth failed:', error);
+  console.log('        headers:', req.headers);
+  res.writeHead(401);
+  res.end(JSON.stringify({ err:'Unauthorized' }, null, 2));
+  return false;
+}
 
 function resetDatastore() {
   datastore = {

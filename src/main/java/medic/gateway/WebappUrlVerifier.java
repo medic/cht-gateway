@@ -16,41 +16,37 @@ public class WebappUrlVerifier {
 		}
 
 		try {
-			JSONObject json = new SimpleJsonClient2().get(webappUrl);
+			SimpleResponse response = new SimpleJsonClient2().get(webappUrl);
 
-			if(json.optBoolean("medic-gateway"))
-				return WebappUrlVerififcation.ok(webappUrl);
+			if(DEBUG) {
+				log("##############################################");
+				log("# " + response);
+				log("##############################################");
+			}
 
-			return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_appNotFound);
+			if(response instanceof JsonResponse && response.status < 400)
+				return handleJsonResponse(webappUrl, (JsonResponse) response);
+			else return handleFailResponse(webappUrl, response);
 		} catch(MalformedURLException ex) {
-			// seems unlikely, as we should have verified this already
-			return WebappUrlVerififcation.failure(webappUrl,
-					errInvalidUrl);
-		} catch(JSONException ex) {
-			return WebappUrlVerififcation.failure(webappUrl,
-					errWebappUrl_appNotFound);
-		} catch(IOException ex) {
-			if(DEBUG) ex.printStackTrace();
-			return WebappUrlVerififcation.failure(webappUrl,
-					errWebappUrl_serverNotFound);
+			return WebappUrlVerififcation.failure(webappUrl, errInvalidUrl);
 		}
 	}
 
-	private boolean is200(String url) {
-		if(DEBUG) log("is200() :: url=%s", url);
-		HttpURLConnection conn = null;
-		try {
-			conn = (HttpURLConnection) new URL(url).openConnection();
-			return conn.getResponseCode() == 200;
-		} catch (Exception ex) {
-			if(DEBUG) ex.printStackTrace();
-			return false;
-		} finally {
-			if(conn != null) try {
-				conn.disconnect();
-			} catch(Exception ex) {
-				if(DEBUG) ex.printStackTrace();
-			}
+	private WebappUrlVerififcation handleJsonResponse(String webappUrl, JsonResponse response) {
+		if(response.json.optBoolean("medic-gateway"))
+			return WebappUrlVerififcation.ok(webappUrl);
+
+		return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_appNotFound);
+	}
+
+	private WebappUrlVerififcation handleFailResponse(String webappUrl, SimpleResponse response) {
+		switch(response.status) {
+			case 401:
+				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_unauthorised);
+			case -1:
+				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_serverNotFound);
+			default:
+				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_appNotFound);
 		}
 	}
 

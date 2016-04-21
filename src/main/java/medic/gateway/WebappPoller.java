@@ -5,6 +5,7 @@ import android.content.*;
 import android.os.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import org.json.*;
@@ -25,7 +26,7 @@ public class WebappPoller {
 		this.db = Db.getInstance(ctx);
 	}
 
-	public void pollWebapp() throws IOException, JSONException {
+	public void pollWebapp() throws JSONException, MalformedURLException {
 		GatewayRequest request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
 				db.getWoMessagesWithStatusChanges(MAX_WO_MESSAGES));
