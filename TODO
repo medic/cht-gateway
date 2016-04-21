@@ -5,7 +5,6 @@ TODO
 
 LATER
 
-* don't cancel-and-restart in StartupActivity if not necessary
 * look at using cursor-adapters for lists
 * include a last-successful-transmission time in case `medic-gateway` has issues reading webapp's response?
 * consider authentication - some kind of shared secret?
