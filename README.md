@@ -11,6 +11,16 @@ An SMS gateway for Android.  Send and receive SMS from your webapp via an Androi
 
 # API
 
+This is the API specification for communications between `medic-gateway` and a web server.  Messages in both directions are `application/json`.
+
+Where a list of values is expected but there are no values provided, it is acceptable to:
+
+* provide a `null` value; or
+* provide an empty array (`[]`); or
+* omit the field completely
+
+Bar array behaviour specified above, `medic-gateway` _must_ include fields specified in this document, and the web server _must_ include all expected fields in its responses.  Either party _may_ include extra fields as they see fit.
+
 ## GET
 
 Expected response:
@@ -22,12 +32,6 @@ Expected response:
 ## POST
 
 `medic-gateway` will accept and process any relevant data received in a response.  However, it may choose to only send certain types of information in a particular request (e.g. only provide a webapp-terminating SMS), and will also poll the web service periodically for webapp-originating messages, even if it has no new data to pass to the web service.
-
-If there are no entries for a list field (e.g. `deliveries`, `messages`), `medic-gateway` and clients may:
-
-* provide a `null` value; or
-* provide an empty array (`[]`); or
-* omit the field completely
 
 ## Request
 
