@@ -11,7 +11,7 @@ import static medic.gateway.DebugLog.logEvent;
 import static medic.gateway.Utils.*;
 
 public class IntentProcessor extends BroadcastReceiver {
-	private static final Uri SMS_INBOX = Uri.parse("content://sms/inbox");
+	private static final Uri SMS_INBOX = android.provider.Telephony.Sms.Inbox.CONTENT_URI;
 	static final String SENDING_REPORT = "medic.gateway.SENDING_REPORT";
 	static final String DELIVERY_REPORT = "medic.gateway.DELIVERY_REPORT";
 
