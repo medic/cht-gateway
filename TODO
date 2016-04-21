@@ -1,7 +1,8 @@
 TODO 
 
 * consider where DB transactions may be necessary
-* review "idemptotence" of app - if a HTTP message fails at any stage, will all messages be retried?
+* make sure that failed incoming SMS are logged
+* make sure that incoming MMS are logged
 
 LATER
 
@@ -13,6 +14,9 @@ LATER
 * consider authentication - some kind of shared secret?
 * get list views working on a reload-on-scroll basis
 * tests?
+  - no `messages` in response should not cause a problem
+  - messages received in a response should be saved to db
+  - one bad message in response (e.g. missing fields) should not prevent good ones from being saved
 * static analysis?!
 * continuous build?!?
 * deploy APK to github on build?!?!
