@@ -18,6 +18,7 @@ import static medic.gateway.BuildConfig.DEBUG;
 public class SimpleJsonClient2 {
 	static {
 		// HTTP connection reuse which was buggy pre-froyo
+		// TODO fix the commented bit!
 //		if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
 			System.setProperty("http.keepAlive", "false");
 //		}
