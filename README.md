@@ -40,7 +40,7 @@ Expected response:
 The following headers will be set by requests:
 
 header           | value
------------------+-------------------
+-----------------|-------------------
 `Accept`         | `application/json`
 `Accept-Charset` | `utf-8`
 `Accept-Encoding`| `gzip`
