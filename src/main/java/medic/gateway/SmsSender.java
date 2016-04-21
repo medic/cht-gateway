@@ -39,6 +39,7 @@ public class SmsSender {
 				if(DEBUG) ex.printStackTrace();
 				m.setStatus(WoMessage.Status.FAILED);
 			} finally {
+				// TODO be more careful updating these messages - ideally they would only be updated if the current Status in the DB matches what was initially fetched (UNSENT, at the time of writing)
 				db.update(m);
 			}
 		}

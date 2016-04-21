@@ -44,6 +44,7 @@ public class WebappPoller {
 	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
 			try {
+				// TODO be more careful updating these messages - ideally they would only be updated if the current Status in the DB matches what was initially fetched (WAITING, at the time of writing)
 				db.update(m);
 			} catch(Exception ex) {
 				if(DEBUG) ex.printStackTrace();
@@ -53,6 +54,7 @@ public class WebappPoller {
 
 		for(WoMessage m : request.statusUpdates) {
 			try {
+				// TODO be more careful updating these messages - ideally they would only be updated if we are changing statusForwarded from `false` to `true` - once they're forwarded, there's no going back
 				db.update(m);
 			} catch(Exception ex) {
 				if(DEBUG) ex.printStackTrace();
