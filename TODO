@@ -3,6 +3,7 @@ IN PROGRESS
 
 TODO
 
+* make WoMessage.statusForwarded property clearer - there's no need to forward PENDING or UNSENT statuses, so really this value should be reversed and named e.g. `doesStatusStillNeedToBeForwarded`
 * work out how `medic-gateway` currently handles multipart sms.  and work out how it _should_ handle them.  Reassembly would be very helpful...except in cases where only part of the message is received!  Likely worth looking at IntentProcessor.handleSmsReceived()
 * look at using cursor-adapters for lists
 * get list views working on a reload-on-scroll basis
