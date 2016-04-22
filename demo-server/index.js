@@ -1,4 +1,5 @@
-var Http = require('http'),
+var port = process.env.PORT || 8000,
+    Http = require('http'),
     Url = require('url'),
     datastore,
     handlers = {
@@ -191,4 +192,6 @@ Http.createServer(function(req, res) {
     .catch(function(e) {
       error(e.message);
     });
-}).listen(process.env.PORT || 8000);
+}).listen(port);
+
+console.log('Listening on port ' + port + '...');

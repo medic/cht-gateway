@@ -38,7 +38,7 @@ kill:
 .PHONY: demo-server
 
 demo-server:
-	npm start
+	npm install && npm start
 
 
 .PHONY: stats
