@@ -132,7 +132,19 @@ The `message` property may be logged and/or displayed to users in the `medic-gat
 Treatment of response codes below `200` and between `300` and `399` will _probably_ be handled sensibly by Android.
 
 
-# Building locally
+# Development
+
+## Requirements
+
+### `medic-gateway`
+
+* JDK
+
+### `demo-server`
+
+* npm
+
+## Building locally
 
 To build locally and install to an attached android device:
 
@@ -142,9 +154,11 @@ To run tests and static analysis tools locally:
 
 	make test
 
-# `demo-server`
+## `demo-server`
 
-## Local
+There is a demonstration implementation of a server included for `medic-gateway` to communicate with.  You can add messages to this server, and query it to see the interactions that it has with `medic-gateway`.
+
+### Local
 
 To start the demo server locally:
 
@@ -174,14 +188,14 @@ To set a username and password on the demo server:
 
 	curl -X POST -d'{"username":"alice", "password":"secret"}' http://localhost:8000/auth
 
-## Remote
+### Remote
 
 It's simple to deploy the demo server to remote NodeJS hosts.
 
-### Heroku
+#### Heroku
 
 TODO walkthrough
 
-### Modulus
+#### Modulus
 
 TODO walkthrough
