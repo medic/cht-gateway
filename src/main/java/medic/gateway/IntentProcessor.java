@@ -8,6 +8,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.provider.Telephony.Sms.Intents.*;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
+import static medic.gateway.WoMessage.Status.*;
 
 public class IntentProcessor extends BroadcastReceiver {
 	private static final Uri SMS_INBOX = android.provider.Telephony.Sms.Inbox.CONTENT_URI;
@@ -79,22 +80,15 @@ public class IntentProcessor extends BroadcastReceiver {
 		WoMessage m = db.getWoMessage(id);
 		if(m == null) {
 			logEvent(ctx, "Could not find SMS %s in database for sending report.", id);
-		} else if(m.getStatus() == WoMessage.Status.PENDING) {
+		} else {
 			int resultCode = getResultCode();
 			switch(resultCode) {
 				case RESULT_OK:
-					m.setStatus(WoMessage.Status.SENT);
+					db.updateStatus(m, PENDING, SENT);
 					break;
 				default:
-					m.setStatus(WoMessage.Status.FAILED);
+					db.updateStatus(m, PENDING, FAILED);
 			}
-			logEvent(ctx, "Updating SMS %s to status %s (result code %s).", id, m.getStatus(), resultCode);
-			// TODO should use a more specific update, where we match the id,
-			// status and lastAction when choosing which row to update, and only
-			// changing status and lastAction fields
-			db.update(m);
-		} else {
-			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
 		}
 	}
 
@@ -107,15 +101,8 @@ public class IntentProcessor extends BroadcastReceiver {
 		WoMessage m = db.getWoMessage(id);
 		if(m == null) {
 			logEvent(ctx, "Could not find SMS %s in database for delivery report.", id);
-		} else if(m.getStatus() == WoMessage.Status.SENT) {
-			m.setStatus(WoMessage.Status.DELIVERED);
-			logEvent(ctx, "Updating SMS %s to status %s.", id, m.getStatus());
-			// TODO should use a more specific update, where we match the id,
-			// status and lastAction when choosing which row to update, and only
-			// changing status and lastAction fields
-			db.update(m);
 		} else {
-			logEvent(ctx, "Not updating SMS %s for sent report, because current status is %s.", id, m.getStatus());
+			db.updateStatus(m, SENT, DELIVERED);
 		}
 	}
 }

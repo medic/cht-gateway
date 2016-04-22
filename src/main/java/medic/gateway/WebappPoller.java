@@ -47,10 +47,7 @@ public class WebappPoller {
 	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
 			try {
-				// TODO be more careful updating these messages - ideally they would only
-				// be updated if the current Status in the DB matches what was initially
-				// fetched (WAITING, at the time of writing)
-				db.update(m);
+				db.updateStatus(m, WtMessage.Status.WAITING);
 			} catch(Exception ex) {
 				logException(ctx, ex, "WebappPoller::Error updating WT message %s status: %s", m.id, ex.getMessage());
 			}
@@ -58,10 +55,7 @@ public class WebappPoller {
 
 		for(WoMessage m : request.statusUpdates) {
 			try {
-				// TODO be more careful updating these messages - ideally they would only
-				// be updated if we are changing statusForwarded from `false` to `true` -
-				// once they're forwarded, there's no going back
-				db.update(m);
+				db.setStatusForwarded(m);
 			} catch(Exception ex) {
 				logException(ctx, ex, "WebappPoller::Error updating WO message %s status_forwarded value: %s", m.id, ex.getMessage());
 			}
@@ -150,9 +144,8 @@ class GatewayRequest {
 			try {
 				json.put(json(
 					"id", m.id,
-					"status", m.getStatus().toString()
+					"status", m.status.toString()
 				));
-				m.statusForwarded = true;
 			} catch(Exception ex) {
 				logException(ex, "GatewayRequest.getStatusUpdateJson()");
 			}

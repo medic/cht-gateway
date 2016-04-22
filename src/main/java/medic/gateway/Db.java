@@ -136,18 +136,33 @@ public final class Db extends SQLiteOpenHelper {
 		return id != -1;
 	}
 
-	void update(WoMessage m) {
-		log("update() :: %s", m);
-		ContentValues v = getContentValues(m);
-		db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id));
+	boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus) {
+		log("updateStatus() :: %s :: %s -> %s", m, oldStatus, newStatus);
+
+		ContentValues v = new ContentValues();
+		v.put(WO_clmSTATUS, newStatus.toString());
+		v.put(WO_clmSTATUS_FORWARDED, FALSE);
+		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
+
+		int affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, oldStatus));
+		return affected > 0;
+	}
+
+	void setStatusForwarded(WoMessage m) {
+		log("setStatusForwarded() :: %s", m);
+
+		ContentValues v = new ContentValues();
+		v.put(WO_clmSTATUS_FORWARDED, TRUE);
+
+		db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, m.status));
 	}
 
 	private ContentValues getContentValues(WoMessage m) {
 		ContentValues v = new ContentValues();
 		v.put(WO_clmID, m.id);
-		v.put(WO_clmSTATUS, m.getStatus().toString());
-		v.put(WO_clmSTATUS_FORWARDED, m.statusForwarded? TRUE: FALSE);
-		v.put(WO_clmLAST_ACTION, m.getLastAction());
+		v.put(WO_clmSTATUS, m.status.toString());
+		v.put(WO_clmSTATUS_FORWARDED, TRUE);
+		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 		v.put(WO_clmTO, m.to);
 		v.put(WO_clmCONTENT, m.content);
 		return v;
@@ -214,10 +229,14 @@ public final class Db extends SQLiteOpenHelper {
 		return id != -1;
 	}
 
-	void update(WtMessage m) {
-		log("update() :: %s", m);
-		ContentValues v = getContentValues(m);
-		db.update(tblWT_MESSAGE, v, eq(WT_clmID), args(m.id));
+	void updateStatus(WtMessage m, WtMessage.Status oldStatus) {
+		log("updateStatus() :: %s :: %s -> %s", m, oldStatus, m.getStatus());
+
+		ContentValues v = new ContentValues();
+		v.put(WT_clmSTATUS, m.getStatus().toString());
+		v.put(WT_clmLAST_ACTION, m.getLastAction());
+
+		db.update(tblWT_MESSAGE, v, eq(WT_clmID, WT_clmSTATUS), args(m.id, oldStatus));
 	}
 
 	private ContentValues getContentValues(WtMessage m) {

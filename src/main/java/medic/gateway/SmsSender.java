@@ -12,6 +12,7 @@ import static medic.gateway.GatewayLog.*;
 import static medic.gateway.IntentProcessor.DELIVERY_REPORT;
 import static medic.gateway.IntentProcessor.SENDING_REPORT;
 import static medic.gateway.Utils.*;
+import static medic.gateway.WoMessage.Status.*;
 
 @SuppressWarnings("PMD.LooseCoupling")
 public class SmsSender {
@@ -33,25 +34,13 @@ public class SmsSender {
 
 	public void sendUnsentSmses() {
 		trace(this, "sendUnsentSmses()");
-		for(WoMessage m : db.getWoMessages(MAX_WO_MESSAGES, WoMessage.Status.UNSENT)) {
+		for(WoMessage m : db.getWoMessages(MAX_WO_MESSAGES, UNSENT)) {
 			try {
 				trace(this, "sendUnsentSmses() :: attempting to send %s", m);
-
-				// TODO be more careful updating these messages - ideally they would only
-				// be updated if the current Status in the DB matches what was initially
-				// fetched (UNSENT, at the time of writing)
-				m.setStatus(WoMessage.Status.PENDING);
-				db.update(m);
-
 				sendSms(m);
 			} catch(Exception ex) {
-				logException(ex, "SmsSender.sendUnsentSmses()");
-
-				// TODO be more careful updating these messages - ideally they would only
-				// be updated if the current Status in the DB matches what was initially
-				// fetched (UNSENT, at the time of writing)
-				m.setStatus(WoMessage.Status.FAILED);
-				db.update(m);
+				logException(ex, "SmsSender.sendUnsentSmses() :: message=%s", m);
+				db.updateStatus(m, PENDING, FAILED);
 			}
 		}
 	}
@@ -60,19 +49,18 @@ public class SmsSender {
 		logEvent(ctx, "sendSms() :: [" + m.to + "] '" + m.content + "'");
 
 		if(isGlobalPhoneNumber(m.to)) {
-			ArrayList<String> parts = smsManager.divideMessage(m.content);
-			smsManager.sendMultipartTextMessage(m.to, DEFAULT_SMSC,
-					parts,
-					intentsFor(SENDING_REPORT, m, parts),
-					intentsFor(DELIVERY_REPORT, m, parts));
+			boolean statusUpdated = db.updateStatus(m, UNSENT, PENDING);
+			if(statusUpdated) {
+				ArrayList<String> parts = smsManager.divideMessage(m.content);
+				smsManager.sendMultipartTextMessage(m.to, DEFAULT_SMSC,
+						parts,
+						intentsFor(SENDING_REPORT, m, parts),
+						intentsFor(DELIVERY_REPORT, m, parts));
+			}
 		} else {
 			logEvent(ctx, "Not sending SMS to '%s' because number appears invalid ('%s')",
 					m.to, m.content);
-			// TODO be more careful updating these messages - ideally they would only
-			// be updated if the current Status in the DB matches what was initially
-			// fetched (UNSENT, at the time of writing)
-			m.setStatus(WoMessage.Status.REJECTED);
-			db.update(m);
+			db.updateStatus(m, PENDING, REJECTED);
 		}
 	}
 

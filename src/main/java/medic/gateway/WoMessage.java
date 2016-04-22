@@ -6,16 +6,15 @@ class WoMessage implements Map<String, String>, Comparable<WoMessage> {
 	public enum Status { UNSENT, PENDING, SENT, FAILED, REJECTED, DELIVERED }
 
 	public final String id;
-	private long lastAction;
-	private Status status;
-	/** Indicates if this status has been forwarded to the webapp yet. */
-	public boolean statusForwarded;
+	public final long lastAction;
+	public final Status status;
 	public final String to;
 	public final String content;
 
 	public WoMessage(String id, String to, String content) {
 		this.id = id;
-		setStatus(Status.UNSENT);
+		this.status = Status.UNSENT;
+		this.lastAction = System.currentTimeMillis();
 		this.to = to;
 		this.content = content;
 	}
@@ -29,15 +28,6 @@ class WoMessage implements Map<String, String>, Comparable<WoMessage> {
 	}
 
 //> ACCESSORS
-	public Status getStatus() { return status; }
-	public void setStatus(Status status) {
-		this.lastAction = System.currentTimeMillis();
-		this.status = status;
-		this.statusForwarded = false;
-	}
-
-	public long getLastAction() { return lastAction; }
-
 	public String toString() {
 		return String.format("%s@%s-%s", getClass().getSimpleName(), id, status);
 	}
