@@ -120,10 +120,10 @@ Response codes of `400` and above will be treated as errors.
 
 If the response's `Content-Type` header is set to `application/json`, `medic-gateway` will attempt to parse the body as JSON.  The following structure is expected:
 
-{
-	error: true,
-	message: <String: error message>
-}
+	{
+		error: true,
+		message: <String: error message>
+	}
 
 The `message` property may be logged and/or displayed to users in the `medic-gateway` UI.
 
