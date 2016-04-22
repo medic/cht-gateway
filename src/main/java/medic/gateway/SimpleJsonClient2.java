@@ -1,5 +1,6 @@
 package medic.gateway;
 
+import android.os.*;
 import android.util.*;
 
 import java.io.*;
@@ -22,10 +23,9 @@ import static medic.gateway.BuildConfig.LOG_TAG;
 public class SimpleJsonClient2 {
 	static {
 		// HTTP connection reuse which was buggy pre-froyo
-		// TODO fix the commented bit!
-//		if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
 			System.setProperty("http.keepAlive", "false");
-//		}
+		}
 	}
 
 //> PUBLIC METHODS
