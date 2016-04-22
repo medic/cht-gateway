@@ -132,6 +132,16 @@ The `message` property may be logged and/or displayed to users in the `medic-gat
 Treatment of response codes below `200` and between `300` and `399` will _probably_ be handled sensibly by Android.
 
 
+# Building locally
+
+To build locally and install to an attached android device:
+
+	make
+
+To run tests and static analysis tools locally:
+
+	make test
+
 # `demo-server`
 
 ## Local
