@@ -16,6 +16,7 @@ TODO
 * work out if using a singleton for Db could be problematic
 * update proguard config for alarm listener: "For production use, ProGuard may rename your AlarmListener class, which will foul up access to your metadata. To stop this from happening, you will need to add a -keep line to your ProGuard configuration file (e.g., proguard.cfg) to stop ProGuard from renaming it."
 * implement a basic SMS composer that will work when using as default SMS app?
+* work out what the HeadlessSmsSendService is and if that needs an implementation too
 
 
 TODONT
