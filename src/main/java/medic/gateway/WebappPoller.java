@@ -47,7 +47,7 @@ public class WebappPoller {
 	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
 			try {
-				db.updateStatus(m, WtMessage.Status.WAITING);
+				db.updateStatusFrom(WtMessage.Status.WAITING, m);
 			} catch(Exception ex) {
 				logException(ctx, ex, "WebappPoller::Error updating WT message %s status: %s", m.id, ex.getMessage());
 			}

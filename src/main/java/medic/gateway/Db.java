@@ -229,8 +229,8 @@ public final class Db extends SQLiteOpenHelper {
 		return id != -1;
 	}
 
-	void updateStatus(WtMessage m, WtMessage.Status oldStatus) {
-		log("updateStatus() :: %s :: %s -> %s", m, oldStatus, m.getStatus());
+	void updateStatusFrom(WtMessage.Status oldStatus, WtMessage m) {
+		log("updateStatusFrom() :: %s :: %s -> %s", m, oldStatus, m.getStatus());
 
 		ContentValues v = new ContentValues();
 		v.put(WT_clmSTATUS, m.getStatus().toString());
