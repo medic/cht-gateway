@@ -30,8 +30,7 @@ dependencies {
 }
 
 def isReleaseBuild = {
-	return System.env.JENKINS == 'true' || (System.env.TRAVIS == 'true' &&
-			System.env.TRAVIS_BRANCH == 'master')
+	System.env.TRAVIS == 'true' && System.env.TRAVIS_BRANCH == 'master'
 }
 def getVersionCode = {
 	if(isReleaseBuild()) {
