@@ -41,7 +41,10 @@ demo-server:
 	npm install && npm start
 
 
-.PHONY: stats
+.PHONY: stats travis
 
 stats:
 	./scripts/project_stats
+
+travis:
+	${GRADLEW} test assembleDebug
