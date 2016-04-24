@@ -20,5 +20,12 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 before_script:
-  - export GATEWAY_VERSION_NAME="0.1.$TRAVIS_BUILD_NUMBER"
-script: make test
+  - export VERSION_TO_BUILD="$TRAVIS_TAG"
+script: make travis
+deploy:
+  provider: releases
+  api_key: $GITHUB_OAUTH_TOKEN
+  file: build/outputs/apk/medic-gateway-${GATEWAY_VERSION_NAME}-debug.apk
+  skip_cleanup: true
+  on:
+    tags: true

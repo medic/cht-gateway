@@ -1,5 +1,7 @@
 IN PROGRESS
 
+* deploy APK to github on build?!?!
+
 
 TODO
 
@@ -12,7 +14,6 @@ TODO
   - messages received in a response should be saved to db
   - one bad message in response (e.g. missing fields) should not prevent good ones from being saved
   - WoMessage should not change status from DELIVERED -> anything else (e.g. DELIVERED -> SENT, DELIVERED -> FAILED)
-* deploy APK to github on build?!?!
 * use proper android styles/R-predefs for font size, color etc.
 * work out if using a singleton for Db could be problematic
 * update proguard config for alarm listener: "For production use, ProGuard may rename your AlarmListener class, which will foul up access to your metadata. To stop this from happening, you will need to add a -keep line to your ProGuard configuration file (e.g., proguard.cfg) to stop ProGuard from renaming it."
