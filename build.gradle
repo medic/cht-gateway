@@ -26,6 +26,8 @@ repositories {
 }
 
 dependencies {
+	testCompile 'junit:junit:4.12'
+
 	compile 'com.commonsware.cwac:wakeful:1.1.0'
 }
 
