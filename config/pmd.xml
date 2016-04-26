@@ -69,7 +69,10 @@ Severity: HARD
 		<exclude name="TooManyStaticImports"/>
 	</rule>
 
-	<rule ref="rulesets/java/junit.xml"/>
+	<rule ref="rulesets/java/junit.xml">
+		<exclude name="JUnitAssertionsShouldIncludeMessage"/>
+		<exclude name="JUnitTestContainsTooManyAsserts"/>
+	</rule>
 
 	<rule ref="rulesets/java/logging-jakarta-commons.xml">
 		<exclude name="GuardLogStatement"/>
@@ -87,6 +90,7 @@ Severity: HARD
 		<exclude name="ShortClassName"/>
 		<exclude name="ShortVariable"/>
 		<exclude name="VariableNamingConventions"/>
+		<exclude name="MethodNamingConventions"/>
 	</rule>
 
 	<rule ref="rulesets/java/optimizations.xml">

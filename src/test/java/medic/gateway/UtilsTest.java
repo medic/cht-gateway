@@ -14,7 +14,7 @@ public class UtilsTest {
 		String[] returned = Utils.args(args);
 
 		// then
-		assertTrue(args == returned);
+		assertSame(args, returned);
 	}
 
 	@Test
