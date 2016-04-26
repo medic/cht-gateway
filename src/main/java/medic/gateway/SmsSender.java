@@ -18,7 +18,6 @@ import static medic.gateway.WoMessage.Status.*;
 public class SmsSender {
 	private static final int MAX_WO_MESSAGES = 10;
 	private static final String DEFAULT_SMSC = null;
-	private static final int NO_FLAGS = 0;
 
 	private final Context ctx;
 	private final Db db;
@@ -85,6 +84,6 @@ public class SmsSender {
 		// TODO use an algorithm that's less likely to generate colliding values
 		int requestCode = r.nextInt();
 
-		return PendingIntent.getBroadcast(ctx, requestCode, intent, NO_FLAGS);
+		return PendingIntent.getBroadcast(ctx, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 }
