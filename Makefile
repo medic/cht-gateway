@@ -19,7 +19,7 @@ clean:
 	rm -rf build/
 
 test:
-	${GRADLEW} check
+	${GRADLEW} check test connectedAndroidTest
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
