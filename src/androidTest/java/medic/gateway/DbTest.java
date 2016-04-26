@@ -198,9 +198,9 @@ public class DbTest extends AndroidTestCase {
 			else if(vals[i] instanceof byte[]) v.put(cols[i], (byte[]) vals[i]);
 			else v.put(cols[i], vals[i].toString());
 		}
-		long row_id = rawDb.insert(tableName, null, v);
+		long rowId = rawDb.insert(tableName, null, v);
 		assertEquals(initialCount+1, count(tableName));
-		assertNotEquals(-1, row_id);
+		assertNotEquals(-1, rowId);
 	}
 
 //> STATIC HELPERS
