@@ -47,4 +47,4 @@ stats:
 	./scripts/project_stats
 
 travis:
-	${GRADLEW} test assembleDebug
+	${GRADLEW} check test assembleDebug

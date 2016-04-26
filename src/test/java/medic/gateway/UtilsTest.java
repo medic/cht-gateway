@@ -8,22 +8,22 @@ public class UtilsTest {
 	@Test
 	public void args_shouldNotModifyStringArrays() {
 		// given
-		String[] SOME_ARGS = { "a", "b", "c" };
+		String[] args = { "a", "b", "c" };
 
 		// when
-		String[] returned = Utils.args(SOME_ARGS);
+		String[] returned = Utils.args(args);
 
 		// then
-		assertTrue(SOME_ARGS == returned);
+		assertTrue(args == returned);
 	}
 
 	@Test
 	public void args_shouldTurnObjectArraysToStrings() {
 		// given
-		Object[] SOME_ARGS = { "a", 1, true };
+		Object[] args = { "a", 1, true };
 
 		// when
-		String[] returned = Utils.args(SOME_ARGS);
+		String[] returned = Utils.args(args);
 
 		// then
 		assertArrayEquals(returned, new String[] {
