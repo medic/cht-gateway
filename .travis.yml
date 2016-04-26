@@ -2,17 +2,17 @@ language: android
 android:
   components:
     # The BuildTools version used by your project
-    - build-tools-22.0.1
+    - build-tools-21.1.1
 
     # The SDK version used to compile your project
-    - android-22
+    - android-21
 
     # Additional components
     - extra-android-m2repository
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-21
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -22,7 +22,7 @@ cache:
 before_script:
   - export VERSION_TO_BUILD="$TRAVIS_TAG"
   # start the emulator
-  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &

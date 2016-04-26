@@ -1,6 +1,6 @@
 ADB = ${ANDROID_HOME}/platform-tools/adb
 EMULATOR = ${ANDROID_HOME}/tools/emulator
-GRADLEW = ./gradlew
+GRADLEW = ./gradlew --daemon
 
 ifdef ComSpec	 # Windows
   # Use `/` for all paths, except `.\`
@@ -47,4 +47,4 @@ stats:
 	./scripts/project_stats
 
 travis:
-	${GRADLEW} check test connectedAndroidTest assembleDebug
+	./gradlew check test connectedAndroidTest assembleDebug
