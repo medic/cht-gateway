@@ -23,14 +23,14 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String LOG_clmTIMESTAMP = "timestamp";
 	private static final String LOG_clmMESSAGE = "message";
 
-	private static final String tblWT_MESSAGE = "mt_message";
+	private static final String tblWT_MESSAGE = "wt_message";
 	private static final String WT_clmID = "id";
 	private static final String WT_clmSTATUS = "status";
 	private static final String WT_clmLAST_ACTION = "last_action";
 	private static final String WT_clmFROM = "_from";
 	private static final String WT_clmCONTENT = "content";
 
-	private static final String tblWO_MESSAGE = "mo_message";
+	private static final String tblWO_MESSAGE = "wo_message";
 	private static final String WO_clmID = "id";
 	private static final String WO_clmSTATUS = "status";
 	private static final String WO_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
