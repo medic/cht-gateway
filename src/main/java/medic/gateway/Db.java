@@ -33,7 +33,7 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String tblWO_MESSAGE = "mo_message";
 	private static final String WO_clmID = "id";
 	private static final String WO_clmSTATUS = "status";
-	private static final String WO_clmSTATUS_FORWARDED = "status_forwarded";
+	private static final String WO_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
 	private static final String WO_clmLAST_ACTION = "last_action";
 	private static final String WO_clmTO = "_to";
 	private static final String WO_clmCONTENT = "content";
@@ -80,7 +80,7 @@ public final class Db extends SQLiteOpenHelper {
 					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
-				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_FORWARDED, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
+				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
 	}
 
 	public void init() {
@@ -141,7 +141,7 @@ public final class Db extends SQLiteOpenHelper {
 
 		ContentValues v = new ContentValues();
 		v.put(WO_clmSTATUS, newStatus.toString());
-		v.put(WO_clmSTATUS_FORWARDED, FALSE);
+		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 
 		int affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, oldStatus));
@@ -152,7 +152,7 @@ public final class Db extends SQLiteOpenHelper {
 		log("setStatusForwarded() :: %s", m);
 
 		ContentValues v = new ContentValues();
-		v.put(WO_clmSTATUS_FORWARDED, TRUE);
+		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
 
 		db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, m.status));
 	}
@@ -161,7 +161,7 @@ public final class Db extends SQLiteOpenHelper {
 		ContentValues v = new ContentValues();
 		v.put(WO_clmID, m.id);
 		v.put(WO_clmSTATUS, m.status.toString());
-		v.put(WO_clmSTATUS_FORWARDED, TRUE);
+		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 		v.put(WO_clmTO, m.to);
 		v.put(WO_clmCONTENT, m.content);
@@ -183,7 +183,7 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	List<WoMessage> getWoMessagesWithStatusChanges(int maxCount) {
-		return getWoMessages(eq(WO_clmSTATUS_FORWARDED), args(FALSE), SortDirection.ASC, maxCount);
+		return getWoMessages(eq(WO_clmSTATUS_NEEDS_FORWARDING), args(TRUE), SortDirection.ASC, maxCount);
 	}
 
 	private List<WoMessage> getWoMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
