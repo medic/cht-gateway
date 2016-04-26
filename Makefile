@@ -47,4 +47,4 @@ stats:
 	./scripts/project_stats
 
 travis:
-	${GRADLEW} check test assembleDebug
+	${GRADLEW} check test connectedAndroidTest assembleDebug
