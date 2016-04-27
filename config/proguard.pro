@@ -1,0 +1,1 @@
+-keep public class medic.gateway.AlarmListener
