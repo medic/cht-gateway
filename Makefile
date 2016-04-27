@@ -47,4 +47,6 @@ stats:
 	./scripts/project_stats
 
 travis:
-	./gradlew check test connectedAndroidTest assembleDebug
+	./gradlew check test assembleDebug
+	./scripts/start_emulator
+	./gradlew connectedAndroidTest
