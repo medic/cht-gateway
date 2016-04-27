@@ -1,11 +1,12 @@
 buildscript {
 	repositories {
+		maven { url "https://jitpack.io" }
 		mavenCentral()
 		jcenter()
 	}
 	dependencies {
 		classpath 'com.android.tools.build:gradle:2.0.0'
-		classpath 'com.noveogroup.android:check:1.2.3'
+		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e'
 	}
 }
 
