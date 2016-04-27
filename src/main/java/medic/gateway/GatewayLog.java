@@ -40,6 +40,6 @@ public final class GatewayLog {
 	}
 
 	private static void debugLogEntry(Context ctx, String message) {
-		Db.getInstance(ctx).store(new DebugLogEntry(System.currentTimeMillis(), message));
+		Db.getInstance(ctx).storeLogEntry(message);
 	}
 }

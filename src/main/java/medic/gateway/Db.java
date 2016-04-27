@@ -20,18 +20,19 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String[] NO_ARGS = {};
 
 	private static final String tblLOG = "log";
+	private static final String LOG_clmID = "_id";
 	private static final String LOG_clmTIMESTAMP = "timestamp";
 	private static final String LOG_clmMESSAGE = "message";
 
 	private static final String tblWT_MESSAGE = "wt_message";
-	private static final String WT_clmID = "id";
+	private static final String WT_clmID = "_id";
 	private static final String WT_clmSTATUS = "status";
 	private static final String WT_clmLAST_ACTION = "last_action";
 	private static final String WT_clmFROM = "_from";
 	private static final String WT_clmCONTENT = "content";
 
 	private static final String tblWO_MESSAGE = "wo_message";
-	private static final String WO_clmID = "id";
+	private static final String WO_clmID = "_id";
 	private static final String WO_clmSTATUS = "status";
 	private static final String WO_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
 	private static final String WO_clmLAST_ACTION = "last_action";
@@ -61,9 +62,10 @@ public final class Db extends SQLiteOpenHelper {
 		this.db = db;
 
 		db.execSQL(String.format("CREATE TABLE %s (" +
-					"%s INTEGER NOT NULL PRIMARY KEY, " +
+					"%s INTEGER PRIMARY KEY, " +
+					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL)",
-				tblLOG, LOG_clmTIMESTAMP, LOG_clmMESSAGE));
+				tblLOG, LOG_clmID, LOG_clmTIMESTAMP, LOG_clmMESSAGE));
 
 		db.execSQL(String.format("CREATE TABLE %s (" +
 					"%s TEXT NOT NULL PRIMARY KEY, " +
@@ -95,38 +97,21 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 //> DebugLogEntry HANDLERS
-	void store(DebugLogEntry e) {
+	void storeLogEntry(String message) {
 		ContentValues v = new ContentValues();
-		v.put(LOG_clmTIMESTAMP, e.timestamp);
-		v.put(LOG_clmMESSAGE, e.message);
+		v.put(LOG_clmTIMESTAMP, System.currentTimeMillis());
+		v.put(LOG_clmMESSAGE, message);
 
 		db.insert(tblLOG, null, v);
 	}
 
-	List<DebugLogEntry> getLogEntries(int maxCount) {
-		Cursor c = null;
-		try {
-			c = db.query(tblLOG,
-					cols(LOG_clmTIMESTAMP, LOG_clmMESSAGE),
-					ALL, NO_ARGS,
-					NO_GROUP, NO_GROUP,
-					SortDirection.DESC.apply(LOG_clmTIMESTAMP),
-					Integer.toString(maxCount));
-
-			int count = c.getCount();
-			log("getLogEntries() :: item fetch count: %s", count);
-			ArrayList<DebugLogEntry> list = new ArrayList<>(count);
-			c.moveToFirst();
-			while(count-- > 0) {
-				list.add(new DebugLogEntry(
-						c.getLong(0),
-						c.getString(1)));
-				c.moveToNext();
-			}
-			return list;
-		} finally {
-			if(c != null) c.close();
-		}
+	Cursor getLogEntries(int maxCount) {
+		return db.query(tblLOG,
+				cols(LOG_clmID, LOG_clmTIMESTAMP, LOG_clmMESSAGE),
+				ALL, NO_ARGS,
+				NO_GROUP, NO_GROUP,
+				SortDirection.DESC.apply(LOG_clmTIMESTAMP),
+				Integer.toString(maxCount));
 	}
 
 //> WoMessage HANDLERS
@@ -174,8 +159,8 @@ public final class Db extends SQLiteOpenHelper {
 		return matches.get(0);
 	}
 
-	List<WoMessage> getWoMessages(int maxCount) {
-		return getWoMessages(null, null, SortDirection.DESC, maxCount);
+	Cursor getWoMessages(int maxCount) {
+		return getWoMessageCursor(null, null, SortDirection.DESC, maxCount);
 	}
 
 	List<WoMessage> getWoMessages(int maxCount, WoMessage.Status status) {
@@ -189,12 +174,7 @@ public final class Db extends SQLiteOpenHelper {
 	private List<WoMessage> getWoMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		Cursor c = null;
 		try {
-			c = db.query(tblWO_MESSAGE,
-					cols(WO_clmID, WO_clmSTATUS, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT),
-					selection, selectionArgs,
-					NO_GROUP, NO_GROUP,
-					sort == null? null: sort.apply(WO_clmLAST_ACTION),
-					Integer.toString(maxCount));
+			c = getWoMessageCursor(selection, selectionArgs, sort, maxCount);
 
 			int count = c.getCount();
 			log("getWoMessages() :: item fetch count: %s", count);
@@ -213,6 +193,15 @@ public final class Db extends SQLiteOpenHelper {
 		} finally {
 			if(c != null) c.close();
 		}
+	}
+
+	private Cursor getWoMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
+		return db.query(tblWO_MESSAGE,
+				cols(WO_clmID, WO_clmSTATUS, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT),
+				selection, selectionArgs,
+				NO_GROUP, NO_GROUP,
+				sort == null? null: sort.apply(WO_clmLAST_ACTION),
+				Integer.toString(maxCount));
 	}
 
 //> WtMessage HANDLERS
@@ -249,8 +238,8 @@ public final class Db extends SQLiteOpenHelper {
 		return v;
 	}
 
-	List<WtMessage> getWtMessages(int maxCount) {
-		return getWtMessages(null, null, SortDirection.DESC, maxCount);
+	Cursor getWtMessages(int maxCount) {
+		return getWtMessageCursor(null, null, SortDirection.DESC, maxCount);
 	}
 
 	List<WtMessage> getWtMessages(int maxCount, WtMessage.Status status) {
@@ -260,12 +249,7 @@ public final class Db extends SQLiteOpenHelper {
 	private List<WtMessage> getWtMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		Cursor c = null;
 		try {
-			c = db.query(tblWT_MESSAGE,
-					cols(WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, WT_clmFROM, WT_clmCONTENT),
-					selection, selectionArgs,
-					NO_GROUP, NO_GROUP,
-					sort.apply(WT_clmLAST_ACTION),
-					Integer.toString(maxCount));
+			c = getWtMessageCursor(selection, selectionArgs, sort, maxCount);
 
 			int count = c.getCount();
 			log("getWtMessages() :: item fetch count: %s", count);
@@ -284,6 +268,15 @@ public final class Db extends SQLiteOpenHelper {
 		} finally {
 			if(c != null) c.close();
 		}
+	}
+
+	private Cursor getWtMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
+		return db.query(tblWT_MESSAGE,
+				cols(WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, WT_clmFROM, WT_clmCONTENT),
+				selection, selectionArgs,
+				NO_GROUP, NO_GROUP,
+				sort.apply(WT_clmLAST_ACTION),
+				Integer.toString(maxCount));
 	}
 
 	private void seed() {

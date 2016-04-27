@@ -79,7 +79,7 @@ public class DbTest extends AndroidTestCase {
 		// given
 		String id = randomUUID().toString();
 		insert("wt_message",
-				cols("id", "status", "last_action", "_from", "content"),
+				cols("_id", "status", "last_action", "_from", "content"),
 				vals(id, WtMessage.Status.FORWARDED, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WtMessage messageWithUpdatedStatus = aMessageWith(id, WtMessage.Status.FAILED);
 
@@ -97,7 +97,7 @@ public class DbTest extends AndroidTestCase {
 		// given
 		String id = randomUUID().toString();
 		insert("wt_message",
-				cols("id", "status", "last_action", "_from", "content"),
+				cols("_id", "status", "last_action", "_from", "content"),
 				vals(id, WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WtMessage messageWithUpdatedStatus = aMessageWith(id, WtMessage.Status.FORWARDED);
 
@@ -141,7 +141,7 @@ public class DbTest extends AndroidTestCase {
 		// given
 		String id = randomUUID().toString();
 		insert("wo_message",
-				cols("id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
+				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
 				vals(id, WoMessage.Status.REJECTED, 0, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
@@ -159,7 +159,7 @@ public class DbTest extends AndroidTestCase {
 		// given
 		String id = randomUUID().toString();
 		insert("wo_message",
-				cols("id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
+				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
 				vals(id, WoMessage.Status.PENDING, 0, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
@@ -178,7 +178,7 @@ public class DbTest extends AndroidTestCase {
 	}
 
 	private Cursor selectById(String tableName, String[] cols, String id) {
-		Cursor c = rawDb.query(tableName, cols, "id=?", args(id), null, null, null);
+		Cursor c = rawDb.query(tableName, cols, "_id=?", args(id), null, null, null);
 		assertEquals(1, c.getCount());
 		c.moveToFirst();
 		return c;
