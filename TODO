@@ -7,8 +7,6 @@ TODO
 * get list views working on a reload-on-scroll basis
 * tests?
   - no `messages` in response should not cause a problem
-  - messages received in a response should be saved to db
-  - one bad message in response (e.g. missing fields) should not prevent good ones from being saved
   - WoMessage should not change status from DELIVERED -> anything else (e.g. DELIVERED -> SENT, DELIVERED -> FAILED)
 * use proper android styles/R-predefs for font size, color etc.
 * work out if using a singleton for Db could be problematic

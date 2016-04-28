@@ -8,7 +8,7 @@ import android.telephony.*;
 import java.util.*;
 
 import static java.util.UUID.randomUUID;
-import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.BuildConfig.LOAD_SEED_DATA;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
@@ -47,7 +47,7 @@ public final class Db extends SQLiteOpenHelper {
 		if(_instance == null) {
 			_instance = new Db(ctx);
 			_instance.init();
-			if(DEBUG) _instance.seed();
+			if(LOAD_SEED_DATA) _instance.seed();
 		}
 		return _instance;
 	}

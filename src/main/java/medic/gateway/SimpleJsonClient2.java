@@ -186,9 +186,7 @@ abstract class SimpleResponse {
 		this.status = status;
 	}
 
-	boolean isError() {
-		return this.status >= 400;
-	}
+	abstract boolean isError();
 }
 
 class ExceptionResponse extends SimpleResponse {
@@ -198,6 +196,8 @@ class ExceptionResponse extends SimpleResponse {
 		super(status);
 		this.ex = ex;
 	}
+
+	boolean isError() { return true; }
 
 	public String toString() {
 		return new StringBuilder()
@@ -216,6 +216,10 @@ class JsonResponse extends SimpleResponse {
 	JsonResponse(int status, JSONObject json) {
 		super(status);
 		this.json = json;
+	}
+
+	boolean isError() {
+		return this.status < 200 || this.status >= 300;
 	}
 
 	public String toString() {

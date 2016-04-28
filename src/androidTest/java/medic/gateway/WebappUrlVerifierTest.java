@@ -1,34 +1,22 @@
 package medic.gateway;
 
-import android.test.*;
-
-import java.util.concurrent.*;
-
-import org.junit.*;
+import medic.gateway.test.*;
 
 import okhttp3.mockwebserver.*;
+
+import org.junit.*;
 
 import static org.junit.Assert.*;
 
 @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-public class WebappUrlVerifierTest extends AndroidTestCase {
-	private MockWebServer server;
-
+public class WebappUrlVerifierTest extends HttpTestCase {
 	private WebappUrlVerifier verifier;
 
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
-		this.server = new MockWebServer();
-		server.start();
 		this.verifier = new WebappUrlVerifier();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-		server.shutdown();
 	}
 
 	@Test
@@ -48,7 +36,7 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 	@Test
 	public void test_verify_shouldReturnOkResponseIfCorrectJsonReturned() {
 		// given
-		server.enqueue(new MockResponse().setBody("{\"medic-gateway\":true}"));
+		nextResponseJson("{\"medic-gateway\":true}");
 
 		// when
 		WebappUrlVerififcation v = verifier.verify(serverUrl());
@@ -64,7 +52,7 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 	@Test
 	public void test_verify_shouldReturnAppNotFoundFailureIfWrongJsonReturned() {
 		// given
-		server.enqueue(new MockResponse().setBody("{}"));
+		nextResponseJson("{}");
 
 		// when
 		WebappUrlVerififcation v = verifier.verify(serverUrl());
@@ -81,7 +69,7 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 	@Test
 	public void test_verify_shouldReturnUnauthorisedFailureIfServerReturnsAuthError() {
 		// given
-		server.enqueue(new MockResponse().setResponseCode(401));
+		nextResponseError(401);
 
 		// when
 		WebappUrlVerififcation v = verifier.verify(serverUrl());
@@ -107,25 +95,5 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 		assertEquals(serverUrl(), v.webappUrl);
 		assertFalse(v.isOk);
 		assertEquals(R.string.errWebappUrl_serverNotFound, v.failure);
-	}
-
-//> PRIVATE HELPERS
-	private String serverUrl() {
-		return server.url("/api").toString();
-	}
-
-	private void assertSingleGetRequestMade() {
-		RecordedRequest r = nextRequest();
-		assertEquals("GET /api HTTP/1.1", r.getRequestLine());
-		assertEquals("application/json", r.getHeader("Content-Type"));
-		assertNull(nextRequest());
-	}
-
-	private RecordedRequest nextRequest() {
-		try {
-			return server.takeRequest(1, TimeUnit.MILLISECONDS);
-		} catch(InterruptedException ex) {
-			return null;
-		}
 	}
 }
