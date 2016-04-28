@@ -7,6 +7,7 @@ import android.os.*;
 import android.widget.*;
 
 import static medic.gateway.GatewayLog.*;
+import static medic.gateway.Utils.*;
 
 public class MessageListsActivity extends TabActivity {
 	private static final Class[] TAB_CLASSES = {
@@ -44,7 +45,7 @@ public class MessageListsActivity extends TabActivity {
 	}
 
 	private void openSettings() {
-		startActivity(new Intent(this, SettingsDialogActivity.class));
+		startSettingsActivity(this);
 		finish();
 	}
 

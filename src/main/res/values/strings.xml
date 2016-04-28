@@ -20,6 +20,18 @@
 
 	<string name="mnuSettings">Settings</string>
 
+	<string name="txtDefaultMessageAppPrompt"><b>Warning: <tt>medic-gateway</tt> is not set as the default messaging app on this device.</b>\n
+		\n
+		\nThe app may not perform as expected unless it is set as the default messaging app:\n
+		\n<li>the SMS inbox may fill up and prevent new messages arriving</li>
+		\n\n
+		\nOn the other hand, if you set <tt>medic-gateway</tt> as the default messaging app, you may find:\n
+		\n<li>composing SMS is no longer possible</li>
+		\n<li>sending and receiving MMS (picture messages) no longer works</li>
+	</string>
+	<string name="btnHelpMeSetDefaultMessagingApp">Help me change</string>
+	<string name="btnIDontCare">I don\'t care</string>
+
 	<string-array name="message_lists_tabs">
 		<item>Debug Log</item>
 		<item>From Webapp</item>

@@ -28,6 +28,7 @@
 			</intent-filter>
 		</activity>
 		<activity android:name="SettingsDialogActivity"/>
+		<activity android:name="PromptToSetAsDefaultMessageAppActivity"/>
 		<activity android:name="MessageListsActivity"/>
 		<activity android:name="DebugLogActivity"/>
 		<activity android:name="WoListActivity"/>

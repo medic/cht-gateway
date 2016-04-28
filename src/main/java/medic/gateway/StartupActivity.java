@@ -6,21 +6,20 @@ import android.webkit.*;
 import android.os.*;
 
 import static medic.gateway.GatewayLog.*;
+import static medic.gateway.Utils.*;
 
 public class StartupActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
 
-		Class newActivity;
 		if(SettingsStore.in(this).hasSettings()) {
-			newActivity = MessageListsActivity.class;
+			log("Starting MessageListsActivity...");
+			startActivity(new Intent(this, MessageListsActivity.class));
 		} else {
-			newActivity = SettingsDialogActivity.class;
+			log("Starting settings activity...");
+			startSettingsActivity(this);
 		}
-
-		log("Starting new activity with class %s", newActivity);
-		startActivity(new Intent(this, newActivity));
 
 		finish();
 	}
