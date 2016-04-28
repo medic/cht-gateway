@@ -12,7 +12,9 @@ import org.junit.*;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.*;
 
-@SuppressWarnings("PMD")
+@SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
+		"PMD.StdCyclomaticComplexity",
+		"PMD.UseVarargs"})
 public class DbTest extends AndroidTestCase {
 	private static final String A_PHONE_NUMBER = "+447890123123";
 	private static final String SOME_CONTENT = "Hello.";
