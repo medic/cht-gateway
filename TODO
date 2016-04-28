@@ -16,6 +16,7 @@ TODO
 * work out what the HeadlessSmsSendService is and if that needs an implementation too
 * warn kitekat users when app is not default SMS app, and link them to a way to set it
 * add link to APKs from README
+* document kitekat intent requirements in an obscure appendix somewhere
 
 
 TODONT
