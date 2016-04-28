@@ -14,6 +14,7 @@ TODO
 * work out if using a singleton for Db could be problematic
 * implement a basic SMS composer that will work when using as default SMS app?
 * work out what the HeadlessSmsSendService is and if that needs an implementation too
+* warn kitekat users when app is not default SMS app, and link them to a way to set it
 
 
 TODONT
