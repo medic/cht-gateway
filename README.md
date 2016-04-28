@@ -3,6 +3,10 @@
 
 <a href="https://travis-ci.org/alxndrsn/medic-gateway"><img src="https://travis-ci.org/alxndrsn/medic-gateway.svg?branch=master"/></a>
 
+Download APKs from: https://github.com/alxndrsn/medic-gateway/releases
+
+-----
+
 An SMS gateway for Android.  Send and receive SMS from your webapp via an Android phone.
 
 	+--------+                 +-----------+
