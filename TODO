@@ -8,12 +8,15 @@ TODO
 * tests?
   - no `messages` in response should not cause a problem
   - WoMessage should not change status from DELIVERED -> anything else (e.g. DELIVERED -> SENT, DELIVERED -> FAILED)
+  - status report should not be sent if status_needs_forwarding is false
+  - WtMessage should be forwarded if WAITING, but not if FORWARDED or FAILED
 * use proper android styles/R-predefs for font size, color etc.
 * work out if using a singleton for Db could be problematic
 * implement a basic SMS composer that will work when using as default SMS app?
 * work out what the HeadlessSmsSendService is and if that needs an implementation too
 * add option to switch back to the standard default SMS app
 * document kitekat intent requirements in an obscure appendix somewhere
+* retry failed WtMessages?
 
 
 TODONT
