@@ -3,6 +3,7 @@ IN PROGRESS
 
 TODO
 
+* add code coverage so we can see if the tests are actually improving things
 * work out how `medic-gateway` currently handles multipart sms.  and work out how it _should_ handle them.  Reassembly would be very helpful...except in cases where only part of the message is received!  Likely worth looking at IntentProcessor.handleSmsReceived()
 * get list views working on a reload-on-scroll basis
 * tests?
