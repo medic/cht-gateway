@@ -65,7 +65,7 @@ public class DbTestHelper {
 			else if(vals[i] instanceof byte[]) v.put(cols[i], (byte[]) vals[i]);
 			else v.put(cols[i], vals[i].toString());
 		}
-		long rowId = raw.insert(tableName, null, v);
+		long rowId = raw.insertOrThrow(tableName, null, v);
 		assertEquals(initialCount+1, count(tableName));
 		assertNotEquals(-1, rowId);
 	}
