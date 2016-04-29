@@ -11,6 +11,7 @@ import medic.gateway.*;
 
 import okhttp3.mockwebserver.*;
 
+import org.json.*;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -64,12 +65,24 @@ public abstract class HttpTestCase extends AndroidTestCase {
 		assertNull(nextRequest());
 	}
 
-	protected RecordedRequest assertSinglePostRequestMade() {
+	protected JSONObject assertPostRequestMade_withJsonResponse() throws JSONException {
+		return new JSONObject(assertPostRequestMade().getBody().readUtf8());
+	}
+
+	protected RecordedRequest assertPostRequestMade() {
 		RecordedRequest r = nextRequest();
 		assertEquals("POST /api HTTP/1.1", r.getRequestLine());
 		assertEquals("application/json", r.getHeader("Content-Type"));
-		assertNull(nextRequest());
 		return r;
+	}
+
+	protected void assertSinglePostRequestMade() {
+		assertPostRequestMade();
+		assertNoMoreRequests();
+	}
+
+	protected void assertNoMoreRequests() {
+		assertNull(nextRequest());
 	}
 
 	protected RecordedRequest nextRequest() {

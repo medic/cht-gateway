@@ -70,7 +70,7 @@ public class DbTestHelper {
 		assertNotEquals(-1, rowId);
 	}
 
-	public void assertTableContains(String tableName, Object... expectedValues) {
+	public void assertTable(String tableName, Object... expectedValues) {
 		Cursor c = getContents(tableName);
 		try {
 			int colCount = c.getColumnCount();

@@ -8,7 +8,6 @@ TODO
 * get list views working on a reload-on-scroll basis
 * tests?
   - WoMessage should not change status from DELIVERED -> anything else (e.g. DELIVERED -> SENT, DELIVERED -> FAILED)
-  - status report should not be sent if status_needs_forwarding is false
 * use proper android styles/R-predefs for font size, color etc.
 * work out if using a singleton for Db could be problematic
 * implement a basic SMS composer that will work when using as default SMS app?
