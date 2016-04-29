@@ -137,7 +137,7 @@ public class DbTest extends AndroidTestCase {
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
 				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.REJECTED, 0, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				vals(id, WoMessage.Status.REJECTED, false, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
 		// when
@@ -155,7 +155,7 @@ public class DbTest extends AndroidTestCase {
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
 				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.PENDING, 0, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				vals(id, WoMessage.Status.PENDING, false, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
 		// when
