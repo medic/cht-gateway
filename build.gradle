@@ -7,11 +7,13 @@ buildscript {
 	dependencies {
 		classpath 'com.android.tools.build:gradle:2.0.0'
 		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e'
+		classpath 'com.trickyandroid:jacoco-everywhere:0.2.1'
 	}
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.noveogroup.android.check'
+apply plugin: 'jacoco-everywhere'
 
 // enable verbose lint warnings
 gradle.projectsEvaluated {
@@ -43,6 +45,26 @@ def getVersionName = {
 	System.env.VERSION_TO_BUILD ?: 'SNAPSHOT'
 }
 
+connectedCheck.doLast {
+	// Add CLI report for Jacoco coverage
+	def slurper = new XmlSlurper()
+	slurper.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false) 
+	slurper.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+	def report = slurper.parse('./build/reports/coverage/debug/report.xml')
+
+	println "----- Code Coverage -----"
+	report.package.each { p ->
+		p.counter.each { c ->
+			def covered = c.@covered.toString() as int
+			def missed = c.@missed.toString() as int
+			def percent = ((100 * covered) / (covered + missed))
+			println String.format(' %-16s %.1f ', c.@type, percent) + '%'
+		}
+	}
+	println "-------------------------"
+}
+
 android {
 	if(System.env.TRAVIS == 'true') {
 		compileSdkVersion 21
@@ -66,7 +88,6 @@ android {
 		buildConfigField "String", "LOG_TAG", '"MedicGateway"'
 		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
 		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")";
-
 	}
 
 	signingConfigs {
@@ -79,6 +100,9 @@ android {
 	}
 
 	buildTypes {
+		debug {
+			testCoverageEnabled = true
+		}
 		release {
 			minifyEnabled true
 			shrinkResources true

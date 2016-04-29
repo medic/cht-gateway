@@ -19,7 +19,7 @@ clean:
 	rm -rf build/
 
 test:
-	${GRADLEW} check test connectedAndroidTest
+	${GRADLEW} check test connectedCheck
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
@@ -49,4 +49,4 @@ stats:
 travis:
 	./gradlew check test assemble
 	./scripts/start_emulator
-	./gradlew connectedAndroidTest
+	./gradlew connectedCheck
