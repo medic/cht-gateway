@@ -38,6 +38,42 @@ public class WebappPollerTest extends HttpTestCase {
 	}
 
 	@Test
+	public void test_pollWebapp_shouldBeFineIfMessagesIsNotIncludedInResponse() throws Exception {
+		// given
+		nextResponseJson("{}");
+
+		// when
+		poller.pollWebapp();
+
+		// then
+		dbTableEmpty("wo_message");
+	}
+
+	@Test
+	public void test_pollWebapp_shouldBeFineIfMessagesIsNull() throws Exception {
+		// given
+		nextResponseJson("{ \"messages\":null }");
+
+		// when
+		poller.pollWebapp();
+
+		// then
+		dbTableEmpty("wo_message");
+	}
+
+	@Test
+	public void test_pollWebapp_shouldBeFineIfNoMessagesInResponse() throws Exception {
+		// given
+		nextResponseJson("{ \"messages\":[] }");
+
+		// when
+		poller.pollWebapp();
+
+		// then
+		dbTableEmpty("wo_message");
+	}
+
+	@Test
 	public void test_pollWebapp_shouldSaveMessagesFromResponseToDb() throws Exception {
 		// given
 		dbTableEmpty("wo_message");
