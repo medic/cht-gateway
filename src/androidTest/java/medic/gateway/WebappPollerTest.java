@@ -1,7 +1,5 @@
 package medic.gateway;
 
-import android.test.*;
-
 import medic.gateway.test.*;
 
 import okhttp3.mockwebserver.*;
@@ -12,12 +10,11 @@ import java.util.regex.*;
 
 import static org.junit.Assert.*;
 import static medic.gateway.test.DbTestHelper.*;
+import static medic.gateway.test.TestUtils.*;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WebappPollerTest extends HttpTestCase {
 	private static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
-	private static final String A_PHONE_NUMBER = "+447890123123";
-	private static final String SOME_CONTENT = "Hello.";
 
 	private WebappPoller poller;
 

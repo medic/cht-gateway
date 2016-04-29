@@ -11,12 +11,10 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 import static medic.gateway.test.DbTestHelper.*;
+import static medic.gateway.test.TestUtils.*;
 
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 public class DbTest extends AndroidTestCase {
-	private static final String A_PHONE_NUMBER = "+447890123123";
-	private static final String SOME_CONTENT = "Hello.";
-
 	private Db db;
 
 	private DbTestHelper dbHelper;
