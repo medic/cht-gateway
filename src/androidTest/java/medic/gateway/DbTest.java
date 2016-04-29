@@ -5,55 +5,48 @@ import android.database.*;
 import android.database.sqlite.*;
 import android.test.*;
 
-import java.lang.reflect.*;
+import medic.gateway.test.*;
 
 import org.junit.*;
 
-import static java.util.UUID.randomUUID;
 import static org.junit.Assert.*;
+import static medic.gateway.test.DbTestHelper.*;
 
-@SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
-		"PMD.StdCyclomaticComplexity",
-		"PMD.UseVarargs"})
+@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 public class DbTest extends AndroidTestCase {
 	private static final String A_PHONE_NUMBER = "+447890123123";
 	private static final String SOME_CONTENT = "Hello.";
 
 	private Db db;
 
-	private Context context;
-	private SQLiteDatabase rawDb;
+	private DbTestHelper dbHelper;
 
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
-		context = new RenamingDelegatingContext(getContext(), "test_");
+		Context context = new RenamingDelegatingContext(getContext(), "test_");
 
-		Constructor<?> constructor = Db.class.getDeclaredConstructors()[0];
-		constructor.setAccessible(true);
-		db = (Db) constructor.newInstance(context);
-
-		rawDb = db.getWritableDatabase();
+		dbHelper = new DbTestHelper(context);
+		db = dbHelper.db;
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		db.close();
+		dbHelper.tearDown();
 	}
 
 	@Test
 	public void test_classParamsShouldBeInitialised() {
 		assertNotNull(db);
-		assertNotNull(context);
-		assertNotNull(rawDb);
+		assertNotNull(dbHelper);
 	}
 
 	@Test
 	public void test_canStoreWtMessages() {
 		// given
-		assertEquals(0, count("wt_message"));
+		dbHelper.assertEmpty("wt_message");
 		WtMessage m = aMessageWith(WtMessage.Status.WAITING);
 
 		// when
@@ -61,7 +54,7 @@ public class DbTest extends AndroidTestCase {
 
 		// then
 		assertTrue(successReported);
-		assertEquals(1, count("wt_message"));
+		assertEquals(1, dbHelper.count("wt_message"));
 	}
 
 	@Test
@@ -73,14 +66,14 @@ public class DbTest extends AndroidTestCase {
 		db.updateStatusFrom(WtMessage.Status.WAITING, unsavedMessage);
 
 		// then
-		assertEquals(0, count("wt_message"));
+		dbHelper.assertEmpty("wt_message");
 	}
 
 	@Test
 	public void test_updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
 		// given
-		String id = randomUUID().toString();
-		insert("wt_message",
+		String id = randomUuid();
+		dbHelper.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
 				vals(id, WtMessage.Status.FORWARDED, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WtMessage messageWithUpdatedStatus = aMessageWith(id, WtMessage.Status.FAILED);
@@ -89,7 +82,7 @@ public class DbTest extends AndroidTestCase {
 		db.updateStatusFrom(WtMessage.Status.WAITING, messageWithUpdatedStatus);
 
 		// then
-		Cursor c = selectById("wt_message", cols("status", "last_action"), id);
+		Cursor c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
 		assertEquals("FORWARDED", c.getString(0));
 		assertEquals(0, c.getLong(1));
 	}
@@ -97,8 +90,8 @@ public class DbTest extends AndroidTestCase {
 	@Test
 	public void test_updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
-		String id = randomUUID().toString();
-		insert("wt_message",
+		String id = randomUuid();
+		dbHelper.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
 				vals(id, WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WtMessage messageWithUpdatedStatus = aMessageWith(id, WtMessage.Status.FORWARDED);
@@ -107,7 +100,7 @@ public class DbTest extends AndroidTestCase {
 		db.updateStatusFrom(WtMessage.Status.WAITING, messageWithUpdatedStatus);
 
 		// then
-		Cursor c = selectById("wt_message", cols("status", "last_action"), id);
+		Cursor c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
 		assertEquals("FORWARDED", c.getString(0));
 		assertNotEquals(0, c.getLong(1));
 	}
@@ -115,7 +108,7 @@ public class DbTest extends AndroidTestCase {
 	@Test
 	public void test_canStoreWoMessages() {
 		// given
-		assertEquals(0, count("wo_message"));
+		dbHelper.assertEmpty("wo_message");
 		WoMessage m = aMessageWith(WoMessage.Status.PENDING);
 
 		// when
@@ -123,7 +116,7 @@ public class DbTest extends AndroidTestCase {
 
 		// then
 		assertTrue(successReported);
-		assertEquals(1, count("wo_message"));
+		assertEquals(1, dbHelper.count("wo_message"));
 	}
 
 	@Test
@@ -135,14 +128,14 @@ public class DbTest extends AndroidTestCase {
 		db.updateStatus(unsavedMessage, WoMessage.Status.PENDING, WoMessage.Status.DELIVERED);
 
 		// then
-		assertEquals(0, count("wt_message"));
+		dbHelper.assertEmpty("wt_message");
 	}
 
 	@Test
 	public void test_updateStatus_shouldFailSilentlyIfWrongStatusFound() {
 		// given
-		String id = randomUUID().toString();
-		insert("wo_message",
+		String id = randomUuid();
+		dbHelper.insert("wo_message",
 				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
 				vals(id, WoMessage.Status.REJECTED, 0, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
@@ -151,7 +144,7 @@ public class DbTest extends AndroidTestCase {
 		db.updateStatus(messageWithUpdatedStatus, WoMessage.Status.PENDING, WoMessage.Status.DELIVERED);
 
 		// then
-		Cursor c = selectById("wo_message", cols("status", "last_action"), id);
+		Cursor c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
 		assertEquals("REJECTED", c.getString(0));
 		assertEquals(0, c.getLong(1));
 	}
@@ -159,8 +152,8 @@ public class DbTest extends AndroidTestCase {
 	@Test
 	public void test_updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
-		String id = randomUUID().toString();
-		insert("wo_message",
+		String id = randomUuid();
+		dbHelper.insert("wo_message",
 				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
 				vals(id, WoMessage.Status.PENDING, 0, 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
@@ -169,58 +162,14 @@ public class DbTest extends AndroidTestCase {
 		db.updateStatus(messageWithUpdatedStatus, WoMessage.Status.PENDING, WoMessage.Status.DELIVERED);
 
 		// then
-		Cursor c = selectById("wo_message", cols("status", "last_action"), id);
+		Cursor c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
 		assertEquals("DELIVERED", c.getString(0));
 		assertNotEquals(0, c.getLong(1));
 	}
 
-//> HELPERS
-	private long count(String tableName) {
-		return rawDb.compileStatement("SELECT COUNT(*) FROM " + tableName).simpleQueryForLong();
-	}
-
-	private Cursor selectById(String tableName, String[] cols, String id) {
-		Cursor c = rawDb.query(tableName, cols, "_id=?", args(id), null, null, null);
-		assertEquals(1, c.getCount());
-		c.moveToFirst();
-		return c;
-	}
-
-	private void insert(String tableName, String[] cols, Object[] vals) {
-		ContentValues v = new ContentValues();
-		long initialCount = count(tableName);
-		for(int i=cols.length-1; i>=0; --i) {
-			if(vals[i] instanceof String) v.put(cols[i], (String) vals[i]);
-			else if(vals[i] instanceof Byte) v.put(cols[i], (Byte) vals[i]);
-			else if(vals[i] instanceof Short) v.put(cols[i], (Short) vals[i]);
-			else if(vals[i] instanceof Integer) v.put(cols[i], (Integer) vals[i]);
-			else if(vals[i] instanceof Long) v.put(cols[i], (Long) vals[i]);
-			else if(vals[i] instanceof Float) v.put(cols[i], (Float) vals[i]);
-			else if(vals[i] instanceof Double) v.put(cols[i], (Double) vals[i]);
-			else if(vals[i] instanceof Boolean) v.put(cols[i], (Boolean) vals[i]);
-			else if(vals[i] instanceof byte[]) v.put(cols[i], (byte[]) vals[i]);
-			else v.put(cols[i], vals[i].toString());
-		}
-		long rowId = rawDb.insert(tableName, null, v);
-		assertEquals(initialCount+1, count(tableName));
-		assertNotEquals(-1, rowId);
-	}
-
 //> STATIC HELPERS
-	private static String[] args(String... args) {
-		return args;
-	}
-
-	private static String[] cols(String... columnNames) {
-		return columnNames;
-	}
-
-	private static Object[] vals(Object... vals) {
-		return vals;
-	}
-
 	private static WtMessage aMessageWith(WtMessage.Status status) {
-		return aMessageWith(randomUUID().toString(), status);
+		return aMessageWith(randomUuid(), status);
 	}
 
 	private static WtMessage aMessageWith(String id, WtMessage.Status status) {
@@ -228,7 +177,7 @@ public class DbTest extends AndroidTestCase {
 	}
 
 	private static WoMessage aMessageWith(WoMessage.Status status) {
-		return aMessageWith(randomUUID().toString(), status);
+		return aMessageWith(randomUuid(), status);
 	}
 
 	private static WoMessage aMessageWith(String id, WoMessage.Status status) {

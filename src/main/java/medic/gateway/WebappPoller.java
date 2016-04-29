@@ -61,7 +61,7 @@ public class WebappPoller {
 			}
 		}
 
-		if(!response.has("messages")) {
+		if(response.isNull("messages")) {
 			return;
 		}
 

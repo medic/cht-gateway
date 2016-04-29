@@ -5,9 +5,7 @@ import android.database.*;
 import android.database.sqlite.*;
 import android.test.*;
 
-import java.lang.reflect.*;
 import java.util.concurrent.*;
-import java.util.regex.*;
 
 import medic.gateway.*;
 
@@ -21,7 +19,7 @@ import static medic.gateway.test.TestUtils.*;
 public abstract class HttpTestCase extends AndroidTestCase {
 	protected MockWebServer server;
 
-	protected SQLiteDatabase db;
+	protected DbTestHelper db;
 
 	@Before
 	public void setUp() throws Exception {
@@ -36,62 +34,14 @@ public abstract class HttpTestCase extends AndroidTestCase {
 		ed.putString("app-url", serverUrl());
 		assertTrue(ed.commit());
 
-		Constructor<?> constructor = Db.class.getDeclaredConstructors()[0];
-		constructor.setAccessible(true);
-		db = ((Db) constructor.newInstance(getContext())).getWritableDatabase();
+		db = new DbTestHelper(getContext());
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		server.shutdown();
-
-		db.delete("log", ALL_ROWS, NO_ARGS);
-		db.delete("wt_message", ALL_ROWS, NO_ARGS);
-		db.delete("wo_message", ALL_ROWS, NO_ARGS);
-	}
-
-//> DB HELPERS
-	protected void dbTableEmpty(String tableName) {
-		Cursor c = getDbContents(tableName);
-		try {
-			assertEquals(0, c.getCount());
-		} finally {
-			c.close();
-		}
-	}
-
-	protected void dbTableContains(String tableName, Object... expectedValues) {
-		Cursor c = getDbContents(tableName);
-		try {
-			int colCount = c.getColumnCount();
-			int expectedRowCount = expectedValues.length / colCount;
-			assertEquals("Wrong number of rows in db.", expectedRowCount, c.getCount());
-			for(int i=0; i<expectedRowCount; ++i) {
-				c.moveToNext();
-				for(int j=0; j<colCount; ++j) {
-					Object expected = expectedValues[i * colCount + j];
-					String actual = c.getString(j);
-					if(expected instanceof Pattern) {
-						assertMatches("Unexpected value at row " + i + " column " + j,
-								expected, actual);
-					} else if(expected instanceof Boolean) {
-						String expectedString = ((Boolean) expected) ? "1" : "0";
-						assertEquals("Unexpected value at row " + i + " column " + j,
-								expectedString, actual);
-					} else {
-						assertEquals("Unexpected value at row " + i + " column " + j,
-								expected.toString(), actual);
-					}
-				}
-			}
-		} finally {
-			c.close();
-		}
-	}
-
-	private Cursor getDbContents(String tableName) {
-		return db.rawQuery("SELECT * FROM " + tableName, NO_ARGS);
+		db.tearDown();
 	}
 
 //> HTTP HELPERS

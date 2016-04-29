@@ -11,6 +11,7 @@ import org.junit.*;
 import java.util.regex.*;
 
 import static org.junit.Assert.*;
+import static medic.gateway.test.DbTestHelper.*;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WebappPollerTest extends HttpTestCase {
@@ -18,13 +19,18 @@ public class WebappPollerTest extends HttpTestCase {
 
 	private WebappPoller poller;
 
+	private DbTestHelper db;
+
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
+		this.db = new DbTestHelper(getContext());
+
 		this.poller = new WebappPoller(getContext());
 	}
 
+//> RESPONSE CONTENT TESTS
 	@Test
 	public void test_pollWebapp_shouldFailQuietlyResponseIsNotJson() throws Exception {
 		// given
@@ -34,7 +40,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		dbTableEmpty("wo_message");
+		db.assertEmpty("wo_message");
 	}
 
 	@Test
@@ -46,7 +52,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		dbTableEmpty("wo_message");
+		db.assertEmpty("wo_message");
 	}
 
 	@Test
@@ -58,7 +64,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		dbTableEmpty("wo_message");
+		db.assertEmpty("wo_message");
 	}
 
 	@Test
@@ -70,13 +76,13 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		dbTableEmpty("wo_message");
+		db.assertEmpty("wo_message");
 	}
 
 	@Test
 	public void test_pollWebapp_shouldSaveMessagesFromResponseToDb() throws Exception {
 		// given
-		dbTableEmpty("wo_message");
+		db.assertEmpty("wo_message");
 		nextResponseJson("{ \"messages\": [ " +
 					"{ \"id\": \"aaa-111\", \"to\": \"+1\", \"content\": \"testing: one\" }," +
 					"{ \"id\": \"aaa-222\", \"to\": \"+2\", \"content\": \"testing: two\" }" +
@@ -86,7 +92,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		dbTableContains("wo_message",
+		db.assertTableContains("wo_message",
 				"aaa-111", "UNSENT", false, ANY_NUMBER, "+1", "testing: one",
 				"aaa-222", "UNSENT", false, ANY_NUMBER, "+2", "testing: two");
 	}
@@ -94,7 +100,7 @@ public class WebappPollerTest extends HttpTestCase {
 	@Test
 	public void test_pollWebapp_poorlyFormedWoMessagesShouldNotAffectWellFormed() throws Exception {
 		// given
-		dbTableEmpty("wo_message");
+		db.assertEmpty("wo_message");
 		nextResponseJson("{ \"messages\": [ " +
 					"{ \"id\": \"ok-111\", \"to\": \"+1\", \"content\": \"ok: one\" }," +
 
@@ -123,7 +129,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		dbTableContains("wo_message",
+		db.assertTableContains("wo_message",
 				"ok-111", "UNSENT", false, ANY_NUMBER, "+1", "ok: one",
 				"ok-222", "UNSENT", false, ANY_NUMBER, "+2", "ok: two");
 	}
