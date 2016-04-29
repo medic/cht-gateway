@@ -9,6 +9,7 @@ import android.widget.*;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
+@SuppressWarnings("deprecation")
 public class MessageListsActivity extends TabActivity {
 	private static final Class[] TAB_CLASSES = {
 		DebugLogActivity.class, WoListActivity.class, WtListActivity.class,
