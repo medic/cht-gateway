@@ -12,6 +12,8 @@ import static medic.gateway.WoMessage.Status.*;
 
 public class IntentProcessor extends BroadcastReceiver {
 	private static final Uri SMS_INBOX = android.provider.Telephony.Sms.Inbox.CONTENT_URI;
+	private static final WoMessage.Status ANY_STATUS = null;
+
 	static final String SENDING_REPORT = "medic.gateway.SENDING_REPORT";
 	static final String DELIVERY_REPORT = "medic.gateway.DELIVERY_REPORT";
 
@@ -102,7 +104,7 @@ public class IntentProcessor extends BroadcastReceiver {
 		if(m == null) {
 			logEvent(ctx, "Could not find SMS %s in database for delivery report.", id);
 		} else {
-			db.updateStatus(m, SENT, DELIVERED);
+			db.updateStatus(m, ANY_STATUS, DELIVERED);
 		}
 	}
 }

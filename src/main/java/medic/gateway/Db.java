@@ -129,7 +129,12 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 
-		int affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, oldStatus));
+		int affected;
+		if(oldStatus == null) {
+			affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id));
+		} else {
+			affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, oldStatus));
+		}
 		return affected > 0;
 	}
 
