@@ -17,6 +17,7 @@ TODO
 * test storing WoMessage in db
 * test SMS_RECEIVED_ACTION and SMS_DELIVER_ACTION in IntentProcessor
 * test message deletion on kitkat+ and also earlier
+* test SmsSender
 
 
 TODONT
