@@ -53,16 +53,17 @@ connectedCheck.doLast {
 
 	def report = slurper.parse('./build/reports/coverage/debug/report.xml')
 
-	println "----- Code Coverage -----"
+	println "------ Code Coverage ------"
 	report.package.each { p ->
+		println "--> ${p.@name.toString().replaceAll('/', '.')}"
 		p.counter.each { c ->
 			def covered = c.@covered.toString() as int
 			def missed = c.@missed.toString() as int
 			def percent = ((100 * covered) / (covered + missed))
-			println String.format(' %-16s %.1f ', c.@type, percent) + '%'
+			println String.format('    %-16s %.1f ', c.@type, percent) + '%'
 		}
+		println "---------------------------"
 	}
-	println "-------------------------"
 }
 
 android {
