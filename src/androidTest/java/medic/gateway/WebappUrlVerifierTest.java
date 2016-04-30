@@ -1,5 +1,7 @@
 package medic.gateway;
 
+import android.test.*;
+
 import medic.gateway.test.*;
 
 import okhttp3.mockwebserver.*;
@@ -9,14 +11,24 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-public class WebappUrlVerifierTest extends HttpTestCase {
+public class WebappUrlVerifierTest extends AndroidTestCase {
 	private WebappUrlVerifier verifier;
+
+	private HttpTestHelper http;
 
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
-		this.verifier = new WebappUrlVerifier();
+		http = new HttpTestHelper();
+		http.configureAppSettings(getContext());
+
+		verifier = new WebappUrlVerifier();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		http.tearDown();
 	}
 
 	@Test
@@ -36,63 +48,63 @@ public class WebappUrlVerifierTest extends HttpTestCase {
 	@Test
 	public void test_verify_shouldReturnOkResponseIfCorrectJsonReturned() {
 		// given
-		nextResponseJson("{\"medic-gateway\":true}");
+		http.nextResponseJson("{\"medic-gateway\":true}");
 
 		// when
-		WebappUrlVerififcation v = verifier.verify(serverUrl());
+		WebappUrlVerififcation v = verifier.verify(http.url());
 
 		// then
-		assertEquals(serverUrl(), v.webappUrl);
+		assertEquals(http.url(), v.webappUrl);
 		assertTrue(v.isOk);
 
 		// and
-		assertSingleGetRequestMade();
+		http.assertSingleGetRequestMade();
 	}
 
 	@Test
 	public void test_verify_shouldReturnAppNotFoundFailureIfWrongJsonReturned() {
 		// given
-		nextResponseJson("{}");
+		http.nextResponseJson("{}");
 
 		// when
-		WebappUrlVerififcation v = verifier.verify(serverUrl());
+		WebappUrlVerififcation v = verifier.verify(http.url());
 
 		// then
-		assertEquals(serverUrl(), v.webappUrl);
+		assertEquals(http.url(), v.webappUrl);
 		assertFalse(v.isOk);
 		assertEquals(R.string.errWebappUrl_appNotFound, v.failure);
 
 		// and
-		assertSingleGetRequestMade();
+		http.assertSingleGetRequestMade();
 	}
 
 	@Test
 	public void test_verify_shouldReturnUnauthorisedFailureIfServerReturnsAuthError() {
 		// given
-		nextResponseError(401);
+		http.nextResponseError(401);
 
 		// when
-		WebappUrlVerififcation v = verifier.verify(serverUrl());
+		WebappUrlVerififcation v = verifier.verify(http.url());
 
 		// then
-		assertEquals(serverUrl(), v.webappUrl);
+		assertEquals(http.url(), v.webappUrl);
 		assertFalse(v.isOk);
 		assertEquals(R.string.errWebappUrl_unauthorised, v.failure);
 
 		// and
-		assertSingleGetRequestMade();
+		http.assertSingleGetRequestMade();
 	}
 
 	@Test
 	public void test_verify_shouldReturnServerNotFoundFailureIfServerIsNotUp() throws Exception {
 		// given
-		server.shutdown();
+		http.server.shutdown();
 
 		// when
-		WebappUrlVerififcation v = verifier.verify(serverUrl());
+		WebappUrlVerififcation v = verifier.verify(http.url());
 
 		// then
-		assertEquals(serverUrl(), v.webappUrl);
+		assertEquals(http.url(), v.webappUrl);
 		assertFalse(v.isOk);
 		assertEquals(R.string.errWebappUrl_serverNotFound, v.failure);
 	}

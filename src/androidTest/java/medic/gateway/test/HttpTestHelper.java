@@ -17,75 +17,71 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static medic.gateway.test.TestUtils.*;
 
-public abstract class HttpTestCase extends AndroidTestCase {
-	protected MockWebServer server;
+@SuppressWarnings({"PMD.JUnit4TestShouldUseAfterAnnotation",
+		"PMD.SignatureDeclareThrowsException"})
+public class HttpTestHelper {
+	public MockWebServer server;
 
-	protected DbTestHelper db;
-
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-
-		this.server = new MockWebServer();
+	public HttpTestHelper() throws Exception {
+		server = new MockWebServer();
 		server.start();
+	}
 
-		SharedPreferences.Editor ed = getContext()
+//> TEST SETUP/TEARDOWN
+	public void tearDown() throws Exception {
+		server.shutdown();
+	}
+
+	public void configureAppSettings(Context ctx) {
+		SharedPreferences.Editor ed = ctx
 				.getSharedPreferences(SettingsStore.class.getName(), Context.MODE_PRIVATE)
 				.edit();
-		ed.putString("app-url", serverUrl());
+		ed.putString("app-url", url());
 		assertTrue(ed.commit());
-
-		db = new DbTestHelper(getContext());
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-		server.shutdown();
-		db.tearDown();
-	}
-
-//> HTTP HELPERS
-	protected void nextResponseJson(String jsonString) {
-		server.enqueue(new MockResponse().setBody(jsonString));
-	}
-
-	protected void nextResponseError(int httpResponseCode) {
-		server.enqueue(new MockResponse().setResponseCode(httpResponseCode));
-	}
-
-	protected String serverUrl() {
+//> CONVENIENCE METHODS
+	public String url() {
 		return server.url("/api").toString();
 	}
 
-	protected void assertSingleGetRequestMade() {
+//> TEST HELPERS
+	public void nextResponseJson(String jsonString) {
+		server.enqueue(new MockResponse().setBody(jsonString));
+	}
+
+	public void nextResponseError(int httpResponseCode) {
+		server.enqueue(new MockResponse().setResponseCode(httpResponseCode));
+	}
+
+	public void assertSingleGetRequestMade() {
 		RecordedRequest r = nextRequest();
 		assertEquals("GET /api HTTP/1.1", r.getRequestLine());
 		assertEquals("application/json", r.getHeader("Content-Type"));
 		assertNull(nextRequest());
 	}
 
-	protected JSONObject assertPostRequestMade_withJsonResponse() throws JSONException {
+	public JSONObject assertPostRequestMade_withJsonResponse() throws JSONException {
 		return new JSONObject(assertPostRequestMade().getBody().readUtf8());
 	}
 
-	protected RecordedRequest assertPostRequestMade() {
+	public RecordedRequest assertPostRequestMade() {
 		RecordedRequest r = nextRequest();
 		assertEquals("POST /api HTTP/1.1", r.getRequestLine());
 		assertEquals("application/json", r.getHeader("Content-Type"));
 		return r;
 	}
 
-	protected void assertSinglePostRequestMade() {
+	public void assertSinglePostRequestMade() {
 		assertPostRequestMade();
 		assertNoMoreRequests();
 	}
 
-	protected void assertNoMoreRequests() {
+	public void assertNoMoreRequests() {
 		assertNull(nextRequest());
 	}
 
-	protected RecordedRequest nextRequest() {
+	public RecordedRequest nextRequest() {
 		try {
 			return server.takeRequest(1, TimeUnit.MILLISECONDS);
 		} catch(InterruptedException ex) {

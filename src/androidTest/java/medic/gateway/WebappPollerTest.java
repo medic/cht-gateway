@@ -1,5 +1,7 @@
 package medic.gateway;
 
+import android.test.*;
+
 import medic.gateway.test.*;
 
 import okhttp3.mockwebserver.*;
@@ -13,29 +15,34 @@ import static medic.gateway.test.DbTestHelper.*;
 import static medic.gateway.test.TestUtils.*;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
-public class WebappPollerTest extends HttpTestCase {
+public class WebappPollerTest extends AndroidTestCase {
 	private static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
 
 	private WebappPoller poller;
 
 	private DbTestHelper db;
+	private HttpTestHelper http;
 
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
-		this.db = new DbTestHelper(getContext());
+		db = new DbTestHelper(getContext());
 
-		this.poller = new WebappPoller(getContext());
+		http = new HttpTestHelper();
+		http.configureAppSettings(getContext());
+
+		poller = new WebappPoller(getContext());
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 
+		http.tearDown();
 		db.tearDown();
 
-		assertNoMoreRequests();
+		http.assertNoMoreRequests();
 	}
 
 //> REQUEST CONTENT TESTS
@@ -52,13 +59,13 @@ public class WebappPollerTest extends HttpTestCase {
 		db.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
 				vals(randomUuid(), WtMessage.Status.FAILED, 0, A_PHONE_NUMBER, SOME_CONTENT));
-		nextResponseJson("{}");
+		http.nextResponseJson("{}");
 
 		// when
 		poller.pollWebapp();
 
 		// then
-		JSONObject responseBody = assertPostRequestMade_withJsonResponse();
+		JSONObject responseBody = http.assertPostRequestMade_withJsonResponse();
 
 		JSONArray messages = responseBody.getJSONArray("messages");
 		assertEquals(1, messages.length());
@@ -79,13 +86,13 @@ public class WebappPollerTest extends HttpTestCase {
 		db.insert("wo_message",
 				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
 				vals(randomUuid(), WoMessage.Status.DELIVERED, false, 0, A_PHONE_NUMBER, SOME_CONTENT));
-		nextResponseJson("{}");
+		http.nextResponseJson("{}");
 
 		// when
 		poller.pollWebapp();
 
 		// then
-		JSONObject responseBody = assertPostRequestMade_withJsonResponse();
+		JSONObject responseBody = http.assertPostRequestMade_withJsonResponse();
 
 		JSONArray messages = responseBody.getJSONArray("deliveries");
 		assertEquals(1, messages.length());
@@ -99,52 +106,52 @@ public class WebappPollerTest extends HttpTestCase {
 	@Test
 	public void test_pollWebapp_shouldFailQuietlyResponseIsNotJson() throws Exception {
 		// given
-		nextResponseJson("muhahaha not really json! {}");
+		http.nextResponseJson("muhahaha not really json! {}");
 
 		// when
 		poller.pollWebapp();
 
 		// then
-		assertSinglePostRequestMade();
+		http.assertSinglePostRequestMade();
 		db.assertEmpty("wo_message");
 	}
 
 	@Test
 	public void test_pollWebapp_shouldBeFineIfMessagesIsNotIncludedInResponse() throws Exception {
 		// given
-		nextResponseJson("{}");
+		http.nextResponseJson("{}");
 
 		// when
 		poller.pollWebapp();
 
 		// then
-		assertSinglePostRequestMade();
+		http.assertSinglePostRequestMade();
 		db.assertEmpty("wo_message");
 	}
 
 	@Test
 	public void test_pollWebapp_shouldBeFineIfMessagesIsNull() throws Exception {
 		// given
-		nextResponseJson("{ \"messages\":null }");
+		http.nextResponseJson("{ \"messages\":null }");
 
 		// when
 		poller.pollWebapp();
 
 		// then
-		assertSinglePostRequestMade();
+		http.assertSinglePostRequestMade();
 		db.assertEmpty("wo_message");
 	}
 
 	@Test
 	public void test_pollWebapp_shouldBeFineIfNoMessagesInResponse() throws Exception {
 		// given
-		nextResponseJson("{ \"messages\":[] }");
+		http.nextResponseJson("{ \"messages\":[] }");
 
 		// when
 		poller.pollWebapp();
 
 		// then
-		assertSinglePostRequestMade();
+		http.assertSinglePostRequestMade();
 		db.assertEmpty("wo_message");
 	}
 
@@ -152,7 +159,7 @@ public class WebappPollerTest extends HttpTestCase {
 	public void test_pollWebapp_shouldSaveMessagesFromResponseToDb() throws Exception {
 		// given
 		db.assertEmpty("wo_message");
-		nextResponseJson("{ \"messages\": [ " +
+		http.nextResponseJson("{ \"messages\": [ " +
 					"{ \"id\": \"aaa-111\", \"to\": \"+1\", \"content\": \"testing: one\" }," +
 					"{ \"id\": \"aaa-222\", \"to\": \"+2\", \"content\": \"testing: two\" }" +
 				"] }");
@@ -161,7 +168,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		assertSinglePostRequestMade();
+		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
 				"aaa-111", "UNSENT", false, ANY_NUMBER, "+1", "testing: one",
 				"aaa-222", "UNSENT", false, ANY_NUMBER, "+2", "testing: two");
@@ -171,7 +178,7 @@ public class WebappPollerTest extends HttpTestCase {
 	public void test_pollWebapp_poorlyFormedWoMessagesShouldNotAffectWellFormed() throws Exception {
 		// given
 		db.assertEmpty("wo_message");
-		nextResponseJson("{ \"messages\": [ " +
+		http.nextResponseJson("{ \"messages\": [ " +
 					"{ \"id\": \"ok-111\", \"to\": \"+1\", \"content\": \"ok: one\" }," +
 
 					// no id
@@ -199,7 +206,7 @@ public class WebappPollerTest extends HttpTestCase {
 		poller.pollWebapp();
 
 		// then
-		assertSinglePostRequestMade();
+		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
 				"ok-111", "UNSENT", false, ANY_NUMBER, "+1", "ok: one",
 				"ok-222", "UNSENT", false, ANY_NUMBER, "+2", "ok: two");
