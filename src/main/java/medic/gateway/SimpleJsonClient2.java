@@ -149,7 +149,7 @@ public class SimpleJsonClient2 {
 		return conn;
 	}
 
-	public static String base64encode(String normal) {
+	private static String base64encode(String normal) {
 		try {
 			return Base64.encodeToString(normal.getBytes("UTF-8"), Base64.DEFAULT);
 		} catch(UnsupportedEncodingException ex) {
