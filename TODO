@@ -13,6 +13,7 @@ TODO
 * document kitekat intent requirements in an obscure appendix somewhere
 * retry failed WtMessages?
 * research BroadcastReceiver.goAsync()
+* test SimpleJsonClient2 sets Authorization header when creds are supplied in the URL
 
 
 TODONT
