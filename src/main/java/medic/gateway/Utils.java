@@ -10,6 +10,9 @@ import org.json.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
 
+@SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
+		"PMD.NPathComplexity",
+		"PMD.StdCyclomaticComplexity"})
 public final class Utils {
 	private static final String[] RANDOM_WORDS = {
 		"I", "a", "action", "admirable", "air", "all", "an", "and", "angel", "animals", "appears", "apprehension", "beauty", "brave", "but", "canopy", "congregation", "custom", "delights", "disposition", "dust", "earth", "excellent", "exercises", "express", "faculty", "fire", "firmament", "forgone", "form", "foul", "frame", "fretted", "god", "goes", "golden", "goodly", "have", "heavily", "how", "in", "indeed", "infinite", "is", "it", "know", "late", "like", "look", "lost", "majestical", "man", "me", "mirth", "most", "moving", "my", "neither", "no", "noble", "nor", "not", "of", "other", "overhanging", "paragon", "pestilential", "piece", "promontory", "quintessence", "reason", "roof", "seems", "so", "sterile", "than", "that", "the", "thing", "this", "to", "vapours", "what", "wherefore", "why", "with", "woman", "work", "world", "yet", "you",
@@ -80,15 +83,18 @@ public final class Utils {
 
 		if(diff < ONE_MONTH) {
 			long weeks = diff / ONE_WEEK;
+			if(weeks == 1) return "a week ago";
 			return weeks + " weeks ago";
 		}
 
 		if(diff < ONE_YEAR) {
 			long months = diff / ONE_MONTH;
+			if(months == 1) return "a month ago";
 			return months + " months ago";
 		}
 
 		long years = diff / ONE_YEAR;
+		if(years == 1) return "a year ago";
 		return years + " years ago";
 	}
 
