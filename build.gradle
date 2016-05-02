@@ -133,6 +133,7 @@ android {
 		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
 		disable 'IconMissingDensityFolder' // we don't care about nice icons at the moment
 		if(System.env.TRAVIS == 'true') {
+			abortOnError true
 			htmlReport false
 			xmlReport false
 			textReport true
