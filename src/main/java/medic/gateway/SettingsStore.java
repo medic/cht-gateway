@@ -54,7 +54,7 @@ public class SettingsStore {
 	}
 
 	public static SettingsStore in(Context ctx) {
-		Log.d(LOG_TAG, String.format("SettingStore :: loading for context: %s", ctx));
+		if(DEBUG) Log.d(LOG_TAG, String.format("SettingStore :: loading for context: %s", ctx));
 
 		SharedPreferences prefs = ctx.getSharedPreferences(
 				SettingsStore.class.getName(),
