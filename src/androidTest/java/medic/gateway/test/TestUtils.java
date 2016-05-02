@@ -20,11 +20,19 @@ public final class TestUtils {
 	private TestUtils() {}
 
 	public static void assertMatches(Object pattern, Object actual) {
-		assertTrue(((Pattern) pattern).matcher(actual.toString()).matches());
+		assertMatches(null, pattern, actual);
 	}
 
 	public static void assertMatches(String failureMessage, Object pattern, Object actual) {
-		assertTrue(failureMessage, ((Pattern) pattern).matcher(actual.toString()).matches());
+		boolean matches = ((Pattern) pattern).matcher(actual.toString()).matches();
+		if(!matches) {
+			if(failureMessage == null) {
+				failureMessage = "";
+			} else {
+				failureMessage += ": ";
+			}
+			fail(String.format("%s\"%s\" did not match regex /%s/", failureMessage, actual, pattern));
+		}
 	}
 
 	public static void clearAppSettings() {
