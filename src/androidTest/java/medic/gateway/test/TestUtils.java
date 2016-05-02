@@ -2,14 +2,13 @@ package medic.gateway.test;
 
 import android.app.*;
 import android.content.*;
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.rule.*;
 
 import medic.gateway.*;
 
 import java.util.*;
 import java.util.regex.*;
 
-import static android.support.test.runner.lifecycle.Stage.RESUMED;
 import static android.support.test.InstrumentationRegistry.*;
 import static org.junit.Assert.*;
 
@@ -46,12 +45,10 @@ public final class TestUtils {
 		assertTrue(ed.commit());
 	}
 
-	public static void recreateCurrentActivity() {
+	public static void recreateActivityFor(final ActivityTestRule testRule) {
 		getInstrumentation().runOnMainSync(new Runnable() {
 			public void run() {
-				Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(RESUMED);
-				assertEquals(1, resumedActivities.size());
-				((Activity) resumedActivities.toArray()[0]).recreate();
+				testRule.getActivity().recreate();
 			}
 		});
 	}

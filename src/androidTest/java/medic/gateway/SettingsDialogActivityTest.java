@@ -50,7 +50,7 @@ public class SettingsDialogActivityTest {
 		settingsStore().save(new Settings(http.url(), true));
 
 		// when
-		recreateCurrentActivity();
+		recreateActivityFor(activityTestRule);
 
 		// then
 		onView(withId(id.btnCancelSettings))
