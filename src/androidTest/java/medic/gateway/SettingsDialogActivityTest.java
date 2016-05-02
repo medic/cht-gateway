@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import static medic.gateway.R.*;
 import static medic.gateway.test.DbTestHelper.*;
 import static medic.gateway.test.TestUtils.*;
+import static medic.gateway.test.InstrumentationTestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})

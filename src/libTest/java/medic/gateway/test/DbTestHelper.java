@@ -4,6 +4,7 @@ import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 
+import java.util.*;
 import java.util.regex.*;
 import java.lang.reflect.*;
 
@@ -78,19 +79,21 @@ public class DbTestHelper {
 			assertEquals("Wrong number of rows in db.", expectedRowCount, c.getCount());
 			for(int i=0; i<expectedRowCount; ++i) {
 				c.moveToNext();
+
+				String expectedRow = Arrays.toString(Arrays.copyOfRange(expectedValues, i * colCount, i * colCount + colCount));
 				for(int j=0; j<colCount; ++j) {
 					Object expected = expectedValues[i * colCount + j];
 					String actual = c.getString(j);
+
+					String failMessage = String.format("Expected row: %s.  Unexpected value at (%s, %s):",
+							expectedRow, i, j);
 					if(expected instanceof Pattern) {
-						assertMatches("Unexpected value at row " + i + " column " + j,
-								expected, actual);
+						assertMatches(failMessage, expected, actual);
 					} else if(expected instanceof Boolean) {
 						String expectedString = ((Boolean) expected) ? "1" : "0";
-						assertEquals("Unexpected value at row " + i + " column " + j,
-								expectedString, actual);
+						assertEquals(failMessage, expectedString, actual);
 					} else {
-						assertEquals("Unexpected value at row " + i + " column " + j,
-								expected.toString(), actual);
+						assertEquals(failMessage, expected.toString(), actual);
 					}
 				}
 			}
