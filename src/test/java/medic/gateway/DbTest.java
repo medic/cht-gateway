@@ -3,7 +3,6 @@ package medic.gateway;
 import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
-import android.test.*;
 import android.telephony.*;
 
 import java.lang.reflect.*;
@@ -11,31 +10,31 @@ import java.lang.reflect.*;
 import medic.gateway.test.*;
 
 import org.junit.*;
+import org.junit.runner.*;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static medic.gateway.test.DbTestHelper.*;
 import static medic.gateway.test.TestUtils.*;
 
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants=BuildConfig.class)
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-public class DbTest extends AndroidTestCase {
+public class DbTest {
 	private Db db;
 
 	private DbTestHelper dbHelper;
 
 	@Before
 	public void setUp() throws Exception {
-		super.setUp();
-
-		Context context = new RenamingDelegatingContext(getContext(), "test_");
-
-		dbHelper = new DbTestHelper(context);
+		dbHelper = new DbTestHelper(RuntimeEnvironment.application);
 		db = dbHelper.db;
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		super.tearDown();
 		dbHelper.tearDown();
 	}
 
