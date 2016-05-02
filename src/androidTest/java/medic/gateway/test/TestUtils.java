@@ -1,5 +1,6 @@
 package medic.gateway.test;
 
+import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.support.test.rule.*;
@@ -57,7 +58,7 @@ public final class TestUtils {
 		});
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("deprecation") @SuppressLint("MissingPermission")
 	public static void preventScreenLock(final ActivityTestRule testRule) throws Throwable {
 		testRule.runOnUiThread(new Runnable() {
 			public void run() {
