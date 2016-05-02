@@ -34,9 +34,10 @@ public class SettingsDialogActivityTest {
 	private HttpTestHelper http;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws Throwable {
 		clearAppSettings();
 		this.http = new HttpTestHelper();
+		preventScreenLock(activityTestRule);
 	}
 
 	@After
