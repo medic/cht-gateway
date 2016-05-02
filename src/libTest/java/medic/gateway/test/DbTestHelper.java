@@ -30,6 +30,7 @@ public class DbTestHelper {
 		Constructor<?> constructor = Db.class.getDeclaredConstructors()[0];
 		constructor.setAccessible(true);
 		db = (Db) constructor.newInstance(ctx);
+		db.init();
 		raw = db.getWritableDatabase();
 	}
 
@@ -38,6 +39,13 @@ public class DbTestHelper {
 		raw.delete("wt_message", ALL_ROWS, NO_ARGS);
 		raw.delete("wo_message", ALL_ROWS, NO_ARGS);
 		db.close();
+		try {
+			Field dbInstanceField = Db.class.getDeclaredField("_instance");
+			dbInstanceField.setAccessible(true);
+			dbInstanceField.set(null, null);
+		} catch(Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	public long count(String tableName) {
