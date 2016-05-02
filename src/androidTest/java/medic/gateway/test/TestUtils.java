@@ -16,6 +16,8 @@ import static org.junit.Assert.*;
 public final class TestUtils {
 	public static final String A_PHONE_NUMBER = "+447890123123";
 	public static final String SOME_CONTENT = "Hello.";
+	public static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
+	public static final Pattern ANY_ID = Pattern.compile("[a-f0-9-]+");
 
 	private TestUtils() {}
 

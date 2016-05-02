@@ -4,12 +4,16 @@ import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 import android.test.*;
+import android.telephony.*;
+
+import java.lang.reflect.*;
 
 import medic.gateway.test.*;
 
 import org.junit.*;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import static medic.gateway.test.DbTestHelper.*;
 import static medic.gateway.test.TestUtils.*;
 
@@ -165,6 +169,21 @@ public class DbTest extends AndroidTestCase {
 		assertNotEquals(0, c.getLong(1));
 	}
 
+	@Test
+	public void test_canStoreSmsMessages() {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		SmsMessage m = anSmsWith(A_PHONE_NUMBER, SOME_CONTENT);
+
+		// when
+		boolean successReported = db.store(m);
+
+		// then
+		assertTrue(successReported);
+		dbHelper.assertTable("wt_message",
+				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
 //> STATIC HELPERS
 	private static WtMessage aMessageWith(WtMessage.Status status) {
 		return aMessageWith(randomUuid(), status);
@@ -180,5 +199,12 @@ public class DbTest extends AndroidTestCase {
 
 	private static WoMessage aMessageWith(String id, WoMessage.Status status) {
 		return new WoMessage(id, status, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
+	private static SmsMessage anSmsWith(String from, String content) {
+		SmsMessage m = mock(SmsMessage.class);
+		when(m.getMessageBody()).thenReturn(content);
+		when(m.getOriginatingAddress()).thenReturn(from);
+		return m;
 	}
 }

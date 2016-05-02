@@ -8,7 +8,6 @@ import okhttp3.mockwebserver.*;
 
 import org.json.*;
 import org.junit.*;
-import java.util.regex.*;
 
 import static org.junit.Assert.*;
 import static medic.gateway.test.DbTestHelper.*;
@@ -16,8 +15,6 @@ import static medic.gateway.test.TestUtils.*;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WebappPollerTest extends AndroidTestCase {
-	private static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
-
 	private WebappPoller poller;
 
 	private DbTestHelper db;

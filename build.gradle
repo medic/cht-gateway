@@ -31,6 +31,10 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 
 	androidTestCompile 'junit:junit:4.12'
+	androidTestCompile 'org.mockito:mockito-core:1.+'
+	androidTestCompile 'com.crittercism.dexmaker:dexmaker:1.4'
+	androidTestCompile 'com.crittercism.dexmaker:dexmaker-dx:1.4'
+	androidTestCompile 'com.crittercism.dexmaker:dexmaker-mockito:1.4'
 	androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
 	androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
 
