@@ -107,6 +107,8 @@ public class IntentProcessorTest extends AndroidTestCase {
 
 		c.moveToFirst();
 		assertEquals(1, c.getLong(0));
+
+		c.close();
 	}
 
 	private void aDeliveryReportArrivesFor(String id) {
