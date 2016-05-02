@@ -54,11 +54,12 @@ public class HttpTestHelper {
 		server.enqueue(new MockResponse().setResponseCode(httpResponseCode));
 	}
 
-	public void assertSingleGetRequestMade() {
+	public RecordedRequest assertSingleGetRequestMade() {
 		RecordedRequest r = nextRequest();
 		assertEquals("GET /api HTTP/1.1", r.getRequestLine());
 		assertEquals("application/json", r.getHeader("Content-Type"));
 		assertNull(nextRequest());
+		return r;
 	}
 
 	public JSONObject assertPostRequestMade_withJsonResponse() throws JSONException {

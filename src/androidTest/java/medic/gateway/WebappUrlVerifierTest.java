@@ -9,6 +9,7 @@ import okhttp3.mockwebserver.*;
 import org.junit.*;
 
 import static org.junit.Assert.*;
+import static medic.gateway.test.TestUtils.*;
 
 @SuppressWarnings("PMD.SignatureDeclareThrowsException")
 public class WebappUrlVerifierTest extends AndroidTestCase {
@@ -107,5 +108,22 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 		assertEquals(http.url(), v.webappUrl);
 		assertFalse(v.isOk);
 		assertEquals(R.string.errWebappUrl_serverNotFound, v.failure);
+	}
+
+	@Test
+	public void test_verify_shouldSendAuthorisaztionHeaderIfIncludedInUrl() throws Exception {
+		// given
+		http.nextResponseJson("{\"medic-gateway\":true}");
+		String urlWithAuth = String.format("http://username:password@%s:%s/api",
+				http.server.getHostName(), http.server.getPort());
+
+		// when
+		verifier.verify(urlWithAuth);
+
+		// then
+		RecordedRequest r = http.assertSingleGetRequestMade();
+		String authHeader = r.getHeader("Authorization");
+		assertEquals("Basic ", authHeader.substring(0, 6));
+		assertEquals("username:password", decodeBase64(authHeader.substring(6)));
 	}
 }

@@ -13,7 +13,6 @@ TODO
 * document kitekat intent requirements in an obscure appendix somewhere
 * retry failed WtMessages?
 * research BroadcastReceiver.goAsync()
-* test SimpleJsonClient2 sets Authorization header when creds are supplied in the URL
 * test SMS_RECEIVED_ACTION and SMS_DELIVER_ACTION in IntentProcessor
 * test message deletion on kitkat+ and also earlier
 * test SmsSender

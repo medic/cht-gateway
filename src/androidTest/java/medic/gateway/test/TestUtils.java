@@ -3,10 +3,12 @@ package medic.gateway.test;
 import android.app.*;
 import android.content.*;
 import android.support.test.rule.*;
+import android.util.*;
 import android.view.*;
 
 import medic.gateway.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -72,5 +74,13 @@ public final class TestUtils {
 						WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			};
 		});
+	}
+
+	public static String decodeBase64(String encodedString) {
+		try {
+			return new String(Base64.decode(encodedString, Base64.DEFAULT), "UTF-8");
+		} catch(UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }
