@@ -9,8 +9,14 @@ buildscript {
 		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e'
 		classpath 'com.trickyandroid:jacoco-everywhere:0.2.1'
 	}
+	configurations.all {
+		resolutionStrategy {
+			// use old jacoco so Robolectric test coverage is included in reports
+			// track https://github.com/paveldudka/JacocoEverywhere/issues/14 for a less hacky solution
+			force 'org.jacoco:org.jacoco.core:0.7.2.201409121644'
+		}
+	}
 }
-
 apply plugin: 'com.android.application'
 apply plugin: 'com.noveogroup.android.check'
 apply plugin: 'jacoco-everywhere'
