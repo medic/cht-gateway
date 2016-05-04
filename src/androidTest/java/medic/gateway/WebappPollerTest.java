@@ -101,7 +101,20 @@ public class WebappPollerTest extends AndroidTestCase {
 
 //> RESPONSE CONTENT TESTS
 	@Test
-	public void test_pollWebapp_shouldFailQuietlyResponseIsNotJson() throws Exception {
+	public void test_pollWebapp_shouldFailQuietlyIfResponseIsError() throws Exception {
+		// given
+		http.nextResponseError(500);
+
+		// when
+		poller.pollWebapp();
+
+		// then
+		http.assertSinglePostRequestMade();
+		db.assertEmpty("wo_message");
+	}
+
+	@Test
+	public void test_pollWebapp_shouldFailQuietlyIfResponseIsNotJson() throws Exception {
 		// given
 		http.nextResponseJson("muhahaha not really json! {}");
 
