@@ -45,7 +45,7 @@ public class SmsSender {
 	}
 
 	private void sendSms(WoMessage m) {
-		logEvent(ctx, "sendSms() :: [" + m.to + "] '" + m.content + "'");
+		logEvent(ctx, "sendSms() :: [%s] '%s'", m.to, m.content);
 
 		if(isGlobalPhoneNumber(m.to)) {
 			boolean statusUpdated = db.updateStatus(m, UNSENT, PENDING);

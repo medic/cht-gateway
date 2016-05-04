@@ -10,7 +10,7 @@ import static medic.gateway.Utils.*;
 
 public class MmsIntentProcessor extends BroadcastReceiver {
 	public void onReceive(Context ctx, Intent intent) {
-		logEvent(ctx, "MmsIntentProcessor.onReceive() :: " + intent.getAction());
+		logEvent(ctx, "MmsIntentProcessor.onReceive() :: %s", intent.getAction());
 
 		try {
 			switch(intent.getAction()) {

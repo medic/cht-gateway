@@ -26,7 +26,7 @@ public class IntentProcessor extends BroadcastReceiver {
 	}
 
 	public void onReceive(Context ctx, Intent intent) {
-		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
+		logEvent(ctx, "IntentProcessor.onReceive() :: %s", intent.getAction());
 
 		try {
 			switch(intent.getAction()) {
@@ -62,7 +62,7 @@ public class IntentProcessor extends BroadcastReceiver {
 			if(success) {
 				deleteSmsFromDeviceInbox(ctx, m);
 			} else {
-				logEvent(ctx, "Failed to save received SMS to db: " + m);
+				logEvent(ctx, "Failed to save received SMS to db: %s", m);
 			}
 		}
 	}

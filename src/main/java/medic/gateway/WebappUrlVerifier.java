@@ -6,7 +6,6 @@ import org.json.*;
 
 import static medic.gateway.R.string.*;
 
-import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.BuildConfig.DISABLE_APP_URL_VALIDATION;
 import static medic.gateway.GatewayLog.*;
 
@@ -18,12 +17,6 @@ public class WebappUrlVerifier {
 
 		try {
 			SimpleResponse response = new SimpleJsonClient2().get(webappUrl);
-
-			if(DEBUG) {
-				log("##############################################");
-				log("# " + response);
-				log("##############################################");
-			}
 
 			if(response instanceof JsonResponse && response.status < 400)
 				return handleJsonResponse(webappUrl, (JsonResponse) response);
@@ -49,10 +42,6 @@ public class WebappUrlVerifier {
 			default:
 				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_appNotFound);
 		}
-	}
-
-	private void log(String message, Object...extras) {
-		trace(this, message, extras);
 	}
 }
 

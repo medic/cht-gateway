@@ -128,7 +128,7 @@ public class SimpleJsonClient2 {
 		if(c != null) try {
 			c.close();
 		} catch(Exception ex) {
-			log(ex, "SimpleJsonClient2.%s()", method);
+			if(DEBUG) log(ex, "SimpleJsonClient2.%s()", method);
 		}
 	}
 
@@ -136,7 +136,7 @@ public class SimpleJsonClient2 {
 		if(conn != null) try {
 			conn.disconnect();
 		} catch(Exception ex) {
-			log(ex, "SimpleJsonClient2.%s()", method);
+			if(DEBUG) log(ex, "SimpleJsonClient2.%s()", method);
 		}
 	}
 

@@ -83,17 +83,17 @@ public class WebappPoller {
 			if(jsonResponse.json.has("message")) description = jsonResponse.json.getString("message");
 		}
 
-		logEvent(ctx, "Received error from server: " + response.status + ": " + description);
+		logEvent(ctx, "Received error from server: %s: %s", response.status, description);
 	}
 
 	private void saveMessage(JSONObject json) throws JSONException {
-		logEvent(ctx, "Saving WO message: " + json);
+		logEvent(ctx, "Saving WO message: %s", json);
 		WoMessage m = new WoMessage(
 				json.getString("id"),
 				json.getString("to"),
 				json.getString("content"));
 		boolean success = db.store(m);
-		if(!success) logEvent(ctx, "Failed to save WO message: " + json);
+		if(!success) logEvent(ctx, "Failed to save WO message: %s", json);
 	}
 
 	private void log(String message, Object...extras) {
