@@ -62,9 +62,9 @@ public class WebappPollerTest extends AndroidTestCase {
 		poller.pollWebapp();
 
 		// then
-		JSONObject responseBody = http.assertPostRequestMade_withJsonResponse();
+		JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
 
-		JSONArray messages = responseBody.getJSONArray("messages");
+		JSONArray messages = requestBody.getJSONArray("messages");
 		assertEquals(1, messages.length());
 
 		JSONObject message = (JSONObject) messages.get(0);
@@ -89,9 +89,9 @@ public class WebappPollerTest extends AndroidTestCase {
 		poller.pollWebapp();
 
 		// then
-		JSONObject responseBody = http.assertPostRequestMade_withJsonResponse();
+		JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
 
-		JSONArray messages = responseBody.getJSONArray("deliveries");
+		JSONArray messages = requestBody.getJSONArray("deliveries");
 		assertEquals(1, messages.length());
 
 		JSONObject message = (JSONObject) messages.get(0);
