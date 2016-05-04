@@ -11,8 +11,8 @@ import java.lang.reflect.*;
 import medic.gateway.*;
 
 import static java.util.UUID.randomUUID;
-import static org.junit.Assert.*;
 import static medic.gateway.test.TestUtils.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings({"PMD.JUnit4TestShouldUseAfterAnnotation",
 		"PMD.ModifiedCyclomaticComplexity",
