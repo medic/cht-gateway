@@ -1,9 +1,21 @@
 package medic.gateway;
 
+import android.app.*;
+import android.content.*;
+
 import org.junit.*;
+import org.junit.runner.*;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import org.robolectric.shadows.*;
 
+import static medic.gateway.test.UnitTestUtils.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.robolectric.Shadows.*;
 
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants=BuildConfig.class)
 @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
 		"PMD.NPathComplexity",
 		"PMD.StdCyclomaticComplexity"})
@@ -14,6 +26,15 @@ public class UtilsTest {
 	private static final long HOUR = 2 * HALF_HOUR;
 	private static final long HALF_DAY = 12 * HOUR;
 	private static final long DAY = 2 * HALF_DAY;
+
+	private Application ctx;
+	private ShadowApplication shadowApplication;
+
+	@Before
+	public void setUp() {
+		ctx = RuntimeEnvironment.application;
+		shadowApplication = shadowOf(ctx);
+	}
 
 	/**
 	 * This test has a race condition.  If there is significant blocking
@@ -76,5 +97,64 @@ public class UtilsTest {
 		assertArrayEquals(returned, new String[] {
 			"a", "1", "true"
 		});
+	}
+
+	@Test
+	public void startSettingsActivity_preKitkat_shouldNotPromptForDefaultSmsAppChange() {
+		// given
+		Capabilities cap = preKitkat();
+
+		// when
+		Utils.startSettingsActivity(ctx, cap);
+
+		// then
+		assertActivityLaunched(shadowApplication, SettingsDialogActivity.class);
+	}
+
+	@Test
+	public void startSettingsActivity_kitkatPlus_defaultSmsApp_shouldNotPromptForDefaultSmsAppChange() {
+		// given
+		Capabilities cap = isDefaultSmsApp();
+
+		// when
+		Utils.startSettingsActivity(ctx, cap);
+
+		// then
+		assertActivityLaunched(shadowApplication, SettingsDialogActivity.class);
+	}
+
+	@Test
+	public void startSettingsActivity_kitkatPlus_notDefaultSmsApp_shouldPromptForDefaultSmsAppChange() {
+		// given
+		Capabilities cap = isNotDefaultSmsApp();
+
+		// when
+		Utils.startSettingsActivity(ctx, cap);
+
+		// then
+		assertActivityLaunched(shadowApplication, PromptToSetAsDefaultMessageAppActivity.class);
+	}
+
+	private Capabilities preKitkat() {
+		Capabilities app = mock(Capabilities.class);
+		when(app.isDefaultSmsProvider(RuntimeEnvironment.application)).thenThrow(new IllegalStateException());
+		when(app.canBeDefaultSmsProvider()).thenReturn(false);
+		return app;
+	}
+
+	private Capabilities isNotDefaultSmsApp() {
+		Capabilities app = mock(Capabilities.class);
+		when(app.canBeDefaultSmsProvider()).thenReturn(true);
+		when(app.isDefaultSmsProvider(RuntimeEnvironment.application))
+				.thenReturn(false);
+		return app;
+	}
+
+	private Capabilities isDefaultSmsApp() {
+		Capabilities app = mock(Capabilities.class);
+		when(app.canBeDefaultSmsProvider()).thenReturn(true);
+		when(app.isDefaultSmsProvider(RuntimeEnvironment.application))
+				.thenReturn(true);
+		return app;
 	}
 }

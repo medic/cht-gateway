@@ -1,9 +1,14 @@
 package medic.gateway.test;
 
+import android.app.*;
+
 import java.lang.reflect.*;
 
 import medic.gateway.*;
 
+import org.robolectric.shadows.*;
+
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public final class UnitTestUtils {
@@ -21,5 +26,13 @@ public final class UnitTestUtils {
 		} catch(Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	public static void assertActivityLaunched(ShadowApplication shadowApplication, Class<? extends Activity> expected) {
+		String expectedName = String.format("%s/%s",
+				expected.getPackage().getName(),
+				expected.getName());
+		String actualName = shadowApplication.getNextStartedActivity().getComponent().flattenToString();
+		assertEquals(expectedName, actualName);
 	}
 }
