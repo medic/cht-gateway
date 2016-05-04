@@ -46,7 +46,7 @@ demo-server:
 stats:
 	./scripts/project_stats
 
-travis:
+travis: stats
 	./gradlew check test assemble
 	./scripts/start_emulator
 	./gradlew connectedCheck
