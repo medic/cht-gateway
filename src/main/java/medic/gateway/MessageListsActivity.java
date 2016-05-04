@@ -6,6 +6,7 @@ import android.view.*;
 import android.os.*;
 import android.widget.*;
 
+import static medic.gateway.Capabilities.*;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
@@ -46,7 +47,7 @@ public class MessageListsActivity extends TabActivity {
 	}
 
 	private void openSettings() {
-		startSettingsActivity(this);
+		startSettingsActivity(this, getCapabilities());
 		finish();
 	}
 

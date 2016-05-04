@@ -110,8 +110,12 @@ public class DbTestHelper {
 		}
 	}
 
+	public void assertCount(String tableName, int expectedCount) {
+		assertEquals(expectedCount, count(tableName));
+	}
+
 	public void assertEmpty(String tableName) {
-		assertEquals(0, count(tableName));
+		assertCount(tableName, 0);
 	}
 
 	private Cursor getContents(String tableName) {

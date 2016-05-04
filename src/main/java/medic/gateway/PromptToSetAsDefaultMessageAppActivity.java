@@ -16,6 +16,14 @@ import static medic.gateway.Utils.*;
 public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 	private static final int REQUEST_CHANGE_DEFAULT_MESSAGING_APP = 1;
 
+	private final Capabilities app;
+
+	public PromptToSetAsDefaultMessageAppActivity() {
+		super();
+
+		this.app = Capabilities.getCapabilities();
+	}
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
@@ -37,7 +45,7 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 				// we should now know if we're the default SMS app from the value of
 				// resultCode, but it seems a little odd to trust that result when we
 				// can just check a method.
-				if(isDefaultSmsProvider(this)) {
+				if(app.isDefaultSmsProvider(this)) {
 					continueToSettings();
 				}
 				break;

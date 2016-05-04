@@ -17,15 +17,23 @@ public class IntentProcessor extends BroadcastReceiver {
 	static final String SENDING_REPORT = "medic.gateway.SENDING_REPORT";
 	static final String DELIVERY_REPORT = "medic.gateway.DELIVERY_REPORT";
 
+	private final Capabilities app;
+
+	public IntentProcessor() {
+		super();
+
+		this.app = Capabilities.getCapabilities();
+	}
+
 	public void onReceive(Context ctx, Intent intent) {
 		logEvent(ctx, "IntentProcessor.onReceive() :: " + intent.getAction());
 
 		try {
 			switch(intent.getAction()) {
 				case SMS_RECEIVED_ACTION:
-					if(!isDefaultSmsProvider(ctx)) {
+					if(app.canBeDefaultSmsProvider() && app.isDefaultSmsProvider(ctx)) {
 						// on Android 4.4+ (kitkat), we will receive both SMS_RECEIVED_ACTION
-						// _and_ SMS_DELIVER_ACTION if we are the default SMS app.  Ignoring
+						// _and_ SMS_DELIVER_ACTION if we are the default SMS app.  Ignoring.
 						break;
 					}
 				case SMS_DELIVER_ACTION:

@@ -1,0 +1,25 @@
+package medic.gateway;
+
+import android.content.*;
+import android.os.*;
+import android.provider.*;
+
+public class Capabilities {
+	public boolean isDefaultSmsProvider(Context ctx) {
+		if(!canBeDefaultSmsProvider()) throw new IllegalStateException();
+		return Utils.class.getPackage().getName().equals(Telephony.Sms.getDefaultSmsPackage(ctx));
+	}
+
+	/**
+	 * Check if medic-gateway can be the default messaging app on this
+	 * device.  This feature is only available on Android 4.4 (kitkat®) or
+	 * later.
+	 */
+	public boolean canBeDefaultSmsProvider() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+	}
+
+	public static Capabilities getCapabilities() {
+		return new Capabilities();
+	}
+}

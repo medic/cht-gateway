@@ -4,11 +4,11 @@ import android.content.*;
 import android.database.*;
 import android.test.*;
 
+import java.lang.reflect.*;
+
 import medic.gateway.test.*;
 
 import org.junit.*;
-import java.lang.reflect.*;
-import java.util.regex.*;
 
 import static android.app.Activity.RESULT_OK;
 import static android.provider.Telephony.Sms.Intents.*;
@@ -19,7 +19,7 @@ import static medic.gateway.test.TestUtils.*;
 import static org.junit.Assert.*;
 
 @SuppressWarnings({"PMD", "PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
-public class IntentProcessorTest extends AndroidTestCase {
+public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	private IntentProcessor intentProcessor;
 
 	private DbTestHelper db;

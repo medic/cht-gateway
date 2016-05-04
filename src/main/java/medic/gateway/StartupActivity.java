@@ -5,6 +5,7 @@ import android.content.*;
 import android.webkit.*;
 import android.os.*;
 
+import static medic.gateway.Capabilities.*;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
@@ -18,7 +19,7 @@ public class StartupActivity extends Activity {
 			startActivity(new Intent(this, MessageListsActivity.class));
 		} else {
 			log("Starting settings activity...");
-			startSettingsActivity(this);
+			startSettingsActivity(this, getCapabilities());
 		}
 
 		finish();
