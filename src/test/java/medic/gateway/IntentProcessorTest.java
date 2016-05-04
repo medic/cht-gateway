@@ -4,6 +4,8 @@ import android.content.*;
 import android.provider.*;
 import android.telephony.*;
 
+import java.util.*;
+
 import medic.gateway.test.*;
 
 import org.junit.*;
@@ -11,8 +13,10 @@ import org.junit.runner.*;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 import org.robolectric.shadows.*;
+import org.robolectric.shadows.ShadowContentResolver.DeleteStatement;
 
 import static android.provider.Telephony.Sms.Intents.*;
+import static android.provider.Telephony.Sms.Inbox.CONTENT_URI;
 import static medic.gateway.WoMessage.Status.*;
 import static medic.gateway.test.DbTestHelper.*;
 import static medic.gateway.test.TestUtils.*;
@@ -29,10 +33,13 @@ public class IntentProcessorTest {
 
 	private DbTestHelper db;
 	private Capabilities mockCapabilities;
+	private ShadowContentResolver contentResolver;
 
 	@Before
 	public void setUp() throws Exception {
 		db = new DbTestHelper(RuntimeEnvironment.application);
+
+		contentResolver = shadowOf(RuntimeEnvironment.application.getContentResolver());
 
 		intentProcessor = new IntentProcessor();
 		mockCapabilities = mockCapabilities(intentProcessor);
@@ -92,6 +99,22 @@ public class IntentProcessorTest {
 
 		// then
 		db.assertCount("wt_message", 1);
+	}
+
+	@Test
+	public void test_onReceive_shouldDeleteMessageFromDeviceInbox() {
+		// given
+		preKitkat();
+
+		// when
+		aSmsReceivedActionArrives();
+
+		// then
+		List<DeleteStatement> deletes = contentResolver.getDeleteStatements();
+		assertEquals(1, deletes.size());
+		assertEquals(CONTENT_URI, deletes.get(0).getUri());
+		assertEquals("address=? AND date=? AND body=?", deletes.get(0).getWhere());
+		assertArrayEquals(args("+447890123456", "1234360056000", "Good for you. Slap on the back etc."), deletes.get(0).getSelectionArgs());
 	}
 
 //> HELPERS

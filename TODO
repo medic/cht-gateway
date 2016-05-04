@@ -13,7 +13,6 @@ TODO
 * document kitekat intent requirements in an obscure appendix somewhere
 * retry failed WtMessages?
 * research BroadcastReceiver.goAsync()
-* test message deletion on kitkat+ and also earlier
 * test status_needs_updating is updated after sending status updates to webapp
 
 

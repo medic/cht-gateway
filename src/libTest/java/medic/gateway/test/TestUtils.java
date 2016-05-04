@@ -6,6 +6,8 @@ import android.content.*;
 import android.util.*;
 import android.view.*;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import medic.gateway.*;
 
 import java.io.*;
@@ -20,6 +22,7 @@ public final class TestUtils {
 	public static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
 	public static final Pattern ANY_ID = Pattern.compile("[a-f0-9-]+");
 	/** There's a chance this PDU could be invalid on CDMA phones, which would break tests :¬( */
+	@SuppressFBWarnings("MS_MUTABLE_ARRAY")
 	public static final byte[] A_VALID_GSM_PDU = {
 		(byte) 0x07, (byte) 0x91, (byte) 0x44, (byte) 0x77, (byte) 0x28, (byte) 0x00, (byte) 0x80, (byte) 0x00, (byte) 0x04, (byte) 0x0c, (byte) 0x91, (byte) 0x44, (byte) 0x87, (byte) 0x09, (byte) 0x21, (byte) 0x43, (byte) 0x65, (byte) 0x00, (byte) 0x00, (byte) 0x90, (byte) 0x20, (byte) 0x11, (byte) 0x31, (byte) 0x74, (byte) 0x63, (byte) 0x00, (byte) 0x23, (byte) 0xc7, (byte) 0xf7, (byte) 0x9b, (byte) 0x0c, (byte) 0x32, (byte) 0xbf, (byte) 0xe5, (byte) 0xa0, (byte) 0xfc, (byte) 0xbb, (byte) 0xee, (byte) 0x02, (byte) 0x4d, (byte) 0xd9, (byte) 0x61, (byte) 0x38, (byte) 0xe8, (byte) 0xed, (byte) 0x06, (byte) 0xd1, (byte) 0xd1, (byte) 0x65, (byte) 0x90, (byte) 0x38, (byte) 0x3c, (byte) 0x5e, (byte) 0x83, (byte) 0xca, (byte) 0xf4, (byte) 0xb1, (byte) 0x0b,
 	};
