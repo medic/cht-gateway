@@ -14,7 +14,6 @@ TODO
 * consider removing SettingsStore.validate(), as it currently is redundant due to WebappUrlVerifier
 * retry failed WtMessages?
 * research BroadcastReceiver.goAsync()
-* test status_needs_updating is updated after sending status updates to webapp
 
 
 TODONT

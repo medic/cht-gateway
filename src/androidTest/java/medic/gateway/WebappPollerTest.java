@@ -99,6 +99,24 @@ public class WebappPollerTest extends AndroidTestCase {
 		assertEquals("DELIVERED", message.getString("status"));
 	}
 
+	@Test
+	public void test_pollWebapp_shouldMarkForwardedStatusesAsSuchInDb() throws Exception {
+		// given
+		db.insert("wo_message",
+				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
+				vals(randomUuid(), WoMessage.Status.DELIVERED, true, 0, A_PHONE_NUMBER, SOME_CONTENT));
+		http.nextResponseJson("{}");
+
+		// when
+		poller.pollWebapp();
+
+		// then
+		http.assertPostRequestMade_withJsonResponse();
+		// and
+		db.assertTable("wo_message",
+				ANY_ID, "DELIVERED", false, 0, A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
 //> RESPONSE CONTENT TESTS
 	@Test
 	public void test_pollWebapp_shouldFailQuietlyIfResponseIsError() throws Exception {
