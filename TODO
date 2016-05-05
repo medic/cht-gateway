@@ -13,7 +13,6 @@ TODO
 * consider removing SettingsStore.validate(), as it currently is redundant due to WebappUrlVerifier
 * retry failed WtMessages?
 * research BroadcastReceiver.goAsync()
-* check if should use VARCHAR instead of TEXT for db ID columns
 
 
 TODONT
