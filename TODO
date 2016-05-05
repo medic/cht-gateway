@@ -9,7 +9,6 @@ TODO
 * implement a basic SMS composer that will work when using as default SMS app?
 * work out what the HeadlessSmsSendService is and if that needs an implementation too
 * add option to switch back to the standard default SMS app
-* document kitekat intent requirements in an obscure appendix somewhere
 * consider removing SettingsStore.validate(), as it currently is redundant due to WebappUrlVerifier
 * retry failed WtMessages?
 * research BroadcastReceiver.goAsync()

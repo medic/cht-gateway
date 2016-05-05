@@ -205,3 +205,28 @@ TODO walkthrough
 #### Modulus
 
 TODO walkthrough
+
+# "Default SMS/Messaging app"
+
+Some changes were made to the Android SMS APIs in 4.4 (Kitkat®).  The significant change was this:
+
+> from android 4.4 onwards, apps cannot delete messages from the device inbox _unless they are set, by the user, as the default messageing app for the device_
+
+Some reading on this can be found at:
+
+* http://android-developers.blogspot.com.es/2013/10/getting-your-sms-apps-ready-for-kitkat.html
+* https://www.addhen.org/blog/2014/02/15/android-4-4-api-changes/
+
+Adding support for kitkat® means that there is some extra code in `medic-gateway` whose purpose is not obvious:
+
+## Non-existent activities in `AndroidManifest.xml`
+
+Activities `HeadlessSmsSendService` and `ComposeSmsActivity` are declared in `AndroidManifest.xml`, but are not implemented in the code.
+
+## Unwanted permissions
+
+The `BROADCAST_WAP_PUSH` permission is requested in `AndroidManifest.xml`, and an extra `BroadcastReceiver`, `MmsIntentProcessor` is declared.  When `medic-gateway` is the default messaging app on a device, incoming MMS messages will be ignored.  Actual WAP Push messages are probably ignored too.
+
+## Extra intents
+
+To support being the default messaging app, `medic-gateway` listens for `SMS_DELIVER` as well as `SMS_RECEIVED`.  If the default SMS app, we need to ignore `SMS_RECEIVED`.
