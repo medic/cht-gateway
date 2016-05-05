@@ -20,6 +20,9 @@ TODONT
 
 * don't stop trying to sync when battery is low
 * don't stop trying to sync when connectivity is gone
+* don't add support for MMS
+* don't add support for WAP push
+* don't add support for binary SMS
 * don't add support for protocols beyond JSON
 * don't add support for Twitter
 * don't add support for keyword filtering
