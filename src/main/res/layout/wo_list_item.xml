@@ -12,15 +12,15 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:textSize="18sp"
+				android:textSize="@dimen/lstMainText"
 				/>
 		<TextView android:id="@+id/txtWoStatus"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="right"
-				android:layout_marginLeft="4dp"
-				android:textSize="18sp"
-				android:textColor="#666666"
+				android:layout_marginLeft="@dimen/lstTextHPad"
+				android:textSize="@dimen/lstMainText"
+				android:textColor="@android:color/secondary_text_dark"
 				/>
 	</LinearLayout>
 	<LinearLayout android:orientation="horizontal"
@@ -31,17 +31,17 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:textSize="12sp"
-				android:textColor="#666666"
+				android:textSize="@dimen/lstSubText"
+				android:textColor="@android:color/tertiary_text_dark"
 				android:ellipsize="end"
 				android:singleLine="true"
 				/>
 		<TextView android:id="@+id/txtWoLastAction"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="4dp"
-				android:textSize="12sp"
-				android:textColor="#666666"
+				android:layout_marginLeft="@dimen/lstTextHPad"
+				android:textSize="@dimen/lstSubText"
+				android:textColor="@android:color/tertiary_text_dark"
 				/>
 	</LinearLayout>
 </LinearLayout>

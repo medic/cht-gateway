@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="lstMainText">18sp</dimen>
+	<dimen name="lstSubText">12sp</dimen>
+	<dimen name="lstTextHPad">4dp</dimen>
+</resources>

@@ -7,12 +7,12 @@
 	<TextView android:id="@+id/txtDebugLogMessage"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textSize="18sp"
+			android:textSize="@dimen/lstMainText"
 			/>
 	<TextView android:id="@+id/txtDebugLogDate"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textSize="12sp"
-			android:textColor="#666666"
+			android:textSize="@dimen/lstSubText"
+			android:textColor="@android:color/tertiary_text_dark"
 			/>
 </LinearLayout>
