@@ -83,7 +83,6 @@ public final class Db extends SQLiteOpenHelper {
 				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
 	}
 
-	@Override
 	public void onUpgrade(SQLiteDatabase db,
 			int oldVersion,
 			int newVersion) {
