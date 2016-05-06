@@ -4,12 +4,12 @@
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
 		>
-	<TextView android:id="@+id/txtDebugLogMessage"
+	<TextView android:id="@+id/txtGatewayEventLogMessage"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/lstMainText"
 			/>
-	<TextView android:id="@+id/txtDebugLogDate"
+	<TextView android:id="@+id/txtGatewayEventLogDate"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/lstSubText"

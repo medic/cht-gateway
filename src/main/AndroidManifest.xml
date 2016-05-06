@@ -30,7 +30,7 @@
 		<activity android:name="SettingsDialogActivity"/>
 		<activity android:name="PromptToSetAsDefaultMessageAppActivity"/>
 		<activity android:name="MessageListsActivity"/>
-		<activity android:name="DebugLogActivity"/>
+		<activity android:name="GatewayEventLogActivity"/>
 		<activity android:name="WoListActivity"/>
 		<activity android:name="WtListActivity"/>
 		<receiver android:name="IntentProcessor" android:label="@string/app_name"

@@ -89,7 +89,7 @@ public final class Db extends SQLiteOpenHelper {
 		// Handle DB upgrades here, once we start supporting released versions
 	}
 
-//> DebugLogEntry HANDLERS
+//> GatewayEventLogEntry HANDLERS
 	void storeLogEntry(String message) {
 		ContentValues v = new ContentValues();
 		v.put(LOG_clmTIMESTAMP, System.currentTimeMillis());

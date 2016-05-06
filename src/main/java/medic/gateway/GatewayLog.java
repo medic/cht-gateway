@@ -18,7 +18,7 @@ public final class GatewayLog {
 		message = String.format(message, extras);
 
 		i(LOG_TAG, message);
-		debugLogEntry(ctx, message);
+		eventLogEntry(ctx, message);
 	}
 
 	public static void trace(Object caller, String message, Object... extras) {
@@ -31,7 +31,7 @@ public final class GatewayLog {
 		message = String.format(message, extras);
 
 		i(LOG_TAG, message, ex);
-		debugLogEntry(ctx, message);
+		eventLogEntry(ctx, message);
 	}
 
 	public static void logException(Exception ex, String message, Object... extras) {
@@ -40,7 +40,7 @@ public final class GatewayLog {
 		d(LOG_TAG, message, ex);
 	}
 
-	private static void debugLogEntry(Context ctx, String message) {
+	private static void eventLogEntry(Context ctx, String message) {
 		try {
 			Db.getInstance(ctx).storeLogEntry(message);
 		} catch(SQLiteException ex) {

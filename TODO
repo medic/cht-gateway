@@ -5,7 +5,6 @@ TODO
 
 * work out how `medic-gateway` currently handles multipart sms.  and work out how it _should_ handle them.  Reassembly would be very helpful...except in cases where only part of the message is received!  Likely worth looking at IntentProcessor.handleSmsReceived()
 * research BroadcastReceiver.goAsync()
-* rename "debug log" - it's really a human-readble log, or user's log or something
 
 
 CONSIDER DOING

@@ -10,7 +10,7 @@ import android.widget.*;
 import java.text.*;
 import java.util.*;
 
-public class DebugLogActivity extends Activity {
+public class GatewayEventLogActivity extends Activity {
 	private static final int MAX_LOG_ITEMS = 200;
 
 	private Db db;
@@ -18,10 +18,10 @@ public class DebugLogActivity extends Activity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.debug_log);
+		setContentView(R.layout.event_log);
 
 		db = Db.getInstance(this);
-		list = (ListView) findViewById(R.id.lstDebugLog);
+		list = (ListView) findViewById(R.id.lstGatewayEventLog);
 
 		((Button) findViewById(R.id.btnRefreshLog))
 				.setOnClickListener(new View.OnClickListener() {
@@ -32,20 +32,20 @@ public class DebugLogActivity extends Activity {
 	}
 
 	private void refreshList() {
-		list.setAdapter(new DebugLogEntryCursorAdapter(this, db.getLogEntries(MAX_LOG_ITEMS)));
+		list.setAdapter(new GatewayEventLogEntryCursorAdapter(this, db.getLogEntries(MAX_LOG_ITEMS)));
 	}
 }
 
-class DebugLogEntryCursorAdapter extends ResourceCursorAdapter {
+class GatewayEventLogEntryCursorAdapter extends ResourceCursorAdapter {
 	private static final int NO_FLAGS = 0;
 
-	public DebugLogEntryCursorAdapter(Context ctx, Cursor c) {
-		super(ctx, R.layout.debug_log_item, c, NO_FLAGS);
+	public GatewayEventLogEntryCursorAdapter(Context ctx, Cursor c) {
+		super(ctx, R.layout.event_log_item, c, NO_FLAGS);
 	}
 
 	public void bindView(View v, Context ctx, Cursor c) {
-		setText(v, R.id.txtDebugLogDate, formatDate(c.getLong(1)));
-		setText(v, R.id.txtDebugLogMessage, c.getString(2));
+		setText(v, R.id.txtGatewayEventLogDate, formatDate(c.getLong(1)));
+		setText(v, R.id.txtGatewayEventLogMessage, c.getString(2));
 	}
 
 	private void setText(View v, int textViewId, String text) {

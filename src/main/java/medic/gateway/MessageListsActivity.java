@@ -13,7 +13,7 @@ import static medic.gateway.Utils.*;
 @SuppressWarnings("deprecation")
 public class MessageListsActivity extends TabActivity {
 	private static final Class[] TAB_CLASSES = {
-		DebugLogActivity.class, WoListActivity.class, WtListActivity.class,
+		GatewayEventLogActivity.class, WoListActivity.class, WtListActivity.class,
 	};
 
 	public void onCreate(Bundle savedInstanceState) {
