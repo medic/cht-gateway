@@ -46,21 +46,19 @@ public final class Db extends SQLiteOpenHelper {
 	public static synchronized Db getInstance(Context ctx) { // NOPMD
 		if(_instance == null) {
 			_instance = new Db(ctx);
-			_instance.init();
 			if(LOAD_SEED_DATA) _instance.seed();
 		}
 		return _instance;
 	}
 
-	private SQLiteDatabase db; // NOPMD
+	private final SQLiteDatabase db; // NOPMD
 
 	private Db(Context ctx) {
 		super(ctx, "medic_gateway", null, VERSION);
+		db = getWritableDatabase();
 	}
 
 	public void onCreate(SQLiteDatabase db) {
-		this.db = db;
-
 		db.execSQL(String.format("CREATE TABLE %s (" +
 					"%s INTEGER PRIMARY KEY, " +
 					"%s INTEGER NOT NULL, " +
@@ -83,10 +81,6 @@ public final class Db extends SQLiteOpenHelper {
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
 				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
-	}
-
-	public void init() {
-		if(db == null) db = getWritableDatabase();
 	}
 
 	@Override

@@ -30,7 +30,6 @@ public class DbTestHelper {
 		Constructor<?> constructor = Db.class.getDeclaredConstructors()[0];
 		constructor.setAccessible(true);
 		db = (Db) constructor.newInstance(ctx);
-		db.init();
 		raw = db.getWritableDatabase();
 	}
 
