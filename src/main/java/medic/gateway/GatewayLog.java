@@ -1,6 +1,7 @@
 package medic.gateway;
 
 import android.content.*;
+import android.database.sqlite.*;
 import android.util.*;
 
 import java.text.*;
@@ -40,6 +41,10 @@ public final class GatewayLog {
 	}
 
 	private static void debugLogEntry(Context ctx, String message) {
-		Db.getInstance(ctx).storeLogEntry(message);
+		try {
+			Db.getInstance(ctx).storeLogEntry(message);
+		} catch(SQLiteException ex) {
+			logException(ctx, ex, "Could not write log entry to DB.");
+		}
 	}
 }
