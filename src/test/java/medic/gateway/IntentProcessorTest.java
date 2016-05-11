@@ -96,6 +96,25 @@ public class IntentProcessorTest {
 		db.assertCount("wt_message", 1);
 	}
 
+	@Test
+	public void test_onReceive_shouldStitchConsecutivePartsOfTheSameMessage() {
+		// given
+		preKitkat();
+
+		// when
+		aSmsReceiveActionArrivesWithMultiplePdus(
+				A_VALID_MULTIPART_GSM_PDU__PART_1,
+				A_VALID_GSM_PDU,
+				A_VALID_MULTIPART_GSM_PDU__PART_2,
+				A_VALID_GSM_PDU_FROM_THE_MULTIPART_SENDER);
+
+		// then
+		db.assertTable("wt_message",
+				ANY_ID, "WAITING", ANY_NUMBER, "+447890123456", "Good for you. Slap on the back etc.",
+				ANY_ID, "WAITING", ANY_NUMBER, "+447890999999", "Good for you. Slap on the back etc.",
+				ANY_ID, "WAITING", ANY_NUMBER, "+447890999999", "Here is a very very very very very very very very very very very very very very very very very very long message which actually spans two other messages apart from the original one!");
+	}
+
 //> HELPERS
 	private void preKitkat() { when(mockCapabilities.canBeDefaultSmsProvider()).thenReturn(false); }
 	private void kitkatPlus() { when(mockCapabilities.canBeDefaultSmsProvider()).thenReturn(true); }
@@ -110,16 +129,20 @@ public class IntentProcessorTest {
 	}
 
 	private void aSmsDeliveredActionArrives() {
-		deliver(smsIntent(SMS_DELIVER_ACTION));
+		deliver(smsIntent(SMS_DELIVER_ACTION, A_VALID_GSM_PDU));
 	}
 
 	private void aSmsReceivedActionArrives() {
-		deliver(smsIntent(SMS_RECEIVED_ACTION));
+		deliver(smsIntent(SMS_RECEIVED_ACTION, A_VALID_GSM_PDU));
 	}
 
-	private Intent smsIntent(String action) {
+	private void aSmsReceiveActionArrivesWithMultiplePdus(byte[]... pdus) {
+		deliver(smsIntent(SMS_RECEIVED_ACTION, pdus));
+	}
+
+	private Intent smsIntent(String action, Object... pdus) {
 		Intent i = new Intent(action);
-		i.putExtra("pdus", new Object[]{ A_VALID_GSM_PDU });
+		i.putExtra("pdus", pdus);
 		i.putExtra("format", "3gpp");
 		return i;
 	}

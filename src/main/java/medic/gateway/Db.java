@@ -203,6 +203,13 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 //> WtMessage HANDLERS
+	boolean store(MultipartSms sms) {
+		WtMessage m = new WtMessage(
+				sms.getOriginatingAddress(),
+				sms.getMessageBody());
+		return store(m);
+	}
+
 	boolean store(SmsMessage sms) {
 		WtMessage m = new WtMessage(
 				sms.getOriginatingAddress(),
