@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.telephony.SmsMessage;
 
+import java.io.*;
+import java.util.*;
+
 import static android.app.Activity.RESULT_OK;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.SmsCompatibility.*;
@@ -55,13 +58,34 @@ public class IntentProcessor extends BroadcastReceiver {
 		}
 	}
 
+	@SuppressWarnings("PMD.UseConcurrentHashMap")
 	private void handleSmsReceived(Context ctx, Intent intent) {
 		Db db = Db.getInstance(ctx);
 
+		Map<String, MultipartSms> multipartMessages = new HashMap<>();
+
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
+			MultipartData multipart = MultipartData.from(m);
+
+			if(multipart != null) {
+				String lookupKey = String.format("%s:%s", multipart.ref, m.getOriginatingAddress());
+				if(!multipartMessages.containsKey(lookupKey)) {
+					multipartMessages.put(lookupKey, new MultipartSms(m, multipart));
+				} else {
+					multipartMessages.get(lookupKey).add(m, multipart);
+				}
+			} else {
+				boolean success = db.store(m);
+				if(!success) {
+					logEvent(ctx, "Failed to save received SMS to db: %s", m);
+				}
+			}
+		}
+
+		for(MultipartSms m : multipartMessages.values()) {
 			boolean success = db.store(m);
 			if(!success) {
-				logEvent(ctx, "Failed to save received SMS to db: %s", m);
+				logEvent(ctx, "Failed to save receive multipart SMS to db: %s", m);
 			}
 		}
 
