@@ -4,6 +4,9 @@ import android.content.*;
 import android.net.*;
 import android.telephony.*;
 
+import java.io.*;
+import java.util.*;
+
 import static android.app.Activity.RESULT_OK;
 import static android.provider.Telephony.Sms.Intents.*;
 import static medic.gateway.GatewayLog.*;
@@ -55,16 +58,39 @@ public class IntentProcessor extends BroadcastReceiver {
 		}
 	}
 
+	@SuppressWarnings("PMD.UseConcurrentHashMap")
 	private void handleSmsReceived(Context ctx, Intent intent) {
 		Db db = Db.getInstance(ctx);
+
+		List<SmsMessage> toDelete = new LinkedList<>();
+		Map<String, MultipartSms> multipartMessages = new HashMap<>();
+
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
-			boolean success = db.store(m);
-			if(success) {
-				deleteSmsFromDeviceInbox(ctx, m);
+			MultipartData multipart = MultipartData.from(m);
+
+			if(multipart != null) {
+				String lookupKey = String.format("%s:%s", multipart.ref, m.getOriginatingAddress());
+				if(!multipartMessages.containsKey(lookupKey)) {
+					multipartMessages.put(lookupKey, new MultipartSms(m, multipart));
+				} else {
+					multipartMessages.get(lookupKey).add(m, multipart);
+				}
 			} else {
-				logEvent(ctx, "Failed to save received SMS to db: %s", m);
+				boolean success = db.store(m);
+				if(success) {
+					toDelete.add(m);
+				} else {
+					logEvent(ctx, "Failed to save received SMS to db: %s", m);
+				}
 			}
 		}
+
+		for(MultipartSms m : multipartMessages.values()) {
+			db.store(m);
+			toDelete.addAll(m.getParts());
+		}
+
+		for(SmsMessage m : toDelete) deleteSmsFromDeviceInbox(ctx, m);
 	}
 
 	/**
