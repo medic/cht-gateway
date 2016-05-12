@@ -35,7 +35,13 @@
 		<activity android:name="WtListActivity"/>
 		<receiver android:name="IntentProcessor" android:label="@string/app_name"
 				android:permission="android.permission.BROADCAST_SMS">
-			<intent-filter>
+			<!--
+			  priority is set here so that on supported android
+			  versions we can abort SMS_RECEIVED broadcasts - we
+			  don't want the incoming messages to reach the standard
+			  inbox
+			-->
+			<intent-filter android:priority="999">
 				<action android:name="android.provider.Telephony.SMS_DELIVER"/>
 				<action android:name="android.provider.Telephony.SMS_RECEIVED"/>
 				<action android:name="medic.gateway.SENDING_REPORT"/>
