@@ -57,28 +57,21 @@ public class IntentProcessor extends BroadcastReceiver {
 
 	private void handleSmsReceived(Context ctx, Intent intent) {
 		Db db = Db.getInstance(ctx);
+
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
 			boolean success = db.store(m);
-			if(success) {
-				deleteSmsFromDeviceInbox(ctx, m);
-			} else {
+			if(!success) {
 				logEvent(ctx, "Failed to save received SMS to db: %s", m);
 			}
 		}
-	}
 
-	/**
-	 * Delete a message from the device's SMS Inbox.
-	 *
-	 * On Android 4.4+, this will fail silently.  This is not really an
-	 * issue - proper users should have medic-gateway set as the default
-	 * SMS application anyway, in which case the messages will never reach
-	 * the device's inbox in the first place.
-	 */
-	private void deleteSmsFromDeviceInbox(Context ctx, SmsMessage sms) {
-		int rowsDeleted = ctx.getContentResolver().delete(SMS_INBOX, "address=? AND date=? AND body=?",
-				args(sms.getOriginatingAddress(), sms.getTimestampMillis(), sms.getMessageBody()));
-		logEvent(ctx, "Attempted to delete %s; %s messages deleted.", sms, rowsDeleted);
+		// android >= 1.6 && android < 4.4: SMS_RECEIVED_ACTION is an
+		// ordered broadcast, so if we cancel it then it should never
+		// reach the inbox.  On 4.4+, either (a) medic-gateway is the
+		// default SMS app, so the SMS will never reach the standard
+		// inbox, or (b) it is _not_ the default SMS app, in which case
+		// there is no way to delete the message.
+		abortBroadcast();
 	}
 
 	private void handleSendingReport(Context ctx, Intent intent) {
