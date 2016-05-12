@@ -11,7 +11,6 @@ import medic.gateway.test.*;
 import org.junit.*;
 
 import static android.app.Activity.RESULT_OK;
-import static android.provider.Telephony.Sms.Intents.*;
 import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
 import static medic.gateway.WoMessage.Status.*;
 import static medic.gateway.test.DbTestHelper.*;

@@ -4,8 +4,8 @@ import android.content.*;
 import android.net.*;
 import android.telephony.*;
 
-import static android.provider.Telephony.Sms.Intents.*;
 import static medic.gateway.GatewayLog.*;
+import static medic.gateway.SmsCompatibility.*;
 import static medic.gateway.Utils.*;
 
 public class MmsIntentProcessor extends BroadcastReceiver {

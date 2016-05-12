@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		xmlns:tools="http://schemas.android.com/tools"
 		package="medic.gateway">
-	<uses-sdk android:minSdkVersion="19"
+	<uses-sdk android:minSdkVersion="17"
 			android:targetSdkVersion="23"/>
 
 	<!-- communication permissions -->

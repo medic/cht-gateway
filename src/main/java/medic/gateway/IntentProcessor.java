@@ -1,17 +1,17 @@
 package medic.gateway;
 
-import android.content.*;
-import android.net.*;
-import android.telephony.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.telephony.SmsMessage;
 
 import static android.app.Activity.RESULT_OK;
-import static android.provider.Telephony.Sms.Intents.*;
 import static medic.gateway.GatewayLog.*;
+import static medic.gateway.SmsCompatibility.*;
 import static medic.gateway.Utils.*;
 import static medic.gateway.WoMessage.Status.*;
 
 public class IntentProcessor extends BroadcastReceiver {
-	private static final Uri SMS_INBOX = android.provider.Telephony.Sms.Inbox.CONTENT_URI;
 	private static final WoMessage.Status ANY_STATUS = null;
 
 	static final String SENDING_REPORT = "medic.gateway.SENDING_REPORT";

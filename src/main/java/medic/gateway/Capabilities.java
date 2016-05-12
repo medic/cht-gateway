@@ -1,10 +1,12 @@
 package medic.gateway;
 
+import android.annotation.TargetApi;
 import android.content.*;
 import android.os.*;
 import android.provider.*;
 
 public class Capabilities {
+	@TargetApi(19)
 	public boolean isDefaultSmsProvider(Context ctx) {
 		if(!canBeDefaultSmsProvider()) throw new IllegalStateException();
 		return Utils.class.getPackage().getName().equals(Telephony.Sms.getDefaultSmsPackage(ctx));

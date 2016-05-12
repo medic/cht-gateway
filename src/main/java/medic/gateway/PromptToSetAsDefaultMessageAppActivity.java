@@ -1,18 +1,20 @@
 package medic.gateway;
 
 import android.app.*;
+import android.annotation.TargetApi;
 import android.content.*;
 import android.os.*;
 import android.provider.*;
+import android.provider.Telephony.Sms.Intents;
 import android.view.*;
 import android.widget.*;
 
 import java.util.*;
 
-import static android.provider.Telephony.Sms.Intents.*;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
+@TargetApi(19)
 public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 	private static final int REQUEST_CHANGE_DEFAULT_MESSAGING_APP = 1;
 
@@ -59,8 +61,8 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 	}
 
 	public void openDefaultMessageAppSettings(View v) {
-		Intent i = new Intent(ACTION_CHANGE_DEFAULT);
-		i.putExtra(EXTRA_PACKAGE_NAME, getPackageName());
+		Intent i = new Intent(Intents.ACTION_CHANGE_DEFAULT);
+		i.putExtra(Intents.EXTRA_PACKAGE_NAME, getPackageName());
 		startActivityForResult(i, REQUEST_CHANGE_DEFAULT_MESSAGING_APP);
 	}
 
