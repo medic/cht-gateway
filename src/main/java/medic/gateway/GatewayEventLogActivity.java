@@ -10,6 +10,8 @@ import android.widget.*;
 import java.text.*;
 import java.util.*;
 
+import static medic.gateway.Utils.*;
+
 public class GatewayEventLogActivity extends Activity {
 	private static final int MAX_LOG_ITEMS = 200;
 
@@ -46,11 +48,6 @@ class GatewayEventLogEntryCursorAdapter extends ResourceCursorAdapter {
 	public void bindView(View v, Context ctx, Cursor c) {
 		setText(v, R.id.txtGatewayEventLogDate, formatDate(c.getLong(1)));
 		setText(v, R.id.txtGatewayEventLogMessage, c.getString(2));
-	}
-
-	private void setText(View v, int textViewId, String text) {
-		TextView tv = (TextView) v.findViewById(textViewId);
-		tv.setText(text);
 	}
 
 	private String formatDate(long timestamp) {
