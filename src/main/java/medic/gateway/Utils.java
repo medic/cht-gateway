@@ -1,6 +1,8 @@
 package medic.gateway;
 
 import android.content.*;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.*;
 
@@ -116,5 +118,10 @@ public final class Utils {
 			activity = SettingsDialogActivity.class;
 		}
 		ctx.startActivity(new Intent(ctx, activity));
+	}
+
+	public static void setText(View v, int textViewId, String text) {
+		TextView tv = (TextView) v.findViewById(textViewId);
+		tv.setText(text);
 	}
 }

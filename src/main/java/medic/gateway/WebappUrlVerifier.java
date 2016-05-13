@@ -45,7 +45,7 @@ public class WebappUrlVerifier {
 	}
 }
 
-@SuppressWarnings({"PMD.ShortMethodName", "PMD.AvoidFieldNameMatchingMethodName"})
+@SuppressWarnings("PMD.ShortMethodName")
 final class WebappUrlVerififcation {
 	public final String webappUrl;
 	public final boolean isOk;

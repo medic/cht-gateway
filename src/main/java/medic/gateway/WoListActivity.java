@@ -1,11 +1,18 @@
 package medic.gateway;
 
 import android.app.*;
-import android.content.*;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.*;
 import android.os.*;
 import android.view.*;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.ResourceCursorAdapter;
+
+import static medic.gateway.Utils.*;
+import static medic.gateway.WoMessage.Status.*;
 
 public class WoListActivity extends Activity {
 	private static final int MAX_WO_MESSAGES = 100;
@@ -18,7 +25,9 @@ public class WoListActivity extends Activity {
 		setContentView(R.layout.message_list_wo);
 
 		db = Db.getInstance(this);
+
 		list = (ListView) findViewById(R.id.lstWoMessages);
+		list.setOnItemClickListener(new WoListItemClickListener(this, list));
 
 		((Button) findViewById(R.id.btnRefreshWoMessageList))
 				.setOnClickListener(new View.OnClickListener() {
@@ -42,19 +51,51 @@ class WoMessageCursorAdapter extends ResourceCursorAdapter {
 	}
 
 	public void bindView(View v, Context ctx, Cursor c) {
-		String status = c.getString(1);
-		long lastAction = c.getLong(2);
-		String to = c.getString(3);
-		String content = c.getString(4);
+		WoMessage m = WoMessage.from(c);
 
-		setText(v, R.id.txtWoStatus, status);
-		setText(v, R.id.txtWoLastAction, Utils.relativeTimestamp(lastAction));
-		setText(v, R.id.txtWoTo, to);
-		setText(v, R.id.txtWoContent, content);
+		setText(v, R.id.txtWoStatus, m.status.toString());
+		setText(v, R.id.txtWoLastAction, relativeTimestamp(m.lastAction));
+		setText(v, R.id.txtWoTo, m.to);
+		setText(v, R.id.txtWoContent, m.content);
+	}
+}
+
+class WoListItemClickListener implements AdapterView.OnItemClickListener {
+	private final WoListActivity activity;
+	private final ListView list;
+
+	WoListItemClickListener(WoListActivity activity, ListView list) {
+		this.activity = activity;
+		this.list = list;
 	}
 
-	private void setText(View v, int textViewId, String text) {
-		TextView tv = (TextView) v.findViewById(textViewId);
-		tv.setText(text);
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+		Cursor c = (Cursor) list.getItemAtPosition(position);
+		final WoMessage m = WoMessage.from(c);
+
+		if(m.status.canBeRetried()) {
+			retryDialog(m, position).show();
+		}
+	}
+
+	private AlertDialog retryDialog(final WoMessage m, final int position) {
+		return new AlertDialog.Builder(activity)
+				.setTitle(R.string.txtRetryTitle)
+				.setMessage(String.format(activity.getString(R.string.txtRetryWoBody), m.to))
+				.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Db db = Db.getInstance(activity);
+						db.updateStatus(m, m.status, UNSENT);
+
+						WoMessage updated = db.getWoMessage(m.id);
+
+						View v = list.getChildAt(position);
+						setText(v, R.id.txtWoStatus, updated.status.toString());
+						setText(v, R.id.txtWoLastAction, relativeTimestamp(updated.lastAction));
+					}
+				})
+				.create();
 	}
 }

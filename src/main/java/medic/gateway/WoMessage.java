@@ -1,9 +1,14 @@
 package medic.gateway;
 
+import android.database.Cursor;
+
 import java.util.*;
 
 class WoMessage {
-	public enum Status { UNSENT, PENDING, SENT, FAILED, REJECTED, DELIVERED }
+	public enum Status {
+		UNSENT, PENDING, SENT, FAILED, REJECTED, DELIVERED;
+		boolean canBeRetried() { return this != UNSENT && this != SENT && this != DELIVERED; }
+	}
 
 	public final String id;
 	public final long lastAction;
@@ -30,5 +35,16 @@ class WoMessage {
 //> ACCESSORS
 	public String toString() {
 		return String.format("%s@%s-%s", getClass().getSimpleName(), id, status);
+	}
+
+//> FACTORIES
+	public static WoMessage from(Cursor c) {
+		String id = c.getString(0);
+		Status status = Status.valueOf(c.getString(1));
+		long lastAction = c.getLong(2);
+		String to = c.getString(3);
+		String content = c.getString(4);
+
+		return new WoMessage(id, status, lastAction, to, content);
 	}
 }
