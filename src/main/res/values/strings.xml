@@ -12,6 +12,7 @@
 	<string name="errRequired">required</string>
 	<string name="errInvalidUrl">must be a valid URL</string>
 
+	<string name="btnOk">OK</string>
 	<string name="btnSave">Save</string>
 	<string name="btnCancel">Cancel</string>
 	<string name="btnContinue">Continue</string>
@@ -31,6 +32,11 @@
 	</string>
 	<string name="btnHelpMeSetDefaultMessagingApp">Help me change</string>
 	<string name="btnIDontCare">I don\'t care</string>
+
+	<string name="txtPermissionsPrompt"><b>Warning: <tt>medic-gateway</tt> does not currently have permissions to send and receive SMS.</b>\n
+		\n
+		\nThe app may not perform as expected.
+	</string>
 
 	<string name="txtRetryTitle">Retry message?</string>
 	<string name="txtRetryWtBody">Retry forwarding message from %s to webapp?</string>

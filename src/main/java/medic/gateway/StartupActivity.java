@@ -5,7 +5,6 @@ import android.content.*;
 import android.webkit.*;
 import android.os.*;
 
-import static medic.gateway.Capabilities.*;
 import static medic.gateway.GatewayLog.*;
 import static medic.gateway.Utils.*;
 
@@ -14,13 +13,9 @@ public class StartupActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
 
-		if(SettingsStore.in(this).hasSettings()) {
-			log("Starting MessageListsActivity...");
-			startActivity(new Intent(this, MessageListsActivity.class));
-		} else {
-			log("Starting settings activity...");
-			startSettingsActivity(this, getCapabilities());
-		}
+		if(!hasRequiredPermissions(this)) {
+			startActivity(new Intent(this, PromptForSmsPermissionsActivity.class));
+		} else startSettingsOrMainActivity(this);
 
 		finish();
 	}

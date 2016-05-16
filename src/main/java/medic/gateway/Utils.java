@@ -1,6 +1,9 @@
 package medic.gateway;
 
+import android.Manifest.permission;
 import android.content.*;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +12,8 @@ import java.util.*;
 import org.json.*;
 
 import static medic.gateway.BuildConfig.DEBUG;
+import static medic.gateway.Capabilities.getCapabilities;
+import static medic.gateway.GatewayLog.*;
 
 @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
 		"PMD.NPathComplexity",
@@ -120,8 +125,24 @@ public final class Utils {
 		ctx.startActivity(new Intent(ctx, activity));
 	}
 
+	public static boolean hasRequiredPermissions(Context ctx) {
+		boolean canSend = ContextCompat.checkSelfPermission(ctx, permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
+		boolean canReceive = ContextCompat.checkSelfPermission(ctx, permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+		return canSend && canReceive;
+	}
+
 	public static void setText(View v, int textViewId, String text) {
 		TextView tv = (TextView) v.findViewById(textViewId);
 		tv.setText(text);
+	}
+
+	public static void startSettingsOrMainActivity(Context ctx) {
+		if(SettingsStore.in(ctx).hasSettings()) {
+			trace(ctx, "Starting MessageListsActivity...");
+			ctx.startActivity(new Intent(ctx, MessageListsActivity.class));
+		} else {
+			trace(ctx, "Starting settings activity...");
+			startSettingsActivity(ctx, getCapabilities());
+		}
 	}
 }
