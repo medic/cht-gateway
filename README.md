@@ -206,7 +206,9 @@ TODO walkthrough
 
 TODO walkthrough
 
-# "Default SMS/Messaging app"
+# Android Version Support
+
+## "Default SMS/Messaging app"
 
 Some changes were made to the Android SMS APIs in 4.4 (Kitkat®).  The significant change was this:
 
@@ -219,14 +221,18 @@ Some reading on this can be found at:
 
 Adding support for kitkat® means that there is some extra code in `medic-gateway` whose purpose is not obvious:
 
-## Non-existent activities in `AndroidManifest.xml`
+### Non-existent activities in `AndroidManifest.xml`
 
 Activities `HeadlessSmsSendService` and `ComposeSmsActivity` are declared in `AndroidManifest.xml`, but are not implemented in the code.
 
-## Unwanted permissions
+### Unwanted permissions
 
 The `BROADCAST_WAP_PUSH` permission is requested in `AndroidManifest.xml`, and an extra `BroadcastReceiver`, `MmsIntentProcessor` is declared.  When `medic-gateway` is the default messaging app on a device, incoming MMS messages will be ignored.  Actual WAP Push messages are probably ignored too.
 
-## Extra intents
+### Extra intents
 
 To support being the default messaging app, `medic-gateway` listens for `SMS_DELIVER` as well as `SMS_RECEIVED`.  If the default SMS app, we need to ignore `SMS_RECEIVED`.
+
+## Runtime Permissions
+
+Since Android 6.0 (marshmallow), permissions for sending and receiving SMS must be requested both in `AndroidManifest.xml` and also at runtime.  Read more at https://developer.android.com/intl/ru/about/versions/marshmallow/android-6.0-changes.html#behavior-runtime-permissions
