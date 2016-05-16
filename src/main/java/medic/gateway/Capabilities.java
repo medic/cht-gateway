@@ -1,9 +1,9 @@
 package medic.gateway;
 
 import android.annotation.TargetApi;
-import android.content.*;
-import android.os.*;
-import android.provider.*;
+import android.content.Context;
+import android.os.Build;
+import android.provider.Telephony;
 
 public class Capabilities {
 	@TargetApi(19)
