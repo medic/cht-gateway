@@ -1,9 +1,9 @@
 `medic-gateway`
 ===============
 
-<a href="https://travis-ci.org/alxndrsn/medic-gateway"><img src="https://travis-ci.org/alxndrsn/medic-gateway.svg?branch=master"/></a>
+<a href="https://travis-ci.org/medic/medic-gateway"><img src="https://travis-ci.org/medic/medic-gateway.svg?branch=master"/></a>
 
-Download APKs from: https://github.com/alxndrsn/medic-gateway/releases
+Download APKs from: https://github.com/medic/medic-gateway/releases
 
 -----
 
