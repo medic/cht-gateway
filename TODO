@@ -8,7 +8,6 @@ TODO
 
 CONSIDER DOING
 
-* allow retrying of one or many messages from the WoMessageList
 * retry failed WtMessages
 * get list views working on a load-more-on-scroll basis
 * add option to switch back to the standard default SMS app
