@@ -143,6 +143,13 @@ public class SimpleJsonClient2 {
 //> STATIC HELPERS
 	private static HttpURLConnection openConnection(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+		String userAgent = String.format("%s %s/%s",
+				System.getProperty("http.agent"),
+				BuildConfig.APPLICATION_ID,
+				BuildConfig.VERSION_NAME);
+		conn.setRequestProperty("User-Agent", userAgent);
+
 		if(url.getUserInfo() != null) {
 			conn.setRequestProperty("Authorization", "Basic " + base64encode(url.getUserInfo()));
 		}
