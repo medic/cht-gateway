@@ -62,7 +62,8 @@ public class DbTestHelper {
 		ContentValues v = new ContentValues();
 		long initialCount = count(tableName);
 		for(int i=cols.length-1; i>=0; --i) {
-			if(vals[i] instanceof String) v.put(cols[i], (String) vals[i]);
+			if(vals[i] == null) v.put(cols[i], (String) null);
+			else if(vals[i] instanceof String) v.put(cols[i], (String) vals[i]);
 			else if(vals[i] instanceof Byte) v.put(cols[i], (Byte) vals[i]);
 			else if(vals[i] instanceof Short) v.put(cols[i], (Short) vals[i]);
 			else if(vals[i] instanceof Integer) v.put(cols[i], (Integer) vals[i]);
@@ -94,7 +95,9 @@ public class DbTestHelper {
 
 					String failMessage = String.format("Expected row: %s.  Unexpected value at (%s, %s):",
 							expectedRow, i, j);
-					if(expected instanceof Pattern) {
+					if(expected == null) {
+						assertNull(failMessage, actual);
+					} else if(expected instanceof Pattern) {
 						assertMatches(failMessage, expected, actual);
 					} else if(expected instanceof Boolean) {
 						String expectedString = ((Boolean) expected) ? "1" : "0";

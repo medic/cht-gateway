@@ -1,7 +1,5 @@
 package medic.gateway;
 
-import android.database.Cursor;
-
 import java.util.*;
 
 import static java.util.UUID.randomUUID;
@@ -44,16 +42,5 @@ class WtMessage {
 
 	public String toString() {
 		return String.format("%s@%s-%s", getClass().getSimpleName(), id, status);
-	}
-
-//> FACTORIES
-	public static WtMessage from(Cursor c) {
-		String id = c.getString(0);
-		Status status = Status.valueOf(c.getString(1));
-		long lastAction = c.getLong(2);
-		String from = c.getString(3);
-		String content = c.getString(4);
-
-		return new WtMessage(id, status, lastAction, from, content);
 	}
 }

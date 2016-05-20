@@ -12,6 +12,9 @@ import org.junit.*;
 
 import static android.app.Activity.RESULT_OK;
 import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
+import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
+import static android.telephony.SmsManager.RESULT_ERROR_NULL_PDU;
+import static android.telephony.SmsManager.RESULT_ERROR_RADIO_OFF;
 import static medic.gateway.WoMessage.Status.*;
 import static medic.gateway.test.DbTestHelper.*;
 import static medic.gateway.test.TestUtils.*;
@@ -54,6 +57,70 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
+	public void test_onReceive_GENERIC_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING);
+		db.assertTable("wo_message",
+				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_GENERIC_FAILURE, 99);
+
+		// then
+		db.assertTable("wo_message",
+				id, "FAILED", true, "generic:99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+	}
+
+	@Test
+	public void test_onReceive_RADIO_OFF_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING);
+		db.assertTable("wo_message",
+				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_RADIO_OFF);
+
+		// then
+		db.assertTable("wo_message",
+				id, "FAILED", true, "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+	}
+
+	@Test
+	public void test_onReceive_NO_SERVICE_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING);
+		db.assertTable("wo_message",
+				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_NO_SERVICE);
+
+		// then
+		db.assertTable("wo_message",
+				id, "FAILED", true, "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+	}
+
+	@Test
+	public void test_onReceive_NULL_PDU_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING);
+		db.assertTable("wo_message",
+				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_NULL_PDU);
+
+		// then
+		db.assertTable("wo_message",
+				id, "FAILED", true, "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+	}
+
+	@Test
 	public void test_onReceive_shouldUpdateDeliveryStatusOfSentWoMessage() throws Exception {
 		// given
 		String id = randomUuid();
@@ -86,7 +153,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		aWoMessageIsInDbWith(id, DELIVERED);
 
 		// when
-		aDeliveryFailedReportArrivesFor(id);
+		aSendFailureReportArrivesFor(id);
 
 		// then
 		assertDbStatusOf(id, DELIVERED);
@@ -111,15 +178,28 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	private void aDeliveryReportArrivesFor(String id) {
-		deliver(intentFor("medic.gateway.DELIVERY_REPORT", id));
+		Intent i = intentFor("medic.gateway.DELIVERY_REPORT", id);
+		i.putExtra("format", "3gpp");
+		i.putExtra("pdu", A_VALID_DELIVERED_REPORT);
+		deliver(i);
 	}
 
 	private void aSendingReportArrivesFor(String id) {
 		deliver(intentFor("medic.gateway.SENDING_REPORT", id), RESULT_OK);
 	}
 
-	private void aDeliveryFailedReportArrivesFor(String id) {
-		deliver(intentFor("medic.gateway.SENDING_REPORT", id), RESULT_ERROR_GENERIC_FAILURE);
+	private void aSendFailureReportArrivesFor(String id) {
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_GENERIC_FAILURE);
+	}
+
+	private void aSendFailureReportArrivesFor(String id, int resultCode) {
+		deliver(intentFor("medic.gateway.SENDING_REPORT", id), resultCode);
+	}
+
+	private void aSendFailureReportArrivesFor(String id, int resultCode, int errorCode) {
+		Intent sendIntent = intentFor("medic.gateway.SENDING_REPORT", id);
+		sendIntent.putExtra("errorCode", errorCode);
+		deliver(sendIntent, RESULT_ERROR_GENERIC_FAILURE);
 	}
 
 	private Intent intentFor(String action, String id) {

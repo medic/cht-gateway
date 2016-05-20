@@ -23,7 +23,9 @@ import static org.junit.Assert.*;
 @SuppressFBWarnings("MS_MUTABLE_ARRAY")
 public final class TestUtils {
 	public static final String A_PHONE_NUMBER = "+447890123123";
+	public static final Pattern ANY_PHONE_NUMBER = Pattern.compile("\\+\\d{7,12}");
 	public static final String SOME_CONTENT = "Hello.";
+	public static final Pattern ANY_CONTENT = Pattern.compile(".*");
 	public static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
 	public static final Pattern ANY_ID = Pattern.compile("[a-f0-9-]+");
 
@@ -40,6 +42,10 @@ public final class TestUtils {
 	};
 	public static final byte[] A_VALID_MULTIPART_GSM_PDU__PART_2 = {
 		(byte) 0x07, (byte) 0x91, (byte) 0x44, (byte) 0x97, (byte) 0x37, (byte) 0x01, (byte) 0x90, (byte) 0x37, (byte) 0x64, (byte) 0x0C, (byte) 0x91, (byte) 0x44, (byte) 0x87, (byte) 0x09, (byte) 0x99, (byte) 0x99, (byte) 0x99, (byte) 0x00, (byte) 0x00, (byte) 0x90, (byte) 0x20, (byte) 0x11, (byte) 0x71, (byte) 0x85, (byte) 0x63, (byte) 0x00, (byte) 0x25, (byte) 0x06, (byte) 0x08, (byte) 0x04, (byte) 0xB9, (byte) 0xDB, (byte) 0x02, (byte) 0x02, (byte) 0xA0, (byte) 0x30, (byte) 0x3C, (byte) 0x2C, (byte) 0xA7, (byte) 0x83, (byte) 0xCC, (byte) 0xF2, (byte) 0x77, (byte) 0x1B, (byte) 0x44, (byte) 0x47, (byte) 0x97, (byte) 0x41, (byte) 0x6F, (byte) 0x79, (byte) 0xFA, (byte) 0x9C, (byte) 0x76, (byte) 0x87, (byte) 0xD9, (byte) 0xA0, (byte) 0xB7, (byte) 0xBB, (byte) 0x1C, (byte) 0x02,
+	};
+
+	public static final byte[] A_VALID_DELIVERED_REPORT = {
+		(byte) 0x07, (byte) 0x91, (byte) 0x52, (byte) 0x74, (byte) 0x22, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x06, (byte) 0x07, (byte) 0x0A, (byte) 0x81, (byte) 0x70, (byte) 0x20, (byte) 0x95, (byte) 0x77, (byte) 0x11, (byte) 0x11, (byte) 0x21, (byte) 0x12, (byte) 0x11, (byte) 0x33, (byte) 0x91, (byte) 0xE1, (byte) 0x11, (byte) 0x21, (byte) 0x12, (byte) 0x11, (byte) 0x33, (byte) 0x91, (byte) 0x21, (byte) 0x00,
 	};
 
 	private TestUtils() {}

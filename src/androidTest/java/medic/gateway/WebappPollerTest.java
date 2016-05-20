@@ -15,6 +15,8 @@ import static medic.gateway.test.TestUtils.*;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WebappPollerTest extends AndroidTestCase {
+	private static final String NO_REASON = null;
+
 	private WebappPoller poller;
 
 	private DbTestHelper db;
@@ -114,7 +116,31 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.assertPostRequestMade_withJsonResponse();
 		// and
 		db.assertTable("wo_message",
-				ANY_ID, "DELIVERED", false, 0, A_PHONE_NUMBER, SOME_CONTENT);
+				ANY_ID, "DELIVERED", false, NO_REASON, 0, A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
+	@Test
+	public void test_pollWebapp_shouldIncludeReasonForFailedDeliveries() throws Exception {
+		// given
+		String messageId = randomUuid();
+		db.insert("wo_message",
+				cols("_id", "status", "status_needs_forwarding", "failure_reason", "last_action", "_to", "content"),
+				vals(messageId, WoMessage.Status.FAILED, true, "something-awful", 0, A_PHONE_NUMBER, SOME_CONTENT));
+		http.nextResponseJson("{}");
+
+		// when
+		poller.pollWebapp();
+
+		// then
+		JSONObject response = http.assertPostRequestMade_withJsonResponse();
+		JSONArray deliveries = response.getJSONArray("deliveries");
+		assertEquals(1, deliveries.length());
+
+		// and
+		JSONObject delivery = deliveries.getJSONObject(0);
+		assertEquals(messageId, delivery.getString("id"));
+		assertEquals("FAILED", delivery.getString("status"));
+		assertEquals("something-awful", delivery.getString("reason"));
 	}
 
 //> RESPONSE CONTENT TESTS
@@ -198,8 +224,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"aaa-111", "UNSENT", false, ANY_NUMBER, "+1", "testing: one",
-				"aaa-222", "UNSENT", false, ANY_NUMBER, "+2", "testing: two");
+				"aaa-111", "UNSENT", false, NO_REASON, ANY_NUMBER, "+1", "testing: one",
+				"aaa-222", "UNSENT", false, NO_REASON, ANY_NUMBER, "+2", "testing: two");
 	}
 
 	@Test
@@ -236,7 +262,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"ok-111", "UNSENT", false, ANY_NUMBER, "+1", "ok: one",
-				"ok-222", "UNSENT", false, ANY_NUMBER, "+2", "ok: two");
+				"ok-111", "UNSENT", false, NO_REASON, ANY_NUMBER, "+1", "ok: one",
+				"ok-222", "UNSENT", false, NO_REASON, ANY_NUMBER, "+2", "ok: two");
 	}
 }

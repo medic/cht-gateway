@@ -35,6 +35,7 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WO_clmID = "_id";
 	private static final String WO_clmSTATUS = "status";
 	private static final String WO_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
+	private static final String WO_clmFAILURE_REASON = "failure_reason";
 	private static final String WO_clmLAST_ACTION = "last_action";
 	private static final String WO_clmTO = "_to";
 	private static final String WO_clmCONTENT = "content";
@@ -77,10 +78,11 @@ public final class Db extends SQLiteOpenHelper {
 					"%s TEXT NOT NULL PRIMARY KEY, " +
 					"%s TEXT NOT NULL, " +
 					"%s INTEGER NOT NULL, " +
+					"%s TEXT, " +
 					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
-				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
+				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmFAILURE_REASON, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
 	}
 
 	public void onUpgrade(SQLiteDatabase db,
@@ -114,12 +116,27 @@ public final class Db extends SQLiteOpenHelper {
 		return id != -1;
 	}
 
+	void setFailed(WoMessage m, String failureReason) {
+		updateStatus(m, WoMessage.Status.PENDING, WoMessage.Status.FAILED, failureReason);
+	}
+
 	boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus) {
+		return updateStatus(m, oldStatus, newStatus, null);
+	}
+
+	private boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus, String failureReason) {
 		log("updateStatus() :: %s :: %s -> %s", m, oldStatus, newStatus);
+
+		if((newStatus == WoMessage.Status.FAILED) == (failureReason == null))
+			throw new IllegalArgumentException(String.format(
+					"Give failureReason iff new status == FAILED (newStatus=%s, failureReason=%s)",
+					newStatus,
+					failureReason));
 
 		ContentValues v = new ContentValues();
 		v.put(WO_clmSTATUS, newStatus.toString());
 		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
+		v.put(WO_clmFAILURE_REASON, failureReason);
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 
 		int affected;
@@ -145,6 +162,7 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WO_clmID, m.id);
 		v.put(WO_clmSTATUS, m.status.toString());
 		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
+		v.put(WO_clmFAILURE_REASON, m.status == WoMessage.Status.FAILED ? m.getFailureReason() : null);
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 		v.put(WO_clmTO, m.to);
 		v.put(WO_clmCONTENT, m.content);
@@ -179,12 +197,7 @@ public final class Db extends SQLiteOpenHelper {
 			ArrayList<WoMessage> list = new ArrayList<>(count);
 			c.moveToFirst();
 			while(count-- > 0) {
-				list.add(new WoMessage(
-						c.getString(0),
-						WoMessage.Status.valueOf(c.getString(1)),
-						c.getLong(2),
-						c.getString(3),
-						c.getString(4)));
+				list.add(woMessageFrom(c));
 				c.moveToNext();
 			}
 			return list;
@@ -195,11 +208,22 @@ public final class Db extends SQLiteOpenHelper {
 
 	private Cursor getWoMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		return db.query(tblWO_MESSAGE,
-				cols(WO_clmID, WO_clmSTATUS, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT),
+				cols(WO_clmID, WO_clmSTATUS, WO_clmFAILURE_REASON, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
 				sort == null? null: sort.apply(WO_clmLAST_ACTION),
 				Integer.toString(maxCount));
+	}
+
+	public static WoMessage woMessageFrom(Cursor c) {
+		String id = c.getString(0);
+		WoMessage.Status status = WoMessage.Status.valueOf(c.getString(1));
+		String failureReason = c.getString(2);
+		long lastAction = c.getLong(3);
+		String to = c.getString(4);
+		String content = c.getString(5);
+
+		return new WoMessage(id, status, failureReason, lastAction, to, content);
 	}
 
 //> WtMessage HANDLERS
@@ -284,6 +308,17 @@ public final class Db extends SQLiteOpenHelper {
 				Integer.toString(maxCount));
 	}
 
+	static WtMessage wtMessageFrom(Cursor c) {
+		String id = c.getString(0);
+		WtMessage.Status status = WtMessage.Status.valueOf(c.getString(1));
+		long lastAction = c.getLong(2);
+		String from = c.getString(3);
+		String content = c.getString(4);
+
+		return new WtMessage(id, status, lastAction, from, content);
+	}
+
+//> DB SEEDING
 	private void seed() {
 		WtMessages: {
 			store(new WtMessage("+254789123123", "hello from kenya"));

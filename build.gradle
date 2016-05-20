@@ -85,13 +85,9 @@ connectedCheck.doLast {
 }
 
 android {
-	if(System.env.TRAVIS == 'true') {
-		compileSdkVersion 21
-		buildToolsVersion '21.1.2'
-	} else {
-		compileSdkVersion 23
-		buildToolsVersion '23.0.3'
-	}
+	compileSdkVersion 23
+	buildToolsVersion '23.0.3'
+
 	packagingOptions {
 		exclude 'META-INF/LICENSE'
 		exclude 'META-INF/NOTICE'
