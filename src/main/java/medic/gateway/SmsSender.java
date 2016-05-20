@@ -59,7 +59,7 @@ public class SmsSender {
 		} else {
 			logEvent(ctx, "Not sending SMS to '%s' because number appears invalid ('%s')",
 					m.to, m.content);
-			db.updateStatus(m, PENDING, REJECTED);
+			db.setFailed(m, "destination.invalid");
 		}
 	}
 

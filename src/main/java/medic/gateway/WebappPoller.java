@@ -142,10 +142,14 @@ class GatewayRequest {
 
 		for(WoMessage m : statusUpdates) {
 			try {
-				json.put(json(
+				JSONObject deliveryUpdate = json(
 					"id", m.id,
 					"status", m.status.toString()
-				));
+				);
+				if(m.status == WoMessage.Status.FAILED) {
+					deliveryUpdate.put("reason", m.getFailureReason());
+				}
+				json.put(deliveryUpdate);
 			} catch(Exception ex) {
 				logException(ex, "GatewayRequest.getStatusUpdateJson()");
 			}

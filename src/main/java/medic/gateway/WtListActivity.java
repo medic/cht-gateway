@@ -53,7 +53,7 @@ class WtMessageCursorAdapter extends ResourceCursorAdapter {
 	}
 
 	public void bindView(View v, Context ctx, Cursor c) {
-		WtMessage m = WtMessage.from(c);
+		WtMessage m = Db.wtMessageFrom(c);
 
 		setText(v, R.id.txtWtStatus, m.getStatus().toString());
 		setText(v, R.id.txtWtLastAction, relativeTimestamp(m.getLastAction()));
@@ -74,7 +74,7 @@ class WtListItemClickListener implements AdapterView.OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 		Cursor c = (Cursor) list.getItemAtPosition(position);
-		final WtMessage m = WtMessage.from(c);
+		final WtMessage m = Db.wtMessageFrom(c);
 
 		if(m.getStatus().canBeRetried()) {
 			retryDialog(m, position).show();

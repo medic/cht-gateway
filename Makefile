@@ -1,6 +1,6 @@
 ADB = ${ANDROID_HOME}/platform-tools/adb
 EMULATOR = ${ANDROID_HOME}/tools/emulator
-GRADLEW = ./gradlew --daemon
+GRADLEW = ./gradlew --daemon --parallel --stacktrace
 
 ifdef ComSpec	 # Windows
   # Use `/` for all paths, except `.\`
@@ -29,7 +29,7 @@ logs:
 	${ADB} logcat MedicGateway:V AndroidRuntime:E *:S | tee android.log
 
 deploy:
-	${GRADLEW} --daemon --parallel installDebug
+	${GRADLEW} installDebug
 
 kill:
 	pkill -9 emulator64-arm
@@ -47,6 +47,6 @@ stats:
 	./scripts/project_stats
 
 travis: stats
-	./gradlew check test assemble
+	${GRADLEW} check test assemble
 	./scripts/start_emulator
-	./gradlew connectedCheck
+	${GRADLEW} connectedCheck

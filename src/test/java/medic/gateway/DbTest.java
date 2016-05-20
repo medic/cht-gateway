@@ -137,8 +137,8 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.REJECTED, false, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "status_needs_forwarding", "failure_reason", "last_action", "_to", "content"),
+				vals(id, WoMessage.Status.FAILED, false, "failure-reason", 0, A_PHONE_NUMBER, SOME_CONTENT));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
 		// when
@@ -146,7 +146,7 @@ public class DbTest {
 
 		// then
 		Cursor c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
-		assertEquals("REJECTED", c.getString(0));
+		assertEquals("FAILED", c.getString(0));
 		assertEquals(0, c.getLong(1));
 	}
 
@@ -197,7 +197,7 @@ public class DbTest {
 	}
 
 	private static WoMessage aMessageWith(String id, WoMessage.Status status) {
-		return new WoMessage(id, status, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
+		return new WoMessage(id, status, null, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
 	}
 
 	private static SmsMessage anSmsWith(String from, String content) {

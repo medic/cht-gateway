@@ -9,14 +9,19 @@ import java.io.*;
 import java.util.*;
 
 import static android.app.Activity.RESULT_OK;
-import static medic.gateway.GatewayLog.*;
-import static medic.gateway.SmsCompatibility.*;
-import static medic.gateway.Utils.*;
-import static medic.gateway.WoMessage.Status.*;
+import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
+import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
+import static android.telephony.SmsManager.RESULT_ERROR_NULL_PDU;
+import static android.telephony.SmsManager.RESULT_ERROR_RADIO_OFF;
+import static medic.gateway.GatewayLog.logEvent;
+import static medic.gateway.GatewayLog.logException;
+import static medic.gateway.SmsCompatibility.getMessagesFromIntent;
+import static medic.gateway.SmsCompatibility.SMS_DELIVER_ACTION;
+import static medic.gateway.SmsCompatibility.SMS_RECEIVED_ACTION;
+import static medic.gateway.WoMessage.Status.PENDING;
+import static medic.gateway.WoMessage.Status.SENT;
 
 public class IntentProcessor extends BroadcastReceiver {
-	private static final WoMessage.Status ANY_STATUS = null;
-
 	static final String SENDING_REPORT = "medic.gateway.SENDING_REPORT";
 	static final String DELIVERY_REPORT = "medic.gateway.DELIVERY_REPORT";
 
@@ -46,7 +51,7 @@ public class IntentProcessor extends BroadcastReceiver {
 					handleSendingReport(ctx, intent);
 					break;
 				case DELIVERY_REPORT:
-					handleDeliveryReport(ctx, intent);
+					new DeliveryReportHandler(ctx).handle(intent);
 					break;
 				default:
 					throw new IllegalStateException("Unexpected intent: " + intent);
@@ -113,23 +118,22 @@ public class IntentProcessor extends BroadcastReceiver {
 				case RESULT_OK:
 					db.updateStatus(m, PENDING, SENT);
 					break;
+				case RESULT_ERROR_GENERIC_FAILURE:
+					int errorCode = intent.getIntExtra("errorCode", -1);
+					db.setFailed(m, "generic:" + errorCode);
+					break;
+				case RESULT_ERROR_NO_SERVICE:
+					db.setFailed(m, "no-service");
+					break;
+				case RESULT_ERROR_NULL_PDU:
+					db.setFailed(m, "null-pdu");
+					break;
+				case RESULT_ERROR_RADIO_OFF:
+					db.setFailed(m, "radio-off");
+					break;
 				default:
-					db.updateStatus(m, PENDING, FAILED);
+					db.setFailed(m, "unknown:" + resultCode);
 			}
-		}
-	}
-
-	private void handleDeliveryReport(Context ctx, Intent intent) {
-		String id = intent.getStringExtra("id");
-		int part = intent.getIntExtra("part", -1);
-		logEvent(ctx, "Received delivery report for message %s part %s.", id, part);
-
-		Db db = Db.getInstance(ctx);
-		WoMessage m = db.getWoMessage(id);
-		if(m == null) {
-			logEvent(ctx, "Could not find SMS %s in database for delivery report.", id);
-		} else {
-			db.updateStatus(m, ANY_STATUS, DELIVERED);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package medic.gateway;
 
+import android.os.Build;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
@@ -31,10 +32,23 @@ final class SmsCompatibility {
 	@SuppressLint("NewApi") // Available in older APIs, but not officially public
 	public static final Uri SMS_INBOX = android.provider.Telephony.Sms.Inbox.CONTENT_URI;
 
+	private SmsCompatibility() {}
+
 	@SuppressLint("NewApi") // Available in older APIs, but not officially public
 	public static SmsMessage[] getMessagesFromIntent(Intent i) {
 		return android.provider.Telephony.Sms.Intents.getMessagesFromIntent(i);
 	}
 
-	private SmsCompatibility() {}
+	/**
+	 * @see https://developer.android.com/reference/android/telephony/SmsMessage.html#createFromPdu%28byte[],%20java.lang.String%29
+	 */
+	public static SmsMessage createFromPdu(Intent intent) {
+		byte[] pdu = intent.getByteArrayExtra("pdu");
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			String format = intent.getStringExtra("format");
+			return SmsMessage.createFromPdu(pdu, format);
+		} else {
+			return SmsMessage.createFromPdu(pdu);
+		}
+	}
 }

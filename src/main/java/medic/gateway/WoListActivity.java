@@ -51,7 +51,7 @@ class WoMessageCursorAdapter extends ResourceCursorAdapter {
 	}
 
 	public void bindView(View v, Context ctx, Cursor c) {
-		WoMessage m = WoMessage.from(c);
+		WoMessage m = Db.woMessageFrom(c);
 
 		setText(v, R.id.txtWoStatus, m.status.toString());
 		setText(v, R.id.txtWoLastAction, relativeTimestamp(m.lastAction));
@@ -72,7 +72,7 @@ class WoListItemClickListener implements AdapterView.OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 		Cursor c = (Cursor) list.getItemAtPosition(position);
-		final WoMessage m = WoMessage.from(c);
+		final WoMessage m = Db.woMessageFrom(c);
 
 		if(m.status.canBeRetried()) {
 			retryDialog(m, position).show();
