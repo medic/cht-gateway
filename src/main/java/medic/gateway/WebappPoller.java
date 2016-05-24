@@ -113,7 +113,7 @@ class GatewayRequest {
 	public JSONObject getJson() throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("messages", getMessagesJson());
-		json.put("deliveries", getStatusUpdateJson());
+		json.put("updates", getStatusUpdateJson());
 		return json;
 	}
 

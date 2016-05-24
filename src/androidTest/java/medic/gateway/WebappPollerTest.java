@@ -93,7 +93,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
 
-		JSONArray messages = requestBody.getJSONArray("deliveries");
+		JSONArray messages = requestBody.getJSONArray("updates");
 		assertEquals(1, messages.length());
 
 		JSONObject message = (JSONObject) messages.get(0);
@@ -133,14 +133,14 @@ public class WebappPollerTest extends AndroidTestCase {
 
 		// then
 		JSONObject response = http.assertPostRequestMade_withJsonResponse();
-		JSONArray deliveries = response.getJSONArray("deliveries");
-		assertEquals(1, deliveries.length());
+		JSONArray statusUpdates = response.getJSONArray("updates");
+		assertEquals(1, statusUpdates.length());
 
 		// and
-		JSONObject delivery = deliveries.getJSONObject(0);
-		assertEquals(messageId, delivery.getString("id"));
-		assertEquals("FAILED", delivery.getString("status"));
-		assertEquals("something-awful", delivery.getString("reason"));
+		JSONObject update = statusUpdates.getJSONObject(0);
+		assertEquals(messageId, update.getString("id"));
+		assertEquals("FAILED", update.getString("status"));
+		assertEquals("something-awful", update.getString("reason"));
 	}
 
 //> RESPONSE CONTENT TESTS

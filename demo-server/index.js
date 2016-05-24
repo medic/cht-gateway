@@ -73,7 +73,7 @@ var port = process.env.PORT || 8000,
               .then(JSON.parse)
               .then(function(json) {
                 push(datastore.webapp_terminating, json.messages);
-                push(datastore.delivery_reports, json.deliveries);
+                push(datastore.status_updates, json.updates);
 
                 res.end(JSON.stringify({
                   messages: datastore.webapp_originating.waiting,
@@ -120,7 +120,7 @@ function resetDatastore() {
       waiting: [],
       passed_to_gateway: [],
     },
-    delivery_reports: [],
+    status_updates: [],
     errors: [],
   };
 }
