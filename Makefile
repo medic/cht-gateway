@@ -9,10 +9,13 @@ ifdef ComSpec	 # Windows
   GRADLEW := $(subst /,\,${GRADLEW})
 endif
 
-.PHONY: default assets clean test deploy emulator kill logs prod
+.PHONY: default assets build clean test deploy emulator kill logs
 
-default: clean deploy logs
-prod: clean deploy
+default:
+	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
+
+build:
+	${GRADLEW} assembleDebug
 
 clean:
 	rm -rf src/main/assets/
