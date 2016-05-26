@@ -22,7 +22,7 @@ clean:
 	rm -rf build/
 
 test:
-	${GRADLEW} check test connectedCheck
+	${GRADLEW} clean check test connectedCheck
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
