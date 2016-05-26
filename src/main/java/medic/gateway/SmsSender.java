@@ -47,19 +47,19 @@ public class SmsSender {
 	private void sendSms(WoMessage m) {
 		logEvent(ctx, "sendSms() :: [%s] '%s'", m.to, m.content);
 
-		if(isGlobalPhoneNumber(m.to)) {
-			boolean statusUpdated = db.updateStatus(m, UNSENT, PENDING);
-			if(statusUpdated) {
+		boolean statusUpdated = db.updateStatus(m, UNSENT, PENDING);
+		if(statusUpdated) {
+			if(isGlobalPhoneNumber(m.to)) {
 				ArrayList<String> parts = smsManager.divideMessage(m.content);
 				smsManager.sendMultipartTextMessage(m.to, DEFAULT_SMSC,
 						parts,
 						intentsFor(SENDING_REPORT, m, parts),
 						intentsFor(DELIVERY_REPORT, m, parts));
+			} else {
+				logEvent(ctx, "Not sending SMS to '%s' because number appears invalid ('%s')",
+						m.to, m.content);
+				db.setFailed(m, "destination.invalid");
 			}
-		} else {
-			logEvent(ctx, "Not sending SMS to '%s' because number appears invalid ('%s')",
-					m.to, m.content);
-			db.setFailed(m, "destination.invalid");
 		}
 	}
 
