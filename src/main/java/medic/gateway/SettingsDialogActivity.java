@@ -49,7 +49,8 @@ public class SettingsDialogActivity extends Activity {
 				if(result.isOk) {
 					boolean savedOk = saveSettings(new Settings(result.webappUrl, syncEnabled));
 					if(savedOk) {
-						start();
+						logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", result.webappUrl);
+						startApp();
 						return;
 					}
 				}
@@ -97,7 +98,7 @@ public class SettingsDialogActivity extends Activity {
 		}
 	}
 
-	private void start() {
+	private void startApp() {
 		AsyncTask.execute(new Runnable() {
 			public void run() {
 				AlarmListener.restart(SettingsDialogActivity.this);
