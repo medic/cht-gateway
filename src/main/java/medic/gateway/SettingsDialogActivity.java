@@ -48,12 +48,15 @@ public class SettingsDialogActivity extends Activity {
 			protected void onPostExecute(WebappUrlVerififcation result) {
 				if(result.isOk) {
 					boolean savedOk = saveSettings(new Settings(result.webappUrl, syncEnabled));
-					if(savedOk) start();
-				} else {
-					showError(R.id.txtWebappUrl, result.failure);
-					submitButton().setEnabled(true);
-					cancelButton().setEnabled(true);
+					if(savedOk) {
+						start();
+						return;
+					}
 				}
+
+				showError(R.id.txtWebappUrl, result.failure);
+				submitButton().setEnabled(true);
+				cancelButton().setEnabled(true);
 			}
 		}.execute(webappUrl);
 	}
