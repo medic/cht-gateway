@@ -9,7 +9,7 @@ import static medic.gateway.GatewayLog.*;
 
 public class AlarmListener implements WakefulIntentService.AlarmListener {
 	public void scheduleAlarms(AlarmManager am, PendingIntent pendingIntent, Context ctx) {
-		if(SettingsStore.in(ctx).isPollingEnabled()) {
+		if(Settings.in(ctx).isPollingEnabled()) {
 			logEvent(ctx, "AlarmManager.scheduleAlarms() :: polling enabled - setting alarms");
 			am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getPollInterval(ctx), pendingIntent);
 		} else {
@@ -23,7 +23,7 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 	}
 
 	public long getMaxAge(Context ctx) {
-		return SettingsStore.in(ctx).getPollInterval() * 2L;
+		return Settings.in(ctx).getPollInterval() * 2L;
 	}
 
 //> PUBLIC STATIC
@@ -34,6 +34,6 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 
 //> STATIC HELPERS
 	private static long getPollInterval(Context ctx) {
-		return SettingsStore.in(ctx).getPollInterval();
+		return Settings.in(ctx).getPollInterval();
 	}
 }

@@ -12,22 +12,25 @@ import static medic.gateway.BuildConfig.DEBUG;
 import static medic.gateway.GatewayLog.*;
 
 public class SettingsDialogActivity extends Activity {
-	private SettingsStore settings;
+	private boolean hasPreviousSettings;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
 
-		this.settings = SettingsStore.in(this);
+		SettingsStore store = SettingsStore.in(this);
+		hasPreviousSettings = store.hasSettings();
 
 		setContentView(R.layout.settings_dialog);
 
-		if(!this.settings.hasSettings()) {
+		if(hasPreviousSettings) {
+			Settings settings = store.get();
+
+			text(R.id.txtWebappUrl, settings.getWebappUrl());
+			check(R.id.cbxEnablePolling, settings.isPollingEnabled());
+		} else {
 			cancelButton().setVisibility(View.GONE);
 		}
-
-		text(R.id.txtWebappUrl, settings.getWebappUrl());
-		check(R.id.cbxEnablePolling, settings.isPollingEnabled());
 	}
 
 //> EVENT HANDLERS
@@ -68,7 +71,7 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 	public void onBackPressed() {
-		if(this.settings.hasSettings()) {
+		if(hasPreviousSettings) {
 			backToMessageListsView();
 		} else {
 			super.onBackPressed();
@@ -83,7 +86,7 @@ public class SettingsDialogActivity extends Activity {
 
 	private boolean saveSettings(Settings s) {
 		try {
-			settings.save(s);
+			SettingsStore.in(this).save(s);
 			return true;
 		} catch(IllegalSettingsException ex) {
 			logException(ex, "SettingsDialogActivity.saveSettings()");

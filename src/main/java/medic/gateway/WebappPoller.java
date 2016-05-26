@@ -34,8 +34,8 @@ public class WebappPoller {
 		logEvent(ctx, "Polling webapp (forwarding %d messages & %d status updates)...",
 				request.wtMessageCount(), request.statusUpdateCount());
 
-		SettingsStore settings = SettingsStore.in(ctx);
-		SimpleResponse response = new SimpleJsonClient2().post(settings.getWebappUrl(), request.getJson());
+		String webappUrl = Settings.in(ctx).getWebappUrl();
+		SimpleResponse response = new SimpleJsonClient2().post(webappUrl, request.getJson());
 		if(DEBUG) log(response.toString());
 
 		if(response.isError()) {

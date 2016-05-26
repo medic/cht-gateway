@@ -19,18 +19,11 @@ public class SettingsStore {
 	}
 
 //> ACCESSORS
-	public String getWebappUrl() { return get("app-url"); }
-
-	public long getPollInterval() { return 30 * 1000L; }
-
-	public boolean isPollingEnabled() { return prefs.getBoolean("polling-enabled", true); }
-
-	private String get(String key) {
-		return prefs.getString(key, null);
-	}
-
 	public Settings get() {
-		Settings s = new Settings(getWebappUrl(), isPollingEnabled());
+		final String webappUrl = prefs.getString("app-url", null);
+		final boolean pollingEnabled = prefs.getBoolean("polling-enabled", true);
+
+		Settings s = new Settings(webappUrl, pollingEnabled);
 		try {
 			s.validate();
 		} catch(IllegalSettingsException ex) {
@@ -64,6 +57,7 @@ public class SettingsStore {
 	}
 }
 
+@SuppressWarnings("PMD.ShortMethodName")
 class Settings {
 	public static final Pattern URL_PATTERN = Pattern.compile(
 			"http[s]?://([^/:]*)(:\\d*)?(.*)");
@@ -77,6 +71,14 @@ class Settings {
 		this.pollingEnabled = pollingEnabled;
 	}
 
+//> ACCESSORS
+	public String getWebappUrl() { return webappUrl; }
+
+	public boolean isPollingEnabled() { return pollingEnabled; }
+
+	public long getPollInterval() { return 30 * 1000L; }
+
+//> PUBLIC
 	public void validate() throws IllegalSettingsException {
 		List<IllegalSetting> errors = new LinkedList<>();
 
@@ -93,12 +95,18 @@ class Settings {
 		}
 	}
 
+//> PRIVATE HELPERS
 	private boolean isSet(String val) {
 		return val != null && val.length() > 0;
 	}
 
 	private void log(String message, Object...extras) {
 		trace(this, message, extras);
+	}
+
+//> FACTORIES
+	public static Settings in(Context ctx) {
+		return SettingsStore.in(ctx).get();
 	}
 }
 

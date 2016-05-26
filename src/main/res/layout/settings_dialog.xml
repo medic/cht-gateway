@@ -14,7 +14,8 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:layout_below="@id/txtWebappUrl"
-			android:text="@string/cbxEnablePolling"/>
+			android:text="@string/cbxEnablePolling"
+			android:checked="true"/>
 	<Button android:id="@+id/btnCancelSettings"
 			android:text="@string/btnCancel"
 			android:onClick="cancelSettingsEdit"

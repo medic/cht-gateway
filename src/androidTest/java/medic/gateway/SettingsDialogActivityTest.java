@@ -139,9 +139,8 @@ public class SettingsDialogActivityTest {
 		saveClicked();
 
 		// then
-		SettingsStore s = settingsStore();
 		assertTrue(settingsStore().hasSettings());
-		assertEquals(http.url(), s.getWebappUrl());
+		assertEquals(http.url(), settings().getWebappUrl());
 	}
 
 	@Test
@@ -169,9 +168,8 @@ public class SettingsDialogActivityTest {
 		saveClicked();
 
 		// then
-		SettingsStore s = settingsStore();
 		assertTrue(settingsStore().hasSettings());
-		assertFalse(s.isPollingEnabled());
+		assertFalse(settings().isPollingEnabled());
 	}
 
 	@Test
@@ -186,9 +184,8 @@ public class SettingsDialogActivityTest {
 		saveClicked();
 
 		// then
-		SettingsStore s = settingsStore();
 		assertTrue(settingsStore().hasSettings());
-		assertTrue(s.isPollingEnabled());
+		assertTrue(settings().isPollingEnabled());
 	}
 
 //> TEST HELPERS
@@ -230,6 +227,10 @@ public class SettingsDialogActivityTest {
 
 	private void assertVisible(int viewId) {
 		onView(withId(viewId)).check(matches(isDisplayed()));
+	}
+
+	private Settings settings() {
+		return Settings.in(getTargetContext());
 	}
 
 	private SettingsStore settingsStore() {
