@@ -32,14 +32,21 @@ public class SmsSender {
 	}
 
 	public void sendUnsentSmses() {
-		trace(this, "sendUnsentSmses()");
-		for(WoMessage m : db.getWoMessages(MAX_WO_MESSAGES, UNSENT)) {
-			try {
-				trace(this, "sendUnsentSmses() :: attempting to send %s", m);
-				sendSms(m);
-			} catch(Exception ex) {
-				logException(ex, "SmsSender.sendUnsentSmses() :: message=%s", m);
-				db.updateStatus(m, PENDING, FAILED);
+		List<WoMessage> smsForSending = db.getWoMessages(MAX_WO_MESSAGES, UNSENT);
+
+		if(smsForSending.isEmpty()) {
+			logEvent(ctx, "No SMS waiting to be sent.");
+		} else {
+			logEvent(ctx, "Sending %d SMSs...", smsForSending.size());
+
+			for(WoMessage m : smsForSending) {
+				try {
+					trace(this, "sendUnsentSmses() :: attempting to send %s", m);
+					sendSms(m);
+				} catch(Exception ex) {
+					logException(ex, "SmsSender.sendUnsentSmses() :: message=%s", m);
+					db.updateStatus(m, PENDING, FAILED);
+				}
 			}
 		}
 	}

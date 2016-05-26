@@ -19,7 +19,6 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 	}
 
 	public void sendWakefulWork(Context ctx) {
-		logEvent(ctx, "AlarmManager.sendWakefulWork()");
 		WakefulIntentService.sendWakefulWork(ctx, new Intent(ctx, WakefulService.class));
 	}
 

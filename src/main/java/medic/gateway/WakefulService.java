@@ -14,8 +14,6 @@ public class WakefulService extends WakefulIntentService {
 	}
 
 	public void doWakefulWork(Intent intent) {
-		logEvent(this, "WakefulService.doWakefulWork()");
-
 		try {
 			new SmsSender(this).sendUnsentSmses();
 		} catch(Exception ex) {

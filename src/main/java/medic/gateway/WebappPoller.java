@@ -27,11 +27,12 @@ public class WebappPoller {
 	}
 
 	public void pollWebapp() throws JSONException, MalformedURLException {
-		trace(this, "pollWebapp()");
-
 		GatewayRequest request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
 				db.getWoMessagesWithStatusChanges(MAX_WO_MESSAGES));
+
+		logEvent(ctx, "Polling webapp (forwarding %d messages & %d status updates)...",
+				request.wtMessageCount(), request.statusUpdateCount());
 
 		SettingsStore settings = SettingsStore.in(ctx);
 		SimpleResponse response = new SimpleJsonClient2().post(settings.getWebappUrl(), request.getJson());
@@ -66,6 +67,9 @@ public class WebappPoller {
 		}
 
 		JSONArray messages = response.getJSONArray("messages");
+
+		logEvent(ctx, "Received %d SMS from server for sending.", messages.length());
+
 		for(int i=0; i<messages.length(); ++i) {
 			try {
 				saveMessage(messages.getJSONObject(i));
@@ -109,6 +113,9 @@ class GatewayRequest {
 		this.messages = messages;
 		this.statusUpdates = statusUpdates;
 	}
+
+	int wtMessageCount() { return messages.size(); }
+	int statusUpdateCount() { return statusUpdates.size(); }
 
 	public JSONObject getJson() throws JSONException {
 		JSONObject json = new JSONObject();
