@@ -13,6 +13,7 @@ CONSIDER DOING
 * work out what the HeadlessSmsSendService is and if that needs an implementation too
 * implement a basic SMS composer that will work when using as default SMS app
 * add dialog for reading a message
+* some kind of backoff algorithm if the server is down, or even just if there is no activity
 
 
 TODONT
