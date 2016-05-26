@@ -56,7 +56,7 @@ public class SmsSender {
 						intentsFor(SENDING_REPORT, m, parts),
 						intentsFor(DELIVERY_REPORT, m, parts));
 			} else {
-				logEvent(ctx, "Not sending SMS to '%s' because number appears invalid ('%s')",
+				logEvent(ctx, "Not sending SMS to '%s' because number appears invalid (content: '%s')",
 						m.to, m.content);
 				db.setFailed(m, "destination.invalid");
 			}
