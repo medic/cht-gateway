@@ -27,7 +27,7 @@
 		\n<li>the SMS inbox may fill up and prevent new messages arriving</li>
 		\n\n
 		\nOn the other hand, if you set <tt>medic-gateway</tt> as the default messaging app, you may find:\n
-		\n<li>composing SMS is no longer possible</li>
+		\n<li>composing SMS through the normal Messages app is no longer possible</li>
 		\n<li>sending and receiving MMS (picture messages) no longer works</li>
 	</string>
 	<string name="btnHelpMeSetDefaultMessagingApp">Help me change</string>
