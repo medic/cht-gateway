@@ -44,7 +44,10 @@ demo-server:
 	npm install && npm start
 
 
-.PHONY: stats travis
+.PHONY: avd stats travis
+
+avd:
+	nohup android avd > /dev/null &
 
 stats:
 	./scripts/project_stats
