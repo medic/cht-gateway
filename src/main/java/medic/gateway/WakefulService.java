@@ -15,14 +15,14 @@ public class WakefulService extends WakefulIntentService {
 
 	public void doWakefulWork(Intent intent) {
 		try {
-			new SmsSender(this).sendUnsentSmses();
-		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to send SMSes: " + ex.getMessage());
-		}
-		try {
 			new WebappPoller(this).pollWebapp();
 		} catch(Exception ex) {
 			logException(this, ex, "Exception caught trying to poll webapp: " + ex.getMessage());
+		}
+		try {
+			new SmsSender(this).sendUnsentSmses();
+		} catch(Exception ex) {
+			logException(this, ex, "Exception caught trying to send SMSes: " + ex.getMessage());
 		}
 	}
 }
