@@ -12,12 +12,12 @@
         <Match>
 		<!-- As far as I can tell, our implementations of compareTo() in
 		     these classes are safe. -->
-		<Class name="~^medic.gateway.W[ot]Message$"/>
+		<Class name="~^medic.gateway.alert.W[ot]Message$"/>
 		<Bug pattern="EQ_COMPARETO_USE_OBJECT_EQUALS"/>
         </Match>
         <Match>
 		<!-- At the time of writing, findbugs was wrong about these two -->
-		<Class name="medic.gateway.SimpleJsonClient2"/>
+		<Class name="medic.gateway.alert.SimpleJsonClient2"/>
 		<Bug pattern="NP_NULL_ON_SOME_PATH_EXCEPTION,DE_MIGHT_IGNORE"/>
         </Match>
 </FindBugsFilter>

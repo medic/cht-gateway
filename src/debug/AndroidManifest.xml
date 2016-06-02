@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- .alert is appended to the package name to fix Samsung AlarmListener bug as per
+  https://code.google.com/p/android/issues/detail?id=82001
+  https://stackoverflow.com/questions/34074955/android-exact-alarm-is-always-3-minutes-off/34085645 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-		package="medic.gateway">
+		package="medic.gateway.alert">
 	<!-- extra permissions used by instrumentation tests -->
 	<uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>

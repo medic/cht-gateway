@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- .alert is appended to the package name to fix Samsung AlarmListener bug as per
+  https://code.google.com/p/android/issues/detail?id=82001
+  https://stackoverflow.com/questions/34074955/android-exact-alarm-is-always-3-minutes-off/34085645 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		xmlns:tools="http://schemas.android.com/tools"
-		package="medic.gateway">
+		package="medic.gateway.alert">
 	<uses-sdk android:minSdkVersion="17"
 			android:targetSdkVersion="23"/>
 
@@ -45,8 +48,8 @@
 			<intent-filter android:priority="999">
 				<action android:name="android.provider.Telephony.SMS_DELIVER"/>
 				<action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-				<action android:name="medic.gateway.SENDING_REPORT"/>
-				<action android:name="medic.gateway.DELIVERY_REPORT"/>
+				<action android:name="medic.gateway.alert.SENDING_REPORT"/>
+				<action android:name="medic.gateway.alert.DELIVERY_REPORT"/>
 			</intent-filter>
 		</receiver>
 		<!-- Android 4.4+ (kitkat) SMS support -->
