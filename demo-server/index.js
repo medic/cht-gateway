@@ -49,8 +49,9 @@ var port = process.env.PORT || 8000,
 
         if(req.method === 'GET' || req.method === 'POST') {
           datastore.requests.unshift({
-            time: new Date().toString(),
+            useragent: req.headers['user-agent'],
             method: req.method,
+            time: new Date().toString(),
           });
         }
 
