@@ -23,7 +23,7 @@ public class AlarmListener implements WakefulIntentService.AlarmListener {
 	}
 
 	public long getMaxAge(Context ctx) {
-		return Settings.in(ctx).getPollInterval() * 2L;
+		return getPollInterval(ctx) * 2L;
 	}
 
 //> PUBLIC STATIC
