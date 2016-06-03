@@ -98,7 +98,7 @@ android {
 		versionName getVersionName()
 		archivesBaseName = "${project.name}-${versionName}"
 
-		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+		testInstrumentationRunner 'medic.gateway.alert.test.WakingJUnitRunner'
 	}
 
 	applicationVariants.all {

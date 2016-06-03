@@ -38,7 +38,6 @@ public class SettingsDialogActivityTest {
 	public void setUp() throws Throwable {
 		clearAppSettings();
 		this.http = new HttpTestHelper();
-		preventScreenLock(activityTestRule);
 	}
 
 	@After
