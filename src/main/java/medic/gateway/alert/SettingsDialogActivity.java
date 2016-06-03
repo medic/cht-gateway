@@ -1,15 +1,19 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-
-import java.util.*;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.logException;
+import static medic.gateway.alert.GatewayLog.trace;
 
 public class SettingsDialogActivity extends Activity {
 	private boolean hasPreviousSettings;
