@@ -1,6 +1,7 @@
 package medic.gateway.alert;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,6 +48,10 @@ public class SettingsDialogActivity extends Activity {
 		String webappUrl = text(R.id.txtWebappUrl);
 		final boolean syncEnabled = checked(R.id.cbxEnablePolling);
 
+		final ProgressDialog spinner = showSpinner(String.format(
+				getString(R.string.txtValidatingWebappUrl),
+				webappUrl));
+
 		new AsyncTask<String, Void, WebappUrlVerififcation>() {
 			protected WebappUrlVerififcation doInBackground(String... webappUrl) {
 				if(DEBUG && webappUrl.length != 1) throw new AssertionError();
@@ -58,13 +63,13 @@ public class SettingsDialogActivity extends Activity {
 					if(savedOk) {
 						logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", result.webappUrl);
 						startApp();
-						return;
 					}
+				} else {
+					showError(R.id.txtWebappUrl, result.failure);
+					submitButton().setEnabled(true);
+					cancelButton().setEnabled(true);
 				}
-
-				showError(R.id.txtWebappUrl, result.failure);
-				submitButton().setEnabled(true);
-				cancelButton().setEnabled(true);
+				spinner.dismiss();
 			}
 		}.execute(webappUrl);
 	}
@@ -150,6 +155,16 @@ public class SettingsDialogActivity extends Activity {
 	private void showError(int componentId, int stringId) {
 		TextView field = (TextView) findViewById(componentId);
 		field.setError(getString(stringId));
+	}
+
+	private ProgressDialog showSpinner(String message) {
+		ProgressDialog p = new ProgressDialog(this);
+		p.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		p.setMessage(message);
+		p.setIndeterminate(true);
+		p.setCanceledOnTouchOutside(false);
+		p.show();
+		return p;
 	}
 
 	private void log(String message, Object... extras) {
