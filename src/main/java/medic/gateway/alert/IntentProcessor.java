@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.telephony.SmsMessage;
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
