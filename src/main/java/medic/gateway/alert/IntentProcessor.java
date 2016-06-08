@@ -48,7 +48,7 @@ public class IntentProcessor extends BroadcastReceiver {
 					handleSmsReceived(ctx, intent);
 					break;
 				case SENDING_REPORT:
-					handleSendingReport(ctx, intent);
+					new SendingReportHandler(ctx).handle(intent, getResultCode());
 					break;
 				case DELIVERY_REPORT:
 					new DeliveryReportHandler(ctx).handle(intent);
@@ -102,8 +102,16 @@ public class IntentProcessor extends BroadcastReceiver {
 		// there is no way to delete the message.
 		abortBroadcast();
 	}
+}
 
-	private void handleSendingReport(Context ctx, Intent intent) {
+class SendingReportHandler {
+	private final Context ctx;
+
+	SendingReportHandler(Context ctx) {
+		this.ctx = ctx;
+	}
+
+	void handle(Intent intent, int resultCode) {
 		String id = intent.getStringExtra("id");
 		int part = intent.getIntExtra("part", -1);
 		logEvent(ctx, "Received delivery report for message %s part %s.", id, part);
@@ -112,28 +120,29 @@ public class IntentProcessor extends BroadcastReceiver {
 		WoMessage m = db.getWoMessage(id);
 		if(m == null) {
 			logEvent(ctx, "Could not find SMS %s in database for sending report.", id);
+		} else if(resultCode == RESULT_OK) {
+			db.updateStatus(m, PENDING, SENT);
 		} else {
-			int resultCode = getResultCode();
+			String failureReason;
 			switch(resultCode) {
-				case RESULT_OK:
-					db.updateStatus(m, PENDING, SENT);
-					break;
 				case RESULT_ERROR_GENERIC_FAILURE:
 					int errorCode = intent.getIntExtra("errorCode", -1);
-					db.setFailed(m, "generic:" + errorCode);
+					failureReason = "generic:" + errorCode;
 					break;
 				case RESULT_ERROR_NO_SERVICE:
-					db.setFailed(m, "no-service");
+					failureReason = "no-service";
 					break;
 				case RESULT_ERROR_NULL_PDU:
-					db.setFailed(m, "null-pdu");
+					failureReason = "null-pdu";
 					break;
 				case RESULT_ERROR_RADIO_OFF:
-					db.setFailed(m, "radio-off");
+					failureReason = "radio-off";
 					break;
 				default:
-					db.setFailed(m, "unknown:" + resultCode);
+					failureReason = "unknown:" + resultCode;
 			}
+			db.setFailed(m, failureReason);
+			logEvent(ctx, "Message to %s failed (cause: %s)", m.to, failureReason);
 		}
 	}
 }
