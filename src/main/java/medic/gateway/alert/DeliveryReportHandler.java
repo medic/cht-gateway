@@ -121,6 +121,7 @@ class DeliveryReportHandler {
 		} else throw new IllegalStateException("Unexpected status (> 0x7F) : 0x" + toHexString(status));
 
 		db.setFailed(m, "Delivery failed: " + fDetail);
+		logEvent(ctx, "Delivering message to %s failed (cause: %s)", m.to, fDetail);
 	}
 
 	private void handleCdmaDelivery(Context ctx) {

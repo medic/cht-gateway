@@ -114,7 +114,7 @@ class SendingReportHandler {
 	void handle(Intent intent, int resultCode) {
 		String id = intent.getStringExtra("id");
 		int part = intent.getIntExtra("part", -1);
-		logEvent(ctx, "Received delivery report for message %s part %s.", id, part);
+		logEvent(ctx, "Received sending report for message %s part %s.", id, part);
 
 		Db db = Db.getInstance(ctx);
 		WoMessage m = db.getWoMessage(id);
@@ -142,7 +142,7 @@ class SendingReportHandler {
 					failureReason = "unknown:" + resultCode;
 			}
 			db.setFailed(m, failureReason);
-			logEvent(ctx, "Message to %s failed (cause: %s)", m.to, failureReason);
+			logEvent(ctx, "Sending message to %s failed (cause: %s)", m.to, failureReason);
 		}
 	}
 }

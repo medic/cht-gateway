@@ -125,7 +125,7 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	private boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus, String failureReason) {
-		log("updateStatus() :: %s :: %s -> %s", m, oldStatus, newStatus);
+		log("updateStatus() :: %s :: %s -> %s (%s)", m, oldStatus, newStatus, failureReason);
 
 		if((newStatus == WoMessage.Status.FAILED) == (failureReason == null))
 			throw new IllegalArgumentException(String.format(
