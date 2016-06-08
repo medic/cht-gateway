@@ -29,7 +29,7 @@ emulator:
 	${ADB} wait-for-device
 
 logs:
-	${ADB} logcat MedicGateway:V AndroidRuntime:E *:S | tee android.log
+	${ADB} logcat MedicGateway:V AndroidRuntime:E '*:S' | tee android.log
 
 deploy:
 	${GRADLEW} installDebug
