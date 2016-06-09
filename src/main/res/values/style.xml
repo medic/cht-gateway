@@ -2,5 +2,5 @@
 <resources>
 	<dimen name="lstMainText">18sp</dimen>
 	<dimen name="lstSubText">12sp</dimen>
-	<dimen name="lstTextHPad">4dp</dimen>
+	<dimen name="lstContentHPad">4dp</dimen>
 </resources>

@@ -22,6 +22,10 @@
 
 	<string name="mnuSettings">Settings</string>
 
+	<string name="btnRefreshList">Refresh all</string>
+	<string name="btnRetrySelected">Retry</string>
+	<string name="btnSelectNewer">Select newer</string>
+
 	<string name="txtDefaultMessageAppPrompt"><b>Warning: <tt>medic-gateway</tt> is not set as the default messaging app on this device.</b>\n
 		\n
 		\nThe app may not perform as expected unless it is set as the default messaging app:\n
