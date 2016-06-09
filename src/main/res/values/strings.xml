@@ -39,9 +39,14 @@
 		\nThe app may not perform as expected.
 	</string>
 
+	<string name="lblTo">To: %s</string>
+	<string name="lblLastAction">Last action: %s</string>
+	<string name="lblStatus">Status: %s</string>
+	<string name="lblStatusWithCause">Status: %1$s (%2$s)</string>
+	<string name="lblContent">Content: %s</string>
+
 	<string name="txtRetryTitle">Retry message?</string>
 	<string name="txtRetryWtBody">Retry forwarding message from %s to webapp?</string>
-	<string name="txtRetryWoBody">Retry forwarding message from webapp to %s?</string>
 	<string name="btnRetry">Retry</string>
 
 	<string-array name="message_lists_tabs">

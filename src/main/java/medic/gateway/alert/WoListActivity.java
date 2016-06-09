@@ -1,6 +1,7 @@
 package medic.gateway.alert;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.*;
@@ -10,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
+
+import java.util.LinkedList;
 
 import static medic.gateway.alert.Utils.*;
 import static medic.gateway.alert.WoMessage.Status.*;
@@ -61,6 +64,8 @@ class WoMessageCursorAdapter extends ResourceCursorAdapter {
 }
 
 class WoListItemClickListener implements AdapterView.OnItemClickListener {
+	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
+
 	private final WoListActivity activity;
 	private final ListView list;
 
@@ -72,30 +77,50 @@ class WoListItemClickListener implements AdapterView.OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 		Cursor c = (Cursor) list.getItemAtPosition(position);
-		final WoMessage m = Db.woMessageFrom(c);
 
-		if(m.status.canBeRetried()) {
-			retryDialog(m, position).show();
-		}
+		WoMessage m = Db.getInstance(activity).getWoMessage(c.getString(0));
+
+		messageDetailDialog(m, position).show();
 	}
 
-	private AlertDialog retryDialog(final WoMessage m, final int position) {
-		return new AlertDialog.Builder(activity)
-				.setTitle(R.string.txtRetryTitle)
-				.setMessage(String.format(activity.getString(R.string.txtRetryWoBody), m.to))
-				.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Db db = Db.getInstance(activity);
-						db.updateStatus(m, m.status, UNSENT);
+	private AlertDialog messageDetailDialog(final WoMessage m, final int position) {
+		LinkedList<String> content = new LinkedList<>();
 
-						WoMessage updated = db.getWoMessage(m.id);
+		content.add(string(R.string.lblTo, m.to));
+		if(m.status == FAILED) {
+			content.add(string(R.string.lblStatusWithCause, m.status, m.getFailureReason()));
+		} else {
+			content.add(string(R.string.lblStatus, m.status));
+		}
+		content.add(string(R.string.lblLastAction, relativeTimestamp(m.lastAction)));
 
-						View v = list.getChildAt(position);
-						setText(v, R.id.txtWoStatus, updated.status.toString());
-						setText(v, R.id.txtWoLastAction, relativeTimestamp(updated.lastAction));
-					}
-				})
-				.create();
+		content.add(string(R.string.lblContent, m.content));
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(activity);
+		if(m.status.canBeRetried()) {
+			dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Db db = Db.getInstance(activity);
+					db.updateStatus(m, m.status, UNSENT);
+
+					WoMessage updated = db.getWoMessage(m.id);
+
+					View v = list.getChildAt(position);
+					setText(v, R.id.txtWoStatus, updated.status.toString());
+					setText(v, R.id.txtWoLastAction, relativeTimestamp(updated.lastAction));
+
+					// TODO need to actually replace the backing wo-message instance for the list item too
+				}
+			});
+		}
+
+		dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
+
+		return dialog.create();
+	}
+
+	private final String string(int stringId, Object...args) {
+		return String.format(activity.getString(stringId), args);
 	}
 }
