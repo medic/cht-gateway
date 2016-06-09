@@ -4,16 +4,21 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.*;
-import android.os.*;
-import android.view.*;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.util.SparseArray;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 
 import java.util.LinkedList;
 
+import static medic.gateway.alert.GatewayLog.*;
 import static medic.gateway.alert.Utils.*;
 import static medic.gateway.alert.WoMessage.Status.*;
 
@@ -22,6 +27,7 @@ public class WoListActivity extends Activity {
 
 	private Db db;
 	private ListView list;
+	private SparseArray<String> checklist;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,32 +43,101 @@ public class WoListActivity extends Activity {
 			public void onClick(View v) { refreshList(); }
 		});
 
+		((Button) findViewById(R.id.btnRetrySelected))
+				.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) { retrySelected(); }
+		});
+
+		((Button) findViewById(R.id.btnSelectNewer))
+				.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) { selectNewer(); }
+		});
+
 		refreshList();
 	}
 
+	void retry(String id, int position) {
+		trace(this, "Retrying message at %d with id %s...", position, id);
+
+		WoMessage m = db.getWoMessage(id);
+
+		if(m.status.canBeRetried()) {
+			db.updateStatus(m, UNSENT);
+
+			WoMessage updated = db.getWoMessage(id);
+
+			View v = list.getChildAt(position);
+			setText(v, R.id.txtWoStatus, updated.status.toString());
+			setText(v, R.id.txtWoLastAction, relativeTimestamp(updated.lastAction));
+		}
+	}
+
+	void updateChecked(String id, int position, boolean isChecked) {
+		if(isChecked) checklist.put(position, id);
+		else checklist.delete(position);
+
+		findViewById(R.id.btnRetrySelected).setEnabled(checklist.size() > 0);
+		findViewById(R.id.btnSelectNewer).setEnabled(checklist.size() > 0);
+	}
+
 	private void refreshList() {
+		checklist = new SparseArray<String>();
 		list.setAdapter(new WoMessageCursorAdapter(this,
 				db.getWoMessages(MAX_WO_MESSAGES)));
+
+		findViewById(R.id.btnRetrySelected).setEnabled(false);
+		findViewById(R.id.btnSelectNewer).setEnabled(false);
+	}
+
+	private void retrySelected() {
+		for(int i=checklist.size()-1; i>=0; --i) {
+			retry(checklist.valueAt(i), checklist.keyAt(i));
+		}
+	}
+
+	private void selectNewer() {
+		int lastSelectedIndex = checklist.keyAt(checklist.size() - 1);
+		for(int i=lastSelectedIndex-1; i>=0; --i) {
+			((CheckBox) list.getChildAt(i).findViewById(R.id.cbxMessage)).setChecked(true);
+		}
 	}
 }
 
+// TODO should this be an inner class?
 class WoMessageCursorAdapter extends ResourceCursorAdapter {
 	private static final int NO_FLAGS = 0;
 
-	public WoMessageCursorAdapter(Context ctx, Cursor c) {
-		super(ctx, R.layout.wo_list_item, c, NO_FLAGS);
+	private final WoListActivity activity;
+
+	public WoMessageCursorAdapter(WoListActivity activity, Cursor c) {
+		super(activity, R.layout.wo_list_item, c, NO_FLAGS);
+		this.activity = activity;
 	}
 
 	public void bindView(View v, Context ctx, Cursor c) {
-		WoMessage m = Db.woMessageFrom(c);
+		final WoMessage m = Db.woMessageFrom(c);
 
 		setText(v, R.id.txtWoStatus, m.status.toString());
 		setText(v, R.id.txtWoLastAction, relativeTimestamp(m.lastAction));
 		setText(v, R.id.txtWoTo, m.to);
 		setText(v, R.id.txtWoContent, m.content);
+
+		CheckBox cbx = (CheckBox) v.findViewById(R.id.cbxMessage);
+		cbx.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
+				View listItem = (View) btn.getParent();
+				int listIndex = ((ViewGroup) listItem.getParent()).indexOfChild(listItem);
+
+				trace(this, "Changed checkbox at %d to %s", listIndex, isChecked);
+
+				activity.updateChecked(m.id, listIndex, isChecked);
+			}
+		});
 	}
 }
 
+// TODO should this be an inner class?
 class WoListItemClickListener implements AdapterView.OnItemClickListener {
 	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
 
@@ -101,16 +176,7 @@ class WoListItemClickListener implements AdapterView.OnItemClickListener {
 			dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					Db db = Db.getInstance(activity);
-					db.updateStatus(m, m.status, UNSENT);
-
-					WoMessage updated = db.getWoMessage(m.id);
-
-					View v = list.getChildAt(position);
-					setText(v, R.id.txtWoStatus, updated.status.toString());
-					setText(v, R.id.txtWoLastAction, relativeTimestamp(updated.lastAction));
-
-					// TODO need to actually replace the backing wo-message instance for the list item too
+					activity.retry(m.id, position);
 				}
 			});
 		}

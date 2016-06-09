@@ -18,7 +18,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="right"
-				android:layout_marginLeft="@dimen/lstTextHPad"
+				android:layout_marginLeft="@dimen/lstContentHPad"
 				android:textSize="@dimen/lstMainText"
 				android:textColor="@android:color/secondary_text_dark"
 				/>
@@ -39,7 +39,7 @@
 		<TextView android:id="@+id/txtWtLastAction"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="@dimen/lstTextHPad"
+				android:layout_marginLeft="@dimen/lstContentHPad"
 				android:textSize="@dimen/lstSubText"
 				android:textColor="@android:color/tertiary_text_dark"
 				/>
