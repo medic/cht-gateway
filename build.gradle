@@ -45,8 +45,6 @@ dependencies {
 	androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
 
 	compile 'com.android.support:support-v4:23.0.1'
-	compile 'com.android.support:appcompat-v7:23.0.1'
-
 	compile 'com.commonsware.cwac:wakeful:1.1.0'
 	compile 'com.google.code.findbugs:annotations:3.0.1', {
 		// Need to exclude these, or build is broken by:
