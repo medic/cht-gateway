@@ -120,6 +120,10 @@ public final class Db extends SQLiteOpenHelper {
 		updateStatus(m, WoMessage.Status.PENDING, WoMessage.Status.FAILED, failureReason);
 	}
 
+	boolean updateStatus(WoMessage m, WoMessage.Status newStatus) {
+		return updateStatus(m, m.status, newStatus);
+	}
+
 	boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus) {
 		return updateStatus(m, oldStatus, newStatus, null);
 	}

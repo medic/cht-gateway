@@ -87,7 +87,7 @@ class WoListItemClickListener implements AdapterView.OnItemClickListener {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						Db db = Db.getInstance(activity);
-						db.updateStatus(m, m.status, UNSENT);
+						db.updateStatus(m, UNSENT);
 
 						WoMessage updated = db.getWoMessage(m.id);
 
