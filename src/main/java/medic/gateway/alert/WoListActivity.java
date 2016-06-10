@@ -103,7 +103,7 @@ public class WoListActivity extends Activity {
 	}
 }
 
-// TODO should this be an inner class?
+// TODO should this be an inner class?  or a separate class with an interface for CheckableList?
 class WoMessageCursorAdapter extends ResourceCursorAdapter {
 	private static final int NO_FLAGS = 0;
 
@@ -153,6 +153,8 @@ class WoListItemClickListener implements AdapterView.OnItemClickListener {
 	public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 		Cursor c = (Cursor) list.getItemAtPosition(position);
 
+		// Get a fresh copy of the message, in case it's been updated
+		// more recently than the list
 		WoMessage m = Db.getInstance(activity).getWoMessage(c.getString(0));
 
 		messageDetailDialog(m, position).show();

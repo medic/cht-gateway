@@ -271,6 +271,12 @@ public final class Db extends SQLiteOpenHelper {
 		return v;
 	}
 
+	WtMessage getWtMessage(String id) {
+		List<WtMessage> matches = getWtMessages(eq(WO_clmID), args(id), null, 1);
+		if(matches.isEmpty()) return null;
+		return matches.get(0);
+	}
+
 	Cursor getWtMessages(int maxCount) {
 		return getWtMessageCursor(null, null, SortDirection.DESC, maxCount);
 	}
@@ -308,7 +314,7 @@ public final class Db extends SQLiteOpenHelper {
 				cols(WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, WT_clmFROM, WT_clmCONTENT),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
-				sort.apply(WT_clmLAST_ACTION),
+				sort == null? null: sort.apply(WT_clmLAST_ACTION),
 				Integer.toString(maxCount));
 	}
 
