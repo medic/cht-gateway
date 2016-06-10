@@ -107,7 +107,6 @@ public class WtListActivity extends Activity {
 	}
 }
 
-// TODO should this be an inner class?  or a separate class with an interface for CheckableList?
 class WtMessageCursorAdapter extends ResourceCursorAdapter {
 	private static final int NO_FLAGS = 0;
 
@@ -141,7 +140,6 @@ class WtMessageCursorAdapter extends ResourceCursorAdapter {
 	}
 }
 
-// TODO should this be an inner class?
 class WtListItemClickListener implements AdapterView.OnItemClickListener {
 	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
 

@@ -103,7 +103,6 @@ public class WoListActivity extends Activity {
 	}
 }
 
-// TODO should this be an inner class?  or a separate class with an interface for CheckableList?
 class WoMessageCursorAdapter extends ResourceCursorAdapter {
 	private static final int NO_FLAGS = 0;
 
@@ -137,7 +136,6 @@ class WoMessageCursorAdapter extends ResourceCursorAdapter {
 	}
 }
 
-// TODO should this be an inner class?
 class WoListItemClickListener implements AdapterView.OnItemClickListener {
 	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
 
