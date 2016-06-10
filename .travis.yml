@@ -18,7 +18,7 @@ android:
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-23
 env:
-- GRADLE_OPTS="-XX:MaxPermSize=256m"
+- GRADLE_OPTS="-XX:MaxPermSize=512m"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
