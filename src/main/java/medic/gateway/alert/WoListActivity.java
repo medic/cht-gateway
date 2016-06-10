@@ -168,7 +168,6 @@ class WoListItemClickListener implements AdapterView.OnItemClickListener {
 			content.add(string(R.string.lblStatus, m.status));
 		}
 		content.add(string(R.string.lblLastAction, relativeTimestamp(m.lastAction)));
-
 		content.add(string(R.string.lblContent, m.content));
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(activity);

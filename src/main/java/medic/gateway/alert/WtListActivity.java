@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 
+import java.util.LinkedList;
+
 import medic.gateway.alert.WtMessage.Status;
 
 import static medic.gateway.alert.Utils.*;
@@ -63,7 +65,10 @@ class WtMessageCursorAdapter extends ResourceCursorAdapter {
 	}
 }
 
+// TODO should this be an inner class?
 class WtListItemClickListener implements AdapterView.OnItemClickListener {
+	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
+
 	private final WtListActivity activity;
 	private final ListView list;
 
@@ -77,27 +82,40 @@ class WtListItemClickListener implements AdapterView.OnItemClickListener {
 		Cursor c = (Cursor) list.getItemAtPosition(position);
 		final WtMessage m = Db.wtMessageFrom(c);
 
-		if(m.getStatus().canBeRetried()) {
-			retryDialog(m, position).show();
-		}
+		messageDetailDialog(m, position).show();
 	}
 
-	private AlertDialog retryDialog(final WtMessage m, final int position) {
-		return new AlertDialog.Builder(activity)
-				.setTitle(R.string.txtRetryTitle)
-				.setMessage(String.format(activity.getString(R.string.txtRetryWtBody), m.from))
-				.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Status oldStatus = m.getStatus();
-						m.setStatus(WAITING);
-						Db.getInstance(activity).updateStatusFrom(oldStatus, m);
+	private AlertDialog messageDetailDialog(final WtMessage m, final int position) {
+		LinkedList<String> content = new LinkedList<>();
 
-						View v = list.getChildAt(position);
-						setText(v, R.id.txtWtStatus, m.getStatus().toString());
-						setText(v, R.id.txtWtLastAction, relativeTimestamp(m.getLastAction()));
-					}
-				})
-				.create();
+		content.add(string(R.string.lblFrom, m.from));
+		content.add(string(R.string.lblStatus, m.getStatus()));
+		content.add(string(R.string.lblLastAction, relativeTimestamp(m.getLastAction())));
+		content.add(string(R.string.lblContent, m.content));
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(activity);
+
+		if(m.getStatus().canBeRetried()) {
+			dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Status oldStatus = m.getStatus();
+					m.setStatus(WAITING);
+					Db.getInstance(activity).updateStatusFrom(oldStatus, m);
+
+					View v = list.getChildAt(position);
+					setText(v, R.id.txtWtStatus, m.getStatus().toString());
+					setText(v, R.id.txtWtLastAction, relativeTimestamp(m.getLastAction()));
+				}
+			});
+		}
+
+		dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
+
+		return dialog.create();
+	}
+
+	private final String string(int stringId, Object...args) {
+		return String.format(activity.getString(stringId), args);
 	}
 }
