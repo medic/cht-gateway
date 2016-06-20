@@ -5,7 +5,10 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Telephony;
 
+@SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal") //should be final, but needs not to be so it can be mocked in tests
 public class Capabilities {
+	private Capabilities() {}
+
 	@TargetApi(19)
 	public boolean isDefaultSmsProvider(Context ctx) {
 		if(!canBeDefaultSmsProvider()) throw new IllegalStateException();

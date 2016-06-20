@@ -74,8 +74,8 @@
 		<!-- Android 4.4+ (kitkat) SMS support
 		     I think this refers to an external Activity, although it may just be that it doesn't work currently.
 		     Activity that allows the user to send new SMS/MMS messages -->
-		<activity android:name=".ComposeSmsActivity"
-				 tools:ignore="MissingRegistered">
+		<activity android:name="ComposeSmsActivity"
+				android:windowSoftInputMode="adjustResize">
 			<intent-filter>
 				<action android:name="android.intent.action.SEND"/>
 				<action android:name="android.intent.action.SENDTO"/>

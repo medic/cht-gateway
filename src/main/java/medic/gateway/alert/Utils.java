@@ -1,15 +1,19 @@
 package medic.gateway.alert;
 
 import android.Manifest.permission;
-import android.content.*;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.*;
 
 import org.json.*;
+
+import static java.util.UUID.randomUUID;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.Capabilities.getCapabilities;
@@ -33,6 +37,18 @@ public final class Utils {
 	private static final long ONE_YEAR = ONE_MONTH * 12;
 
 	private Utils() {}
+
+	public static String randomUuid() {
+		return randomUUID().toString();
+	}
+
+	public static void toast(Context ctx, int messageId, Object... args) {
+		toast(ctx, ctx.getString(messageId), args);
+	}
+
+	public static void toast(Context ctx, String message, Object... args) {
+		Toast.makeText(ctx, String.format(message, args), Toast.LENGTH_LONG).show();
+	}
 
 	public static JSONObject json(Object... keyVals) throws JSONException {
 		if(DEBUG && keyVals.length % 2 != 0) throw new AssertionError();

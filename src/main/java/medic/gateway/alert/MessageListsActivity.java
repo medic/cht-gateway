@@ -1,14 +1,16 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.view.*;
-import android.os.*;
-import android.widget.*;
+import android.app.TabActivity;
+import android.content.Intent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.net.Uri;
+import android.os.Bundle;
+import android.widget.TabHost;
 
-import static medic.gateway.alert.Capabilities.*;
-import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.Utils.*;
+import static medic.gateway.alert.Capabilities.getCapabilities;
+import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.startSettingsActivity;
 
 @SuppressWarnings("deprecation")
 public class MessageListsActivity extends TabActivity {
@@ -38,6 +40,15 @@ public class MessageListsActivity extends TabActivity {
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
+			case R.id.mnuCompose:
+				Intent composer;
+				if(getCapabilities().isDefaultSmsProvider(this)) {
+					composer = new Intent(this, ComposeSmsActivity.class);
+				} else {
+					composer = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"));
+				}
+				startActivity(composer);
+				return true;
 			case R.id.mnuSettings:
 				openSettings();
 				return true;

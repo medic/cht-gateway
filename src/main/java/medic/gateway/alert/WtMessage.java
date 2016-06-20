@@ -2,7 +2,7 @@ package medic.gateway.alert;
 
 import java.util.*;
 
-import static java.util.UUID.randomUUID;
+import static medic.gateway.alert.Utils.randomUuid;
 
 class WtMessage {
 	public enum Status {
@@ -17,7 +17,7 @@ class WtMessage {
 	public final String content;
 
 	public WtMessage(String from, String content) {
-		this.id = randomUUID().toString();
+		this.id = randomUuid();
 		setStatus(Status.WAITING);
 		this.from = from;
 		this.content = content;

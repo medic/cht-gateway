@@ -13,6 +13,15 @@
 	<string name="errRequired">required</string>
 	<string name="errInvalidUrl">must be a valid URL</string>
 
+	<string name="btnComposer_send">Send</string>
+	<string name="txtComposer_content">Message</string>
+	<string name="txtComposer_recipients">To</string>
+	<plurals name="txtComposer_sentConfirmation">
+		<item quantity="one">Message scheduled for 1 recipient</item>
+		<item quantity="other">Message scheduled for %d recipients</item>
+	</plurals>
+	<string name="errComposer_noRecipients">You must add at least one recipient</string>
+
 	<string name="btnOk">OK</string>
 	<string name="btnSave">Save</string>
 	<string name="btnCancel">Cancel</string>
@@ -20,6 +29,7 @@
 	<string name="btnQuit">Quit</string>
 	<string name="btnRefresh">Refresh</string>
 
+	<string name="mnuCompose">Compose</string>
 	<string name="mnuSettings">Settings</string>
 
 	<string name="btnRefreshList">Refresh all</string>

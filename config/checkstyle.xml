@@ -35,6 +35,9 @@
 	</module>
 
 	<module name="TreeWalker">
+		<!-- Allow suppression of checkstyle warnings via @SuppressWarnings annotation -->
+		<module name="SuppressWarningsHolder"/>
+
 		<!-- require TAB indentation -->
 		<module name="RegexpSinglelineJava">
 			<property name="format" value="^\t*(?! \*) "/>
@@ -176,7 +179,10 @@
 
 		<!-- Checks for class design -->
 		<!-- See http://checkstyle.sourceforge.net/config_design.html -->
-		<module name="FinalClass"/>
+		<module name="FinalClass">
+			<!-- this check is performed by PMD as well -->
+			<property name="severity" value="ignore"/>
+		</module>
 		<module name="HideUtilityClassConstructor"/>
 		<module name="InterfaceIsType">
 			<property name="severity" value="ignore"/>
@@ -198,14 +204,6 @@
 	</module>
 
 	<!-- Enable suppression comments -->
-	<module name="SuppressionCommentFilter">
-		<property name="offCommentFormat" value="CHECKSTYLE IGNORE\s+(\S+)"/>
-		<property name="onCommentFormat" value="CHECKSTYLE END IGNORE\s+(\S+)"/>
-		<property name="checkFormat" value="$1"/>
-	</module>
-	<module name="SuppressWithNearbyCommentFilter">
-		<property name="commentFormat" value="SUPPRESS CHECKSTYLE (\w+)"/>
-		<property name="checkFormat" value="$1"/>
-		<property name="influenceFormat" value="1"/>
-	</module>
+		<!-- Allow suppression of checkstyle warnings via @SuppressWarnings annotation -->
+	<module name="SuppressWarningsFilter"/>
 </module>

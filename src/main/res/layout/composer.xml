@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:paddingLeft="16dp"
+		android:paddingRight="16dp"
+		android:orientation="vertical">
+	<EditText android:id="@+id/txtComposer_recipients"
+			android:hint="@string/txtComposer_recipients"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:lines="2"
+			/>
+	<RelativeLayout
+			android:layout_width="fill_parent"
+			android:layout_height="0dp"
+			android:layout_weight="1"
+			>
+		<EditText android:id="@+id/txtComposer_content"
+				android:hint="@string/txtComposer_content"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true"
+				android:layout_toLeftOf="@+id/btnComposer_send">
+			<requestFocus/>
+		</EditText>
+		<Button android:id="@+id/btnComposer_send"
+				android:text="@string/btnComposer_send"
+				android:onClick="send"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:paddingLeft="16dp"
+				android:paddingRight="16dp"
+				android:layout_alignParentBottom="true"
+				android:layout_alignParentRight="true"
+				/>
+	</RelativeLayout>
+</LinearLayout>
