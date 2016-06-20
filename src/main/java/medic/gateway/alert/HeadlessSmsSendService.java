@@ -13,9 +13,10 @@ public class HeadlessSmsSendService extends IntentService {
 	}
 
 	protected void onHandleIntent(Intent i) {
-		logEvent(this, "HeadlessSmsSendService :: received intent.  No action will be taken (none implemented) [Intent: action=%s, data=%s, msg=%s]",
+		logEvent(this, "HeadlessSmsSendService :: received intent.  No action will be taken (none implemented) [Intent: action=%s, data=%s, subject=%s, msg=%s]",
 				i.getAction(),
 				i.getDataString(),
+				i.getStringExtra(Intent.EXTRA_SUBJECT),
 				i.getStringExtra(Intent.EXTRA_TEXT));
 	}
 }
