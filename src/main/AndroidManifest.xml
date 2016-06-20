@@ -92,7 +92,7 @@
 		<!-- Android 4.4+ (kitkat) SMS support
 		     I think this refers to an external Service, although it may just be that it doesn't work currently.
 		     Service that delivers messages from the phone "quick response" -->
-		<service android:name=".HeadlessSmsSendService"
+		<service android:name="HeadlessSmsSendService"
 				android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
 				android:exported="true"
 				tools:ignore="MissingRegistered"
