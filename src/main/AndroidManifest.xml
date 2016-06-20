@@ -74,9 +74,9 @@
 		<!-- Android 4.4+ (kitkat) SMS support
 		     I think this refers to an external Activity, although it may just be that it doesn't work currently.
 		     Activity that allows the user to send new SMS/MMS messages -->
-		<!-- TODO this should be suppressed on pre-kitkat devices -->
 		<activity android:name="ComposeSmsActivity"
-				android:windowSoftInputMode="adjustResize">
+				android:windowSoftInputMode="adjustResize"
+				android:enabled="@bool/kitkat_plus">
 			<intent-filter>
 				<action android:name="android.intent.action.SEND"/>
 				<action android:name="android.intent.action.SENDTO"/>
@@ -93,9 +93,10 @@
 		     I think this refers to an external Service, although it may just be that it doesn't work currently.
 		     Service that delivers messages from the phone "quick response" -->
 		<service android:name=".HeadlessSmsSendService"
-				 android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
-				 android:exported="true"
-				 tools:ignore="MissingRegistered">
+				android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
+				android:exported="true"
+				tools:ignore="MissingRegistered"
+				android:enabled="@bool/kitkat_plus">
 			<intent-filter>
 				<action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>
 				<category android:name="android.intent.category.DEFAULT"/>
