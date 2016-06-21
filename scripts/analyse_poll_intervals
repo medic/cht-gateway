@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+
+/*
+ * Analyse poll requests from the demo server to see if medic-gateway is waking
+ * up as expected on a particular device.
+ *
+ * Use:
+ *   curl https://medic-gateway-demo-server.herokuapp.com/ | jq -r '.datastore.requests[].time' | scripts/analyse_poll_intervals
+ *
+ * Options:
+ *   -d <num> | --discard=<num>		number of timestamps to discard from the start of the list
+ */
+
+const SS = require('simple-statistics');
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin });
+
+//> PROCESS ARGS
+var i, discard = 0;
+for(i=0; i<process.argv.length; ++i) {
+	arg = process.argv[i];
+	if(arg === '-d') {
+		discard = parseInt(process.argv[++i], 10);
+	} else if(~arg.indexOf('--discard=')) {
+		discard = parseInt(arg.substring(10));
+	}
+}
+
+function report(title, diffs) {
+	console.log('-----');
+	console.log('- ' + title);
+	console.log('Diffs: ' + diffs);
+	console.log('');
+	console.log('Min: ' + SS.min(diffs) + 's');
+	console.log('Max: ' + SS.max(diffs) + 's');
+	console.log('');
+	console.log('Mean: ' + SS.mean(diffs).toFixed(2) + 's');
+	console.log('Mode: ' + SS.mode(diffs) + 's');
+	console.log('Median: ' + SS.median(diffs) + 's');
+	console.log('');
+	console.log('Standard deviation: ' + SS.standardDeviation(diffs).toFixed(3) + 's');
+	console.log('-----');
+}
+
+const timestamps = [];
+
+rl.on('line', (line) => {
+	timestamps.unshift(new Date(line).getTime());
+});
+
+rl.on('close', () => {
+	// If user has requested to discard some of the early timestamps, do this now.
+	// This is useful if the initial timestamps are anomalous.
+	while(discard--) timestamps.shift();
+
+	const single_diffs = [], double_diffs = [];
+	var i;
+
+	for(i=1; i<timestamps.length; ++i) {
+		single_diffs[i-1] = (timestamps[i] - timestamps[i-1]) / 1000;
+		if(i > 1) 
+			double_diffs[i-2] = (timestamps[i] - timestamps[i-2]) / 1000;
+	}
+
+	console.log('Timestamps: ' + timestamps.length);
+	report('SINGLE DIFFS', single_diffs);
+	report('DOUBLE DIFFS', double_diffs);
+	console.log('Finished.');
+});

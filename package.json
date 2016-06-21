@@ -11,5 +11,8 @@
   "license": "MIT",
   "engines": {
     "node": "5.10.x"
+  },
+  "devDependencies": {
+    "simple-statistics": "^2.0.0"
   }
 }
