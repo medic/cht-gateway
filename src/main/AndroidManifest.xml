@@ -26,7 +26,9 @@
 			tools:ignore="GoogleAppIndexingWarning">
 		<activity android:name="StartupActivity"
 				android:screenOrientation="portrait"
-				android:configChanges="orientation|screenSize">
+				android:configChanges="orientation|screenSize"
+				android:theme="@android:style/Theme.NoDisplay"
+				>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
