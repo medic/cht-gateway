@@ -9,10 +9,13 @@ ifdef ComSpec	 # Windows
   GRADLEW := $(subst /,\,${GRADLEW})
 endif
 
-.PHONY: default assets build clean test deploy emulator kill logs
+.PHONY: default assets build clean test deploy emulator kill logs force
 
 default:
 	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
+
+force: build
+	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-debug.apk
 
 build:
 	${GRADLEW} assembleDebug
