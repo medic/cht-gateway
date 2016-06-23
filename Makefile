@@ -9,12 +9,12 @@ ifdef ComSpec	 # Windows
   GRADLEW := $(subst /,\,${GRADLEW})
 endif
 
-.PHONY: default assets build clean test deploy emulator kill logs force
+.PHONY: default assets build clean test deploy uninstall emulator kill logs force
 
 default:
 	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
 
-force: build
+force: build uninstall
 	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-debug.apk
 
 build:
@@ -36,6 +36,9 @@ logs:
 
 deploy:
 	${GRADLEW} installDebug
+
+uninstall:
+	adb uninstall medic.gateway.alert
 
 kill:
 	pkill -9 emulator64-arm
