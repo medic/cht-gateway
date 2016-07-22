@@ -15,6 +15,22 @@ An SMS gateway for Android.  Send and receive SMS from your webapp via an Androi
 	|        |                 | (android) | --------> SMS
 	+--------+                 +-----------+
 
+# Use
+
+## Installation
+
+Download the latest APK from https://github.com/medic/medic-gateway/releases
+
+## Configuration
+
+### Medic Mobile
+
+If you're configuring `medic-gateway` for use with [`medic-webapp`](https://github.com/medic/medic-webapp), set the webapp URL to `https://username:password@example.com/api/sms`.
+
+### Other
+
+If you're configuring `medic-gateway` for use with other services, you will need to find out the value for _webapp URL_ from your tech support.
+
 # API
 
 This is the API specification for communications between `medic-gateway` and a web server.  Messages in both directions are `application/json`.
