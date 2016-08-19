@@ -7,7 +7,7 @@
 		android:installLocation="internalOnly"
 		package="medic.gateway.alert"
 		>
-	<uses-sdk android:minSdkVersion="17"
+	<uses-sdk android:minSdkVersion="16"
 			android:targetSdkVersion="23"/>
 
 	<!-- communication permissions -->
