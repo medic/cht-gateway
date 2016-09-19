@@ -14,6 +14,7 @@ import static medic.gateway.alert.Utils.*;
 
 public class GatewayEventLogActivity extends Activity {
 	private static final int MAX_LOG_ITEMS = 200;
+	private static final boolean DEFER_LOADING = true;
 
 	private Db db;
 	private ListView list;
@@ -30,7 +31,17 @@ public class GatewayEventLogActivity extends Activity {
 			public void onClick(View v) { refreshList(); }
 		});
 
-		refreshList();
+		if(DEFER_LOADING) {
+			// Don't refresh list on first load - instead add a list
+			// item explaining that the list must be refreshed.
+			// TODO we *should* refresh list on first load, but only
+			// once doing this does not impact performance.
+			list.setAdapter(new ArrayAdapter<String>(this,
+					R.layout.event_log_empty_item,
+					new String[]{ getString(R.string.txtEmptyListPrompt) }));
+		} else {
+			refreshList();
+		}
 	}
 
 	private void refreshList() {

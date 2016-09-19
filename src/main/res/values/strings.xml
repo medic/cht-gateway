@@ -32,6 +32,7 @@
 	<string name="mnuCompose">Compose</string>
 	<string name="mnuSettings">Settings</string>
 
+	<string name="txtEmptyListPrompt">(press Refresh to load content)</string>
 	<string name="btnRefreshList">Refresh all</string>
 	<string name="btnRetrySelected">Retry</string>
 	<string name="btnSelectNewer">Select newer</string>
