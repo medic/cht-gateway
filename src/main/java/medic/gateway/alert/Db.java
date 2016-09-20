@@ -8,6 +8,7 @@ import android.telephony.*;
 import java.util.*;
 
 import static java.util.UUID.randomUUID;
+import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOAD_SEED_DATA;
 import static medic.gateway.alert.GatewayLog.*;
 import static medic.gateway.alert.Utils.*;
@@ -47,8 +48,16 @@ public final class Db extends SQLiteOpenHelper {
 	public static synchronized Db getInstance(Context ctx) { // NOPMD
 		if(_instance == null) {
 			_instance = new Db(ctx);
-			if(LOAD_SEED_DATA) _instance.seed();
+			if(LOAD_SEED_DATA &&
+					_instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong() == 0) {
+				_instance.seed();
+			}
+
+			if(DEBUG) _instance.storeLogEntry("LOG MESSAGES: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("WO MESSAGES: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWO_MESSAGE).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("WT MESSAGES: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWT_MESSAGE).simpleQueryForLong());
 		}
+
 		return _instance;
 	}
 
@@ -330,22 +339,32 @@ public final class Db extends SQLiteOpenHelper {
 
 //> DB SEEDING
 	private void seed() {
-		WtMessages: {
-			store(new WtMessage("+254789123123", "hello from kenya"));
-			store(new WtMessage("+34678123123", "hello from spain"));
-			store(new WtMessage("+447890123123", "hello from uk"));
+		LogMessages: {
+			for(int i=0; i<500000; ++i) {
+				storeLogEntry("Seed log entry " + i);
+			}
+		}
 
-			for(int i=0; i<20; ++i) {
+		WtMessages: {
+			for(int i=0; i<100000; ++i) {
+				store(new WtMessage("+254789123123", "hello from kenya " + i));
+				store(new WtMessage("+34678123123", "hello from spain " + i));
+				store(new WtMessage("+447890123123", "hello from uk " + i));
+			}
+
+			for(int i=0; i<200000; ++i) {
 				store(new WtMessage(randomPhoneNumber(), randomSmsContent()));
 			}
 		}
 
 		WoMessages: {
-			store(new WoMessage(randomUUID().toString(), "+254789123123", "hello kenya"));
-			store(new WoMessage(randomUUID().toString(), "+34678123123", "hello spain"));
-			store(new WoMessage(randomUUID().toString(), "+447890123123", "hello uk"));
+			for(int i=0; i<100000; ++i) {
+				store(new WoMessage(randomUUID().toString(), "+254789123123", "hello kenya " + i));
+				store(new WoMessage(randomUUID().toString(), "+34678123123", "hello spain " + i));
+				store(new WoMessage(randomUUID().toString(), "+447890123123", "hello uk " + i));
+			}
 
-			for(int i=0; i<20; ++i) {
+			for(int i=0; i<200000; ++i) {
 				store(new WoMessage(randomUUID().toString(), randomPhoneNumber(), randomSmsContent()));
 			}
 		}

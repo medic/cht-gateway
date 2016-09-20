@@ -4,7 +4,8 @@
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
-	<ListView android:id="@+id/lstGatewayEventLog"
+	<fragment android:name="medic.gateway.alert.GatewayEventLogFragment"
+			android:id="@+id/lstGatewayEventLog"
 			android:layout_width="fill_parent"
 			android:layout_height="0dp"
 			android:layout_weight="1"
