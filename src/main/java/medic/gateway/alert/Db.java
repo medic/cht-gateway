@@ -9,6 +9,7 @@ import java.util.*;
 
 import static java.util.UUID.randomUUID;
 import static medic.gateway.alert.BuildConfig.DEBUG;
+import static medic.gateway.alert.BuildConfig.FORCE_SEED;
 import static medic.gateway.alert.BuildConfig.LOAD_SEED_DATA;
 import static medic.gateway.alert.GatewayLog.*;
 import static medic.gateway.alert.Utils.*;
@@ -48,8 +49,8 @@ public final class Db extends SQLiteOpenHelper {
 	public static synchronized Db getInstance(Context ctx) { // NOPMD
 		if(_instance == null) {
 			_instance = new Db(ctx);
-			if(LOAD_SEED_DATA &&
-					_instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong() == 0) {
+			if(LOAD_SEED_DATA && (FORCE_SEED ||
+					_instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong() == 0)) {
 				_instance.seed();
 			}
 
