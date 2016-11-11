@@ -1,4 +1,5 @@
 language: android
+sudo: required
 android:
   components:
     # some travis/android magic from https://github.com/travis-ci/travis-ci/issues/5036
