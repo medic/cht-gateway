@@ -135,6 +135,9 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus) {
+		if(newStatus == WoMessage.Status.FAILED)
+			throw new IllegalArgumentException("updateStatus() should not be called with newStatus==FAILED.  Use setFailed().");
+
 		return updateStatus(m, oldStatus, newStatus, null);
 	}
 

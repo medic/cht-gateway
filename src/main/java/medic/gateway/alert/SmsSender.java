@@ -45,7 +45,8 @@ public class SmsSender {
 					sendSms(m);
 				} catch(Exception ex) {
 					logException(ex, "SmsSender.sendUnsentSmses() :: message=%s", m);
-					db.updateStatus(m, PENDING, FAILED);
+					db.setFailed(m, String.format("Exception: %s; message: %s; cause: %s",
+							ex, ex.getMessage(), ex.getCause()));
 				}
 			}
 		}
