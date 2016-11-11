@@ -63,7 +63,7 @@ class DeliveryReportHandler {
 	@SuppressWarnings("PMD.EmptyIfStmt")
 	private void handleGsmDelivery(Context ctx, int status, WoMessage m) {
 		// Detail of the failure.  Must be set for FAILED messages.
-		String fDetail= null;
+		String fDetail = null;
 
 		Db db = Db.getInstance(ctx);
 
