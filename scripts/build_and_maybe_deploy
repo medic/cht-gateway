@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-adb_state="$($ADB get-state 2>/dev/null)"
+adb_state="$($ADB get-state 2>/dev/null || true)"
 
 if [[ "$adb_state" = "device" ]]; then
 	make deploy
