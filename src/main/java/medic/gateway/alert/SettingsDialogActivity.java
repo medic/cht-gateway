@@ -15,6 +15,7 @@ import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.showSpinner;
 
 public class SettingsDialogActivity extends Activity {
 	private boolean hasPreviousSettings;
@@ -48,9 +49,9 @@ public class SettingsDialogActivity extends Activity {
 		String webappUrl = text(R.id.txtWebappUrl);
 		final boolean syncEnabled = checked(R.id.cbxEnablePolling);
 
-		final ProgressDialog spinner = showSpinner(String.format(
-				getString(R.string.txtValidatingWebappUrl),
-				webappUrl));
+		final ProgressDialog spinner = showSpinner(this,
+				String.format(getString(R.string.txtValidatingWebappUrl),
+						webappUrl));
 
 		new AsyncTask<String, Void, WebappUrlVerififcation>() {
 			protected WebappUrlVerififcation doInBackground(String... webappUrl) {
@@ -155,16 +156,6 @@ public class SettingsDialogActivity extends Activity {
 	private void showError(int componentId, int stringId) {
 		TextView field = (TextView) findViewById(componentId);
 		field.setError(getString(stringId));
-	}
-
-	private ProgressDialog showSpinner(String message) {
-		ProgressDialog p = new ProgressDialog(this);
-		p.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		p.setMessage(message);
-		p.setIndeterminate(true);
-		p.setCanceledOnTouchOutside(false);
-		p.show();
-		return p;
 	}
 
 	private void log(String message, Object... extras) {

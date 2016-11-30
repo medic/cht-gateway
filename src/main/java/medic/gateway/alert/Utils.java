@@ -1,6 +1,7 @@
 package medic.gateway.alert;
 
 import android.Manifest.permission;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -48,6 +49,20 @@ public final class Utils {
 
 	public static void toast(Context ctx, String message, Object... args) {
 		Toast.makeText(ctx, String.format(message, args), Toast.LENGTH_LONG).show();
+	}
+
+	public static ProgressDialog showSpinner(Context ctx) {
+		return showSpinner(ctx, null);
+	}
+
+	public static ProgressDialog showSpinner(Context ctx, String message) {
+		ProgressDialog p = new ProgressDialog(ctx);
+		p.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		if(message != null) p.setMessage(message);
+		p.setIndeterminate(true);
+		p.setCanceledOnTouchOutside(false);
+		p.show();
+		return p;
 	}
 
 	public static JSONObject json(Object... keyVals) throws JSONException {

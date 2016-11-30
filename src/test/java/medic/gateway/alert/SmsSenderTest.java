@@ -17,7 +17,7 @@ import static medic.gateway.alert.test.TestUtils.*;
 import static org.junit.Assert.*;
 import static org.robolectric.Shadows.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert",
 		"PMD.UnnecessaryFullyQualifiedName"})

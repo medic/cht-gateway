@@ -101,6 +101,19 @@ public final class Db extends SQLiteOpenHelper {
 		// Handle DB upgrades here, once we start supporting released versions
 	}
 
+//> GENERAL HANDLERS
+	int deleteOldData() {
+		long oneWeekAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+
+		int totalRecordsDeleted = 0;
+
+		totalRecordsDeleted += db.delete(tblLOG, lt(LOG_clmTIMESTAMP), args(oneWeekAgo));
+		totalRecordsDeleted += db.delete(tblWO_MESSAGE, lt(WO_clmLAST_ACTION), args(oneWeekAgo));
+		totalRecordsDeleted += db.delete(tblWT_MESSAGE, lt(WT_clmLAST_ACTION), args(oneWeekAgo));
+
+		return totalRecordsDeleted;
+	}
+
 //> GatewayEventLogEntry HANDLERS
 	void storeLogEntry(String message) {
 		ContentValues v = new ContentValues();
@@ -377,6 +390,10 @@ public final class Db extends SQLiteOpenHelper {
 //> STATIC HELPERS
 	private static String[] cols(String... args) {
 		return args;
+	}
+
+	private static String lt(String col) { // NOPMD
+		return col + "<?";
 	}
 
 	private static String eq(String... cols) { // NOPMD

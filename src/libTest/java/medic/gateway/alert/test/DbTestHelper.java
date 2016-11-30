@@ -58,25 +58,27 @@ public class DbTestHelper {
 		return c;
 	}
 
-	public void insert(String tableName, String[] cols, Object[] vals) {
-		ContentValues v = new ContentValues();
+	public void insert(String tableName, String[] cols, Object[]... valss) {
 		long initialCount = count(tableName);
-		for(int i=cols.length-1; i>=0; --i) {
-			if(vals[i] == null) v.put(cols[i], (String) null);
-			else if(vals[i] instanceof String) v.put(cols[i], (String) vals[i]);
-			else if(vals[i] instanceof Byte) v.put(cols[i], (Byte) vals[i]);
-			else if(vals[i] instanceof Short) v.put(cols[i], (Short) vals[i]);
-			else if(vals[i] instanceof Integer) v.put(cols[i], (Integer) vals[i]);
-			else if(vals[i] instanceof Long) v.put(cols[i], (Long) vals[i]);
-			else if(vals[i] instanceof Float) v.put(cols[i], (Float) vals[i]);
-			else if(vals[i] instanceof Double) v.put(cols[i], (Double) vals[i]);
-			else if(vals[i] instanceof Boolean) v.put(cols[i], (Boolean) vals[i]);
-			else if(vals[i] instanceof byte[]) v.put(cols[i], (byte[]) vals[i]);
-			else v.put(cols[i], vals[i].toString());
+		for(Object[] vals : valss) {
+			ContentValues v = new ContentValues();
+			for(int i=cols.length-1; i>=0; --i) {
+				if(vals[i] == null) v.put(cols[i], (String) null);
+				else if(vals[i] instanceof String) v.put(cols[i], (String) vals[i]);
+				else if(vals[i] instanceof Byte) v.put(cols[i], (Byte) vals[i]);
+				else if(vals[i] instanceof Short) v.put(cols[i], (Short) vals[i]);
+				else if(vals[i] instanceof Integer) v.put(cols[i], (Integer) vals[i]);
+				else if(vals[i] instanceof Long) v.put(cols[i], (Long) vals[i]);
+				else if(vals[i] instanceof Float) v.put(cols[i], (Float) vals[i]);
+				else if(vals[i] instanceof Double) v.put(cols[i], (Double) vals[i]);
+				else if(vals[i] instanceof Boolean) v.put(cols[i], (Boolean) vals[i]);
+				else if(vals[i] instanceof byte[]) v.put(cols[i], (byte[]) vals[i]);
+				else v.put(cols[i], vals[i].toString());
+			}
+			long rowId = raw.insertOrThrow(tableName, null, v);
+			assertEquals(++initialCount, count(tableName));
+			assertNotEquals(-1, rowId);
 		}
-		long rowId = raw.insertOrThrow(tableName, null, v);
-		assertEquals(initialCount+1, count(tableName));
-		assertNotEquals(-1, rowId);
 	}
 
 	public void assertTable(String tableName, Object... expectedValues) {

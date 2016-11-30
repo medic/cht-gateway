@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 public class DbTest {
@@ -181,6 +181,112 @@ public class DbTest {
 		assertTrue(successReported);
 		dbHelper.assertTable("wt_message",
 				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
+	@Test
+	public void test_deleteOldData_shouldHaveNoEffectIfNoData() {
+		// given
+		dbHelper.assertEmpty("log");
+		dbHelper.assertEmpty("wo_message");
+		dbHelper.assertEmpty("wt_message");
+
+		// when
+		int deletedCount = db.deleteOldData();
+
+		// then
+		assertEquals(0, deletedCount);
+		dbHelper.assertEmpty("log");
+		dbHelper.assertEmpty("wo_message");
+		dbHelper.assertEmpty("wt_message");
+	}
+
+	@Test
+	public void test_deleteOldData_shouldDeleteOldEventLogsButNotNewOnes() {
+		// given
+		dbHelper.insert("log",
+				cols("_id", "timestamp", "message"),
+				vals(1, now(), "should not delete 1"),
+				vals(2, daysAgo(8), "should delete 1"),
+				vals(3, daysAgo(6), "should not delete 2"),
+				vals(4, daysAgo(800), "should delete 2"));
+		assertEquals(4, dbHelper.count("log"));
+
+		// when
+		int deletedCount = db.deleteOldData();
+
+		// then
+		assertEquals(2, deletedCount);
+		dbHelper.assertTable("log",
+				ANY_ID, ANY_NUMBER, "should not delete 1",
+				ANY_ID, ANY_NUMBER, "should not delete 2");
+	}
+
+	@Test
+	public void test_deleteOldData_shouldDeleteOldWoMessagesButNotNewOnes() {
+		// given
+		dbHelper.insert("wo_message",
+				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, false, now(), A_PHONE_NUMBER, "should keep 1"),
+				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(8), A_PHONE_NUMBER, "should delete 1"),
+				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(6), A_PHONE_NUMBER, "should keep 2"),
+				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(800), A_PHONE_NUMBER, "should delete 2"));
+		assertEquals(4, dbHelper.count("wo_message"));
+
+		// when
+		int deletedCount = db.deleteOldData();
+
+		// then
+		assertEquals(2, deletedCount);
+		dbHelper.assertTable("wo_message",
+				ANY_ID, "PENDING", false, null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 1",
+				ANY_ID, "PENDING", false, null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 2");
+	}
+
+	@Test
+	public void test_deleteOldData_shouldDeleteOldWtMessagesButNotNewOnes() {
+		// given
+		dbHelper.insert("wt_message",
+				cols("_id", "status", "last_action", "_from", "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, now(), A_PHONE_NUMBER, "should keep 1"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6), A_PHONE_NUMBER, "should keep 2"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800), A_PHONE_NUMBER, "should delete 2"));
+		assertEquals(4, dbHelper.count("wt_message"));
+
+		// when
+		int deletedCount = db.deleteOldData();
+
+		// then
+		assertEquals(2, deletedCount);
+		dbHelper.assertTable("wt_message",
+				ANY_ID, "PENDING", ANY_NUMBER, A_PHONE_NUMBER, "should keep 1",
+				ANY_ID, "PENDING", ANY_NUMBER, A_PHONE_NUMBER, "should keep 2");
+	}
+
+	@Test
+	public void test_deleteOldData_shouldDeleteAllKindsOfData() {
+		// given
+		dbHelper.insert("log",
+				cols("_id", "timestamp", "message"),
+				vals(1, daysAgo(8), "Should be deleted"));
+		dbHelper.insert("wo_message",
+				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(8), A_PHONE_NUMBER, "should delete"));
+		dbHelper.insert("wt_message",
+				cols("_id", "status", "last_action", "_from", "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"));
+		assertEquals(1, dbHelper.count("log"));
+		assertEquals(1, dbHelper.count("wo_message"));
+		assertEquals(1, dbHelper.count("wt_message"));
+
+		// when
+		int deletedCount = db.deleteOldData();
+
+		// then
+		assertEquals(3, deletedCount);
+		dbHelper.assertEmpty("log");
+		dbHelper.assertEmpty("wo_message");
+		dbHelper.assertEmpty("wt_message");
 	}
 
 //> STATIC HELPERS

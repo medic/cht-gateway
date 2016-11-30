@@ -32,6 +32,17 @@
 	<string name="mnuCompose">Compose</string>
 	<string name="mnuSettings">Settings</string>
 
+	<string name="mnuDeleteOldData">Clear old data</string>
+	<string name="txtConfirmDeleteOldData_title">Clear old data</string>
+	<string name="txtConfirmDeleteOldData_body">Are you sure you want to delete data more than one week old?
+		\n
+		\nWarning: pending messages <b>will</b> be deleted.</string>
+	<string name="btnConfirmDeleteOldData_confirm">Delete data</string>
+	<plurals name="txtOldDataDeleteCount">
+		<item quantity="one">Deleted 1 record.</item>
+		<item quantity="other">Deleted %,d records.</item>
+	</plurals>
+
 	<string name="txtEmptyListPrompt">(press Refresh to load content)</string>
 	<string name="btnRefreshList">Refresh all</string>
 	<string name="btnRetrySelected">Retry</string>

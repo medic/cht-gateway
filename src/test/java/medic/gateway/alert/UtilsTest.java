@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.robolectric.Shadows.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
 @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
 		"PMD.NPathComplexity",

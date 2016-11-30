@@ -73,4 +73,12 @@ public final class TestUtils {
 			throw new RuntimeException(ex);
 		}
 	}
+
+	public static long now() {
+		return System.currentTimeMillis();
+	}
+
+	public static long daysAgo(long numberOfDaysAgo) {
+		return now() - (numberOfDaysAgo * 1000 * 60 * 60 * 24);
+	}
 }
