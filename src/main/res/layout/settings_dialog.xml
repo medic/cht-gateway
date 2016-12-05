@@ -9,11 +9,13 @@
 			android:hint="@string/txtWebappUrl"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
 			android:inputType="textUri"/>
 	<CheckBox android:id="@+id/cbxEnablePolling"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:layout_below="@id/txtWebappUrl"
+			android:layout_marginTop="16dp"
 			android:text="@string/cbxEnablePolling"
 			android:checked="true"/>
 	<Button android:id="@+id/btnCancelSettings"
@@ -27,7 +29,7 @@
 			android:layout_toLeftOf="@+id/btnSaveSettings"/>
 	<Button android:id="@+id/btnSaveSettings"
 			android:text="@string/btnSave"
-			android:onClick="verifyAndSave"
+			android:onClick="doSave"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:paddingLeft="16dp"

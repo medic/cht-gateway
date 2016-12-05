@@ -11,7 +11,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
@@ -40,39 +39,17 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 //> EVENT HANDLERS
-	public void verifyAndSave(View view) {
-		log("verifyAndSave");
+	public void doSave(View view) {
+		log("doSave");
 
 		submitButton().setEnabled(false);
 		cancelButton().setEnabled(false);
 
-		String webappUrl = text(R.id.txtWebappUrl);
-		final boolean syncEnabled = checked(R.id.cbxEnablePolling);
+		boolean syncEnabled = checked(R.id.cbxEnablePolling);
 
-		final ProgressDialog spinner = showSpinner(this,
-				String.format(getString(R.string.txtValidatingWebappUrl),
-						webappUrl));
-
-		new AsyncTask<String, Void, WebappUrlVerififcation>() {
-			protected WebappUrlVerififcation doInBackground(String... webappUrl) {
-				if(DEBUG && webappUrl.length != 1) throw new AssertionError();
-				return new WebappUrlVerifier().verify(webappUrl[0]);
-			}
-			protected void onPostExecute(WebappUrlVerififcation result) {
-				if(result.isOk) {
-					boolean savedOk = saveSettings(new Settings(result.webappUrl, syncEnabled));
-					if(savedOk) {
-						logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", result.webappUrl);
-						startApp();
-					}
-				} else {
-					showError(R.id.txtWebappUrl, result.failure);
-					submitButton().setEnabled(true);
-					cancelButton().setEnabled(true);
-				}
-				spinner.dismiss();
-			}
-		}.execute(webappUrl);
+		if(syncEnabled) {
+			verifyAndSave();
+		} else saveWithoutVerification();
 	}
 
 	public void cancelSettingsEdit(View view) {
@@ -94,9 +71,60 @@ public class SettingsDialogActivity extends Activity {
 		finish();
 	}
 
+	private void verifyAndSave() {
+		final String webappUrl = text(R.id.txtWebappUrl);
+
+		final ProgressDialog spinner = showSpinner(this,
+				String.format(getString(R.string.txtValidatingWebappUrl),
+						webappUrl));
+
+		new AsyncTask<Void, Void, WebappUrlVerififcation>() {
+			protected WebappUrlVerififcation doInBackground(Void..._) {
+				return new WebappUrlVerifier().verify(webappUrl);
+			}
+			protected void onPostExecute(WebappUrlVerififcation result) {
+				boolean savedOk = false;
+
+				if(result.isOk)
+					savedOk = saveSettings(new Settings(result.webappUrl, true));
+				else
+					showError(R.id.txtWebappUrl, result.failure);
+
+				if(savedOk) startApp();
+				else {
+					submitButton().setEnabled(true);
+					cancelButton().setEnabled(true);
+				}
+				spinner.dismiss();
+			}
+		}.execute();
+	}
+
+	private void saveWithoutVerification() {
+		final String webappUrl = text(R.id.txtWebappUrl);
+
+		final ProgressDialog spinner = showSpinner(this,
+				getString(R.string.txtSavingSettings));
+
+		new AsyncTask<Void, Void, Void>() {
+			protected Void doInBackground(Void..._) {
+				boolean savedOk = saveSettings(new Settings(webappUrl, false));
+
+				if(savedOk) startApp();
+				else {
+					submitButton().setEnabled(true);
+					cancelButton().setEnabled(true);
+				}
+				spinner.dismiss();
+				return null;
+			}
+		}.execute();
+	}
+
 	private boolean saveSettings(Settings s) {
 		try {
 			SettingsStore.in(this).save(s);
+			logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", s.getWebappUrl());
 			return true;
 		} catch(IllegalSettingsException ex) {
 			logException(ex, "SettingsDialogActivity.saveSettings()");
