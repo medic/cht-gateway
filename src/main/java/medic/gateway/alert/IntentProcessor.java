@@ -126,8 +126,7 @@ class SendingReportHandler {
 			String failureReason;
 			switch(resultCode) {
 				case RESULT_ERROR_GENERIC_FAILURE:
-					int errorCode = intent.getIntExtra("errorCode", -1);
-					failureReason = "generic:" + errorCode;
+					failureReason = getGenericFailureReason(intent);
 					break;
 				case RESULT_ERROR_NO_SERVICE:
 					failureReason = "no-service";
@@ -139,10 +138,19 @@ class SendingReportHandler {
 					failureReason = "radio-off";
 					break;
 				default:
-					failureReason = "unknown:" + resultCode;
+					failureReason = "unknown; resultCode=" + resultCode;
 			}
 			db.setFailed(m, failureReason);
 			logEvent(ctx, "Sending message to %s failed (cause: %s)", m.to, failureReason);
+		}
+	}
+
+	private String getGenericFailureReason(Intent intent) {
+		if(intent.hasExtra("errorCode")) {
+			int errorCode = intent.getIntExtra("errorCode", -1);
+			return "generic; errorCode=" + errorCode;
+		} else {
+			return "generic; no errorCode supplied";
 		}
 	}
 }

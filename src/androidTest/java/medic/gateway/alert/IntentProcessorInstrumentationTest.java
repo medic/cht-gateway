@@ -69,7 +69,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", true, "generic:99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", true, "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
 	}
 
 	@Test
