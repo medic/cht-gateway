@@ -176,4 +176,3 @@ class WoCursorLoader extends CursorLoader {
 		return db.getWoMessages(MAX_WO_MESSAGES);
 	}
 }
-
