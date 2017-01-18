@@ -13,6 +13,7 @@ import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
 import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
 import static android.telephony.SmsManager.RESULT_ERROR_NULL_PDU;
 import static android.telephony.SmsManager.RESULT_ERROR_RADIO_OFF;
+import static medic.gateway.alert.CellSignalStrengthUtil.getSignalStrengthDescription;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.SmsCompatibility.getMessagesFromIntent;
@@ -146,11 +147,15 @@ class SendingReportHandler {
 	}
 
 	private String getGenericFailureReason(Intent intent) {
+		String reason;
+
 		if(intent.hasExtra("errorCode")) {
 			int errorCode = intent.getIntExtra("errorCode", -1);
-			return "generic; errorCode=" + errorCode;
+			reason = "generic; errorCode=" + errorCode;
 		} else {
-			return "generic; no errorCode supplied";
+			reason = "generic; no errorCode supplied";
 		}
+
+		return String.format("%; cell signal strength: %s", reason, getSignalStrengthDescription(ctx));
 	}
 }
