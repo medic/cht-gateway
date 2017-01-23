@@ -224,8 +224,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"aaa-111", "UNSENT", false, NO_REASON, ANY_NUMBER, "+1", "testing: one",
-				"aaa-222", "UNSENT", false, NO_REASON, ANY_NUMBER, "+2", "testing: two");
+				"aaa-111", "UNSENT", true, NO_REASON, ANY_NUMBER, "+1", "testing: one",
+				"aaa-222", "UNSENT", true, NO_REASON, ANY_NUMBER, "+2", "testing: two");
 	}
 
 	@Test
@@ -262,7 +262,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"ok-111", "UNSENT", false, NO_REASON, ANY_NUMBER, "+1", "ok: one",
-				"ok-222", "UNSENT", false, NO_REASON, ANY_NUMBER, "+2", "ok: two");
+				"ok-111", "UNSENT", true, NO_REASON, ANY_NUMBER, "+1", "ok: one",
+				"ok-222", "UNSENT", true, NO_REASON, ANY_NUMBER, "+2", "ok: two");
 	}
 }

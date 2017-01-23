@@ -191,7 +191,7 @@ public final class Db extends SQLiteOpenHelper {
 		ContentValues v = new ContentValues();
 		v.put(WO_clmID, m.id);
 		v.put(WO_clmSTATUS, m.status.toString());
-		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
+		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
 		v.put(WO_clmFAILURE_REASON, m.status == WoMessage.Status.FAILED ? m.getFailureReason() : null);
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 		v.put(WO_clmTO, m.to);
