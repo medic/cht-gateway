@@ -119,9 +119,9 @@ The status field is defined as follows.
 
 Status           | Description
 -----------------|-------------------
-PENDING | The message has been sent to the gateways network
-SENT | The message has been sent to the recipients network
-DELIVERED | The message has been received by the recipients phone
+PENDING | The message has been sent to the gateway's network
+SENT | The message has been sent to the recipient's network
+DELIVERED | The message has been received by the recipient's phone
 FAILED | The delivery has failed and will not be retried
 
 ### Response
