@@ -81,18 +81,20 @@ connectedCheck.doLast {
 	slurper.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false) 
 	slurper.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-	def report = slurper.parse('./build/reports/coverage/debug/report.xml')
+	['generic', 'medic'].each { flavour ->
+		def report = slurper.parse("./build/reports/coverage/${flavour}/debug/report.xml")
 
-	println "------ Code Coverage ------"
-	report.package.each { p ->
-		println "--> ${p.@name.toString().replaceAll('/', '.')}"
-		p.counter.each { c ->
-			def covered = c.@covered.toString() as int
-			def missed = c.@missed.toString() as int
-			def percent = ((100 * covered) / (covered + missed))
-			println String.format('    %-16s %.1f ', c.@type, percent) + '%'
+		println "------ Code Coverage (flavour: $flavour)) ------"
+		report.package.each { p ->
+			println "--> ${p.@name.toString().replaceAll('/', '.')}"
+			p.counter.each { c ->
+				def covered = c.@covered.toString() as int
+				def missed = c.@missed.toString() as int
+				def percent = ((100 * covered) / (covered + missed))
+				println String.format('    %-16s %.1f ', c.@type, percent) + '%'
+			}
+			println "----------------------------------"
 		}
-		println "---------------------------"
 	}
 }
 
@@ -173,6 +175,17 @@ android {
 				outputs.upToDateWhen { false }
 				showStandardStreams = true
 			}
+		}
+	}
+
+	productFlavors {
+		generic {
+			applicationId = 'medic.gateway.alert.generic'
+			buildConfigField "boolean", "IS_MEDIC_FLAVOUR", "false"
+		}
+		medic {
+			applicationId = 'medic.gateway.alert'
+			buildConfigField "boolean", "IS_MEDIC_FLAVOUR", "true"
 		}
 	}
 }

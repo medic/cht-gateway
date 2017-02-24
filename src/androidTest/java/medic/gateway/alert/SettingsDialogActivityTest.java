@@ -20,14 +20,18 @@ import static android.support.test.espresso.assertion.ViewAssertions.*;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.R.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
 import static medic.gateway.alert.test.InstrumentationTestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
-@SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert", "PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsDialogActivityTest {
+	private static final boolean NOT_MEDIC_FLAVOUR = !IS_MEDIC_FLAVOUR;
+	private static final boolean NOT_GENERIC_FLAVOUR = IS_MEDIC_FLAVOUR;
+
 	@Rule @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 	public ActivityTestRule<SettingsDialogActivity> activityTestRule =
 			new ActivityTestRule<>(SettingsDialogActivity.class);
@@ -45,8 +49,26 @@ public class SettingsDialogActivityTest {
 		clearAppSettings();
 	}
 
+
+//> GENERIC FLAVOUR TESTS
 	@Test
-	public void shouldDisplayCancelButtonIfSettingsExist() throws Exception {
+	public void generic_shouldDisplayCorrectFields() throws Exception {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
+		// expect
+		assertVisible(id.txtWebappUrl);
+		assertVisible(id.cbxEnablePolling);
+		assertVisible(id.btnSaveSettings);
+
+		assertDoesNotExist(id.txtWebappInstanceName);
+		assertDoesNotExist(id.txtWebappUsername);
+		assertDoesNotExist(id.txtWebappPassword);
+	}
+
+	@Test
+	public void generic_shouldDisplayCancelButtonIfSettingsExist() throws Exception {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
 		settingsStore().save(new Settings(http.url(), true));
 
@@ -59,16 +81,34 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void shouldNotDisplayCancelButtonIfSettingsDoNotExist() {
+	public void generic_shouldNotDisplayCancelButtonIfSettingsDoNotExist() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// expect
 		onView(withId(id.btnCancelSettings))
 				.check(matches(not(isDisplayed())));
 	}
 
 	@Test
-	public void leavingUrlBlankShouldShowError() {
+	public void generic_leavingUrlBlankShouldShowError() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
-		urlEnreredAs("");
+		urlEnteredAs("");
+
+		// when
+		saveClicked();
+
+		// then
+		assertErrorDisplayed(string.errRequired);
+	}
+
+	@Test
+	public void generic_enteringInvalidUrlShouldShowError() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		urlEnteredAs("nonsense");
 
 		// when
 		saveClicked();
@@ -78,21 +118,11 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void enteringInvalidUrlShouldShowError() {
+	public void generic_enteringUrlWhichDoesNotRespondShouldShowError() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
-		urlEnreredAs("nonsense");
-
-		// when
-		saveClicked();
-
-		// then
-		assertErrorDisplayed(string.errInvalidUrl);
-	}
-
-	@Test
-	public void enteringUrlWhichDoesNotRespondShouldShowError() {
-		// given
-		urlEnreredAs("http://not-a-real-domain-i-hope.com");
+		urlEnteredAs("http://not-a-real-domain-i-hope.com");
 
 		// when
 		saveClicked();
@@ -102,10 +132,12 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void enteringUrlWhichRespondsIncorrectlyShouldShowError() {
+	public void generic_enteringUrlWhichRespondsIncorrectlyShouldShowError() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
 		http.nextResponseJson("{ \"bad\": true }");
-		urlEnreredAs(http.url());
+		urlEnteredAs(http.url());
 
 		// when
 		saveClicked();
@@ -115,10 +147,12 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void enteringUrlWhichRespondsWithUnauthorisedShouldShowError() {
+	public void generic_enteringUrlWhichRespondsWithUnauthorisedShouldShowError() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
 		http.nextResponseError(401);
-		urlEnreredAs(http.url());
+		urlEnteredAs(http.url());
 
 		// when
 		saveClicked();
@@ -128,11 +162,13 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void enteringGoodUrlShouldSaveWebappUrl() {
+	public void generic_enteringGoodUrlShouldSaveWebappUrl() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
 		assertFalse(settingsStore().hasSettings());
 		http.nextResponseJson("{ \"medic-gateway\": true }");
-		urlEnreredAs(http.url());
+		urlEnteredAs(http.url());
 
 		// when
 		saveClicked();
@@ -143,24 +179,13 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void enteringGoodUrlShouldForwardToMessagesList() {
-		// given
-		http.nextResponseJson("{ \"medic-gateway\": true }");
-		urlEnreredAs(http.url());
+	public void generic_disablingPollingShouldSave() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
 
-		// when
-		saveClicked();
-
-		// then
-		assertVisible(id.btnRefreshLog);
-	}
-
-	@Test
-	public void disablingPollingShouldSave() {
 		// given
 		assertFalse(settingsStore().hasSettings());
-		http.nextResponseJson("{ \"medic-gateway\": true }");
-		urlEnreredAs(http.url());
+		http.nextResponseJson("{ \"error\": \"this url should not be contacted if polling disabled\" }");
+		urlEnteredAs(http.url());
 		uncheckPollingEnabled();
 
 		// when
@@ -172,11 +197,13 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void enablingPollingShouldSave() {
+	public void generic_enablingPollingShouldSave() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
 		// given
 		assertFalse(settingsStore().hasSettings());
 		http.nextResponseJson("{ \"medic-gateway\": true }");
-		urlEnreredAs(http.url());
+		urlEnteredAs(http.url());
 		checkPollingEnabled();
 
 		// when
@@ -187,10 +214,157 @@ public class SettingsDialogActivityTest {
 		assertTrue(settings().isPollingEnabled());
 	}
 
+//> MEDIC FLAVOUR TESTS
+	@Test
+	public void medic_shouldDisplayCorrectFields() throws Exception {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// expect
+		assertVisible(id.txtWebappInstanceName);
+		assertVisible(id.txtWebappUsername);
+		assertVisible(id.txtWebappPassword);
+
+		assertVisible(id.cbxEnablePolling);
+		assertVisible(id.btnSaveSettings);
+
+		assertDoesNotExist(id.txtWebappUrl);
+	}
+
+	@Test
+	public void medic_shouldDisplayCancelButtonIfSettingsExist() throws Exception {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true));
+
+		// when
+		recreateActivityFor(activityTestRule);
+
+		// then
+		onView(withId(id.btnCancelSettings))
+				.check(matches(isDisplayed()));
+	}
+
+	@Test
+	public void medic_shouldNotDisplayCancelButtonIfSettingsDoNotExist() {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// expect
+		onView(withId(id.btnCancelSettings))
+				.check(matches(not(isDisplayed())));
+	}
+
+	@Test
+	public void medic_leavingWebappInstanceNameBlankShouldShowError() {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		webappInstanceNameEnteredAs("");
+		usernameEnteredAs("some-user");
+		passwordEnteredAs("some-password");
+
+		// when
+		saveClicked();
+
+		// then
+		assertErrorDisplayed(string.errRequired);
+	}
+
+	@Test
+	public void medic_leavingUsernameBlankShouldShowError() {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		webappInstanceNameEnteredAs("some.instance");
+		usernameEnteredAs("");
+		passwordEnteredAs("some-password");
+
+		// when
+		saveClicked();
+
+		// then
+		assertErrorDisplayed(id.txtWebappUsername, string.errRequired);
+	}
+
+	@Test
+	public void medic_leavingPasswordBlankShouldShowError() {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		webappInstanceNameEnteredAs("some.instance");
+		usernameEnteredAs("some-user");
+		passwordEnteredAs("");
+
+		// when
+		saveClicked();
+
+		// then
+		assertErrorDisplayed(id.txtWebappPassword, string.errRequired);
+	}
+
+	@Test
+	public void medic_enteringBadInstanceNameShouldShowError() {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		webappInstanceNameEnteredAs("...");
+		usernameEnteredAs("user");
+		passwordEnteredAs("pass");
+
+		// when
+		saveClicked();
+
+		// then
+		assertErrorDisplayed(string.errInvalidInstanceName);
+	}
+
+	@Test
+	public void medic_disablingPollingShouldSave() {
+		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		assertFalse(settingsStore().hasSettings());
+		webappInstanceNameEnteredAs("some.instance");
+		usernameEnteredAs("some-user");
+		passwordEnteredAs("some-password");
+		uncheckPollingEnabled();
+
+		// when
+		saveClicked();
+
+		// then
+		assertTrue(settingsStore().hasSettings());
+		assertFalse(settings().isPollingEnabled());
+	}
+
 //> TEST HELPERS
-	private void urlEnreredAs(String url) {
-		onView(withId(id.txtWebappUrl))
-				.perform(typeText(url), closeSoftKeyboard());
+	private void urlEnteredAs(String url) {
+		if(NOT_GENERIC_FLAVOUR) throw new IllegalStateException();
+
+		enterText(id.txtWebappUrl, url);
+	}
+
+	private void webappInstanceNameEnteredAs(String instanceName) {
+		if(NOT_MEDIC_FLAVOUR) throw new IllegalStateException();
+
+		enterText(id.txtWebappInstanceName, instanceName);
+	}
+
+	private void usernameEnteredAs(String username) {
+		if(NOT_MEDIC_FLAVOUR) throw new IllegalStateException();
+
+		enterText(id.txtWebappUsername, username);
+	}
+
+	private void passwordEnteredAs(String password) {
+		if(NOT_MEDIC_FLAVOUR) throw new IllegalStateException();
+
+		enterText(id.txtWebappPassword, password);
+	}
+
+	private void enterText(int componentId, String text) {
+		onView(withId(componentId))
+				.perform(typeText(text), closeSoftKeyboard());
 	}
 
 	private void checkPollingEnabled() {
@@ -208,12 +382,17 @@ public class SettingsDialogActivityTest {
 	}
 
 	private void assertErrorDisplayed(int errorMessageResourceId) {
-		String errorString = getTargetContext().getResources().getString(errorMessageResourceId);
-		assertErrorDisplayed(errorString);
+		int componentId = IS_MEDIC_FLAVOUR ? id.txtWebappInstanceName : id.txtWebappUrl;
+		assertErrorDisplayed(componentId, errorMessageResourceId);
 	}
 
-	private void assertErrorDisplayed(final String expectedMessage) {
-		onView(withId(id.txtWebappUrl))
+	private void assertErrorDisplayed(int componentId, int errorMessageResourceId) {
+		String errorString = getTargetContext().getResources().getString(errorMessageResourceId);
+		assertErrorDisplayed(componentId, errorString);
+	}
+
+	private void assertErrorDisplayed(int componentId, final String expectedMessage) {
+		onView(withId(componentId))
 				.check(new ViewAssertion() {
 					public void check(View view, NoMatchingViewException noViewFoundException) {
 						if(!(view instanceof TextView))
@@ -226,6 +405,16 @@ public class SettingsDialogActivityTest {
 
 	private void assertVisible(int viewId) {
 		onView(withId(viewId)).check(matches(isDisplayed()));
+	}
+
+	@SuppressWarnings("PMD.EmptyCatchBlock")
+	private void assertDoesNotExist(int viewId) {
+		try {
+			onView(withId(viewId)).check(matches(isDisplayed()));
+			fail("Found view which should not exist!");
+		} catch(NoMatchingViewException ex) {
+			// expected
+		}
 	}
 
 	private Settings settings() {

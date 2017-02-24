@@ -80,13 +80,17 @@ class Settings {
 
 //> PUBLIC
 	public void validate() throws IllegalSettingsException {
+		if(!isPollingEnabled()) return;
+
 		List<IllegalSetting> errors = new LinkedList<>();
 
 		if(!isSet(webappUrl)) {
-			errors.add(new IllegalSetting(R.id.txtWebappUrl,
+			errors.add(new IllegalSetting("txtWebappUrl:errRequired",
+					R.id.txtWebappUrl,
 					R.string.errRequired));
 		} else if(!URL_PATTERN.matcher(webappUrl).matches()) {
-			errors.add(new IllegalSetting(R.id.txtWebappUrl,
+			errors.add(new IllegalSetting("txtWebappUrl:errInvalidUrl:" + webappUrl,
+					R.id.txtWebappUrl,
 					R.string.errInvalidUrl));
 		}
 
@@ -111,10 +115,12 @@ class Settings {
 }
 
 class IllegalSetting {
+	public final String description;
 	public final int componentId;
 	public final int errorStringId;
 
-	public IllegalSetting(int componentId, int errorStringId) {
+	public IllegalSetting(String description, int componentId, int errorStringId) {
+		this.description = description;
 		this.componentId = componentId;
 		this.errorStringId = errorStringId;
 	}
@@ -139,8 +145,7 @@ class IllegalSettingsException extends SettingsException {
 			StringBuilder bob = new StringBuilder();
 			for(IllegalSetting e : errors) {
 				if(bob.length() > 0) bob.append("; ");
-				bob.append(String.format(
-						"component[%s]: error[%s]", e.componentId, e.errorStringId));
+				bob.append(e.description);
 			}
 			return bob.toString();
 		}

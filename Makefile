@@ -15,9 +15,11 @@ default:
 	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
 
 force: build uninstall
-	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-debug.apk
+	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-medic-debug.apk
 
 build:
+	${GRADLEW} assembleMedicDebug
+build-all:
 	${GRADLEW} assembleDebug
 
 clean:
@@ -35,7 +37,10 @@ logs:
 	${ADB} logcat MedicGateway:V AndroidRuntime:E '*:S' | tee android.log
 
 deploy:
-	${GRADLEW} installDebug
+	${GRADLEW} installMedicDebug
+deploy-all: build-all
+	find build/outputs/apk -name \*-debug.apk | \
+		xargs -n1 ${ADB} install -r
 
 uninstall:
 	adb uninstall medic.gateway.alert
