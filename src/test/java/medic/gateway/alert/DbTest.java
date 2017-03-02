@@ -39,13 +39,13 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_classParamsShouldBeInitialised() {
+	public void classParamsShouldBeInitialised() {
 		assertNotNull(db);
 		assertNotNull(dbHelper);
 	}
 
 	@Test
-	public void test_canStoreWtMessages() {
+	public void canStoreWtMessages() {
 		// given
 		dbHelper.assertEmpty("wt_message");
 		WtMessage m = aMessageWith(WtMessage.Status.WAITING);
@@ -59,7 +59,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_updateStatusFrom_shouldFailSilentlyIfMessageNotInDb() {
+	public void updateStatusFrom_shouldFailSilentlyIfMessageNotInDb() {
 		// given
 		WtMessage unsavedMessage = aMessageWith(WtMessage.Status.FORWARDED);
 
@@ -71,7 +71,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
+	public void updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
@@ -89,7 +89,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
+	public void updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
@@ -107,7 +107,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_canStoreWoMessages() {
+	public void canStoreWoMessages() {
 		// given
 		dbHelper.assertEmpty("wo_message");
 		WoMessage m = aMessageWith(WoMessage.Status.PENDING);
@@ -121,7 +121,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_updateStatus_shouldFailSilentlyIfMessageNotInDb() {
+	public void updateStatus_shouldFailSilentlyIfMessageNotInDb() {
 		// given
 		WoMessage unsavedMessage = aMessageWith(WoMessage.Status.PENDING);
 
@@ -133,7 +133,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_updateStatus_shouldFailSilentlyIfWrongStatusFound() {
+	public void updateStatus_shouldFailSilentlyIfWrongStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
@@ -151,7 +151,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
+	public void updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
@@ -169,7 +169,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_canStoreSmsMessages() {
+	public void canStoreSmsMessages() {
 		// given
 		dbHelper.assertEmpty("wt_message");
 		SmsMessage m = anSmsWith(A_PHONE_NUMBER, SOME_CONTENT);
@@ -184,7 +184,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_deleteOldData_shouldHaveNoEffectIfNoData() {
+	public void deleteOldData_shouldHaveNoEffectIfNoData() {
 		// given
 		dbHelper.assertEmpty("log");
 		dbHelper.assertEmpty("wo_message");
@@ -201,7 +201,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_deleteOldData_shouldDeleteOldEventLogsButNotNewOnes() {
+	public void deleteOldData_shouldDeleteOldEventLogsButNotNewOnes() {
 		// given
 		dbHelper.insert("log",
 				cols("_id", "timestamp", "message"),
@@ -222,7 +222,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_deleteOldData_shouldDeleteOldWoMessagesButNotNewOnes() {
+	public void deleteOldData_shouldDeleteOldWoMessagesButNotNewOnes() {
 		// given
 		dbHelper.insert("wo_message",
 				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
@@ -243,7 +243,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_deleteOldData_shouldDeleteOldWtMessagesButNotNewOnes() {
+	public void deleteOldData_shouldDeleteOldWtMessagesButNotNewOnes() {
 		// given
 		dbHelper.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
@@ -264,7 +264,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void test_deleteOldData_shouldDeleteAllKindsOfData() {
+	public void deleteOldData_shouldDeleteAllKindsOfData() {
 		// given
 		dbHelper.insert("log",
 				cols("_id", "timestamp", "message"),
