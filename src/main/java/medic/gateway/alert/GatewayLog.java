@@ -2,6 +2,7 @@ package medic.gateway.alert;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteFullException;
 
 import static android.util.Log.d;
 import static android.util.Log.i;
@@ -28,7 +29,12 @@ public final class GatewayLog {
 		message = String.format(message, extras);
 
 		i(LOG_TAG, message, ex);
-		eventLogEntry(ctx, message);
+
+		// Do not try to save SQLiteFullException to the database - this
+		// will (unsurprisingly) fail if the database is full
+		if(!(ex instanceof SQLiteFullException)) {
+			eventLogEntry(ctx, message);
+		}
 	}
 
 	public static void logException(Exception ex, String message, Object... extras) {
