@@ -55,7 +55,7 @@ public class DbTest {
 
 		// then
 		assertTrue(successReported);
-		assertEquals(1, dbHelper.count("wt_message"));
+		dbHelper.assertCount("wt_message", 1);
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class DbTest {
 
 		// then
 		assertTrue(successReported);
-		assertEquals(1, dbHelper.count("wo_message"));
+		dbHelper.assertCount("wo_message", 1);
 	}
 
 	@Test
@@ -209,7 +209,7 @@ public class DbTest {
 				vals(2, daysAgo(8), "should delete 1"),
 				vals(3, daysAgo(6), "should not delete 2"),
 				vals(4, daysAgo(800), "should delete 2"));
-		assertEquals(4, dbHelper.count("log"));
+		dbHelper.assertCount("log", 4);
 
 		// when
 		int deletedCount = db.deleteOldData();
@@ -230,7 +230,7 @@ public class DbTest {
 				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(8), A_PHONE_NUMBER, "should delete 1"),
 				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(6), A_PHONE_NUMBER, "should keep 2"),
 				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(800), A_PHONE_NUMBER, "should delete 2"));
-		assertEquals(4, dbHelper.count("wo_message"));
+		dbHelper.assertCount("wo_message", 4);
 
 		// when
 		int deletedCount = db.deleteOldData();
@@ -251,7 +251,7 @@ public class DbTest {
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6), A_PHONE_NUMBER, "should keep 2"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800), A_PHONE_NUMBER, "should delete 2"));
-		assertEquals(4, dbHelper.count("wt_message"));
+		dbHelper.assertCount("wt_message", 4);
 
 		// when
 		int deletedCount = db.deleteOldData();
@@ -275,9 +275,9 @@ public class DbTest {
 		dbHelper.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"));
-		assertEquals(1, dbHelper.count("log"));
-		assertEquals(1, dbHelper.count("wo_message"));
-		assertEquals(1, dbHelper.count("wt_message"));
+		dbHelper.assertCount("log", 1);
+		dbHelper.assertCount("wo_message", 1);
+		dbHelper.assertCount("wt_message", 1);
 
 		// when
 		int deletedCount = db.deleteOldData();
