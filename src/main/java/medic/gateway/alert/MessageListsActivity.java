@@ -27,7 +27,7 @@ public class MessageListsActivity extends TabActivity {
 
 	private final DialogInterface.OnClickListener deleteOldDataHandler = new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int which) {
-			final ProgressDialog spinner = showSpinner(MessageListsActivity.this);
+			final ProgressDialog spinner = showSpinner(MessageListsActivity.this, R.string.txtDeleteOldData_inProgress);
 
 			new AsyncTask<String, Void, Integer>() {
 				private final Context ctx = MessageListsActivity.this;

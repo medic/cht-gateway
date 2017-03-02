@@ -47,6 +47,7 @@
 		\n
 		\nWarning: pending messages <b>will</b> be deleted.</string>
 	<string name="btnConfirmDeleteOldData_confirm">Delete data</string>
+	<string name="txtDeleteOldData_inProgress">Deleting old data…</string>
 	<plurals name="txtOldDataDeleteCount">
 		<item quantity="one">Deleted 1 record.</item>
 		<item quantity="other">Deleted %,d records.</item>
