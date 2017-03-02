@@ -67,8 +67,6 @@ class GatewayEventLogEntryCursorAdapter extends ResourceCursorAdapter {
 }
 
 class GatewayEventLogEntryCursorLoader extends CursorLoader {
-	private static final int MAX_LOG_ITEMS = 200;
-
 	private final Db db;
 
 	public GatewayEventLogEntryCursorLoader(Context ctx, Db db) {
@@ -77,6 +75,6 @@ class GatewayEventLogEntryCursorLoader extends CursorLoader {
 	}
 
 	public Cursor loadInBackground() {
-		return db.getLogEntries(MAX_LOG_ITEMS);
+		return db.getLogEntries();
 	}
 }

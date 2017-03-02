@@ -42,6 +42,10 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WO_clmTO = "_to";
 	private static final String WO_clmCONTENT = "content";
 
+	/** a soft limit for the number of log entries to store in the system */
+	private int logEntryLimit;
+	private String logEntryLimitString;
+
 	private static final String TRUE = "1";
 	private static final String FALSE = "0";
 
@@ -67,6 +71,8 @@ public final class Db extends SQLiteOpenHelper {
 	private Db(Context ctx) {
 		super(ctx, "medic_gateway", null, VERSION);
 		db = getWritableDatabase();
+
+		setLogEntryLimit(200);
 	}
 
 	public void onCreate(SQLiteDatabase db) {
@@ -101,6 +107,12 @@ public final class Db extends SQLiteOpenHelper {
 		// Handle DB upgrades here, once we start supporting released versions
 	}
 
+//> ACCESSORS
+	void setLogEntryLimit(int limit) {
+		logEntryLimit = limit;
+		logEntryLimitString = Integer.toString(limit);
+	}
+
 //> GENERAL HANDLERS
 	int deleteOldData() {
 		long oneWeekAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
@@ -110,6 +122,8 @@ public final class Db extends SQLiteOpenHelper {
 		totalRecordsDeleted += db.delete(tblLOG, lt(LOG_clmTIMESTAMP), args(oneWeekAgo));
 		totalRecordsDeleted += db.delete(tblWO_MESSAGE, lt(WO_clmLAST_ACTION), args(oneWeekAgo));
 		totalRecordsDeleted += db.delete(tblWT_MESSAGE, lt(WT_clmLAST_ACTION), args(oneWeekAgo));
+
+		// TODO do we need to VACUUM after deleting?
 
 		return totalRecordsDeleted;
 	}
@@ -123,13 +137,32 @@ public final class Db extends SQLiteOpenHelper {
 		db.insert(tblLOG, null, v);
 	}
 
-	Cursor getLogEntries(int maxCount) {
+	Cursor getLogEntries() {
 		return db.query(tblLOG,
 				cols(LOG_clmID, LOG_clmTIMESTAMP, LOG_clmMESSAGE),
 				ALL, NO_ARGS,
 				NO_GROUP, NO_GROUP,
 				SortDirection.DESC.apply(LOG_clmTIMESTAMP),
-				Integer.toString(maxCount));
+				logEntryLimitString);
+	}
+
+	// TODO could these SQL statements be combined into 2 or even a single statement?
+	void cleanLogs() {
+		// TODO consider doing this on INSERT using a TRIGGER
+		long entryCount = count(tblLOG);
+
+		if(entryCount <= logEntryLimit) return;
+
+		long lastId;
+		try {
+			long lastRowIndex = entryCount - logEntryLimit - 1;
+			lastId = db.compileStatement("SELECT " + LOG_clmID + " FROM " + tblLOG + " LIMIT " + lastRowIndex + ",1").simpleQueryForLong();
+		} catch(SQLiteDoneException ex) {
+			// entry count is less than limit (must have changed since we checked!)
+			return;
+		}
+		db.compileStatement("DELETE FROM " + tblLOG + " WHERE " + LOG_clmID + "<='" + lastId + "'").execute();
+		// TODO do we need to VACUUM after deleting?
 	}
 
 //> WoMessage HANDLERS
@@ -352,6 +385,11 @@ public final class Db extends SQLiteOpenHelper {
 		String content = c.getString(4);
 
 		return new WtMessage(id, status, lastAction, from, content);
+	}
+
+//> GENERAL HELPERS
+	private long count(String tableName) {
+		return db.compileStatement("SELECT COUNT(*) FROM " + tableName).simpleQueryForLong();
 	}
 
 //> DB SEEDING

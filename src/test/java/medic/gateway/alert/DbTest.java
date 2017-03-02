@@ -31,6 +31,8 @@ public class DbTest {
 	public void setUp() throws Exception {
 		dbHelper = new DbTestHelper(RuntimeEnvironment.application);
 		db = dbHelper.db;
+
+		db.setLogEntryLimit(50);
 	}
 
 	@After
@@ -287,6 +289,78 @@ public class DbTest {
 		dbHelper.assertEmpty("log");
 		dbHelper.assertEmpty("wo_message");
 		dbHelper.assertEmpty("wt_message");
+	}
+
+	@Test
+	public void cleanLogs_shouldNotComplainIfNoLogs() {
+		// given: nothing in the db
+
+		// when:
+		db.cleanLogs();
+
+		// then
+		dbHelper.assertEmpty("log");
+	}
+
+	@Test
+	public void cleanLogs_shouldNotDeleteAnythingIfNotEnoughLogs() {
+		// given:
+		for(int i=0; i<50; ++i) dbHelper.insert("log", cols("timestamp", "message"), vals(now(), "entry: " + i));
+		dbHelper.assertCount("log", 50);
+
+		// when:
+		db.cleanLogs();
+
+		// then
+		dbHelper.assertCount("log", 50);
+	}
+
+	@Test
+	public void cleanLogs_shouldOnlyDeleteOldestEntriesOverTheLimit() {
+		// given
+		for(int i=0; i<100; ++i) dbHelper.insert("log", cols("timestamp", "message"), vals(now(), "entry: " + i));
+		dbHelper.assertCount("log", 100);
+
+		// when:
+		db.cleanLogs();
+
+		// then
+		dbHelper.assertCount("log", 50);
+		dbHelper.assertValues("log", cols("message"),
+				"entry: 50", "entry: 51", "entry: 52", "entry: 53", "entry: 54",
+				"entry: 55", "entry: 56", "entry: 57", "entry: 58", "entry: 59",
+				"entry: 60", "entry: 61", "entry: 62", "entry: 63", "entry: 64",
+				"entry: 65", "entry: 66", "entry: 67", "entry: 68", "entry: 69",
+				"entry: 70", "entry: 71", "entry: 72", "entry: 73", "entry: 74",
+				"entry: 75", "entry: 76", "entry: 77", "entry: 78", "entry: 79",
+				"entry: 80", "entry: 81", "entry: 82", "entry: 83", "entry: 84",
+				"entry: 85", "entry: 86", "entry: 87", "entry: 88", "entry: 89",
+				"entry: 90", "entry: 91", "entry: 92", "entry: 93", "entry: 94",
+				"entry: 95", "entry: 96", "entry: 97", "entry: 98", "entry: 99");
+	}
+
+	@Test
+	public void cleanLogs_shouldOnlyDeleteOldestEntriesOverTheLimit_withMoreMessages() {
+		// given
+		for(int i=0; i<500; ++i) dbHelper.insert("log", cols("timestamp", "message"), vals(now(), "entry: " + i));
+		dbHelper.assertCount("log", 500);
+
+		// when:
+		db.cleanLogs();
+
+		// then
+		dbHelper.assertCount("log", 50);
+		dbHelper.assertValues("log", cols("message"),
+				"entry: 450", "entry: 451", "entry: 452", "entry: 453", "entry: 454",
+				"entry: 455", "entry: 456", "entry: 457", "entry: 458", "entry: 459",
+				"entry: 460", "entry: 461", "entry: 462", "entry: 463", "entry: 464",
+				"entry: 465", "entry: 466", "entry: 467", "entry: 468", "entry: 469",
+				"entry: 470", "entry: 471", "entry: 472", "entry: 473", "entry: 474",
+				"entry: 475", "entry: 476", "entry: 477", "entry: 478", "entry: 479",
+				"entry: 480", "entry: 481", "entry: 482", "entry: 483", "entry: 484",
+				"entry: 485", "entry: 486", "entry: 487", "entry: 488", "entry: 489",
+				"entry: 490", "entry: 491", "entry: 492", "entry: 493", "entry: 494",
+				"entry: 495", "entry: 496", "entry: 497", "entry: 498", "entry: 499");
 	}
 
 //> STATIC HELPERS

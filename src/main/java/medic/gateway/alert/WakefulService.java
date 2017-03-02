@@ -15,6 +15,11 @@ public class WakefulService extends WakefulIntentService {
 
 	public void doWakefulWork(Intent intent) {
 		try {
+			Db.getInstance(this).cleanLogs();
+		} catch(Exception ex) {
+			logException(this, ex, "Exception caught trying to clean up event log: " + ex.getMessage());
+		}
+		try {
 			new WebappPoller(this).pollWebapp();
 		} catch(Exception ex) {
 			logException(this, ex, "Exception caught trying to poll webapp: " + ex.getMessage());

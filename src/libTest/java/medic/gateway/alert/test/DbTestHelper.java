@@ -82,7 +82,28 @@ public class DbTestHelper {
 	}
 
 	public void assertTable(String tableName, Object... expectedValues) {
-		Cursor c = getContents(tableName);
+		Cursor c = raw.rawQuery("SELECT * FROM " + tableName, NO_ARGS);
+		assertValues(c, expectedValues);
+	}
+
+	public void assertValues(String tableName, String[] cols, Object... expectedValues) {
+		StringBuilder colBuilder = new StringBuilder();
+		for(String col : cols) colBuilder.append(',').append(col);
+		Cursor c = raw.rawQuery("SELECT " + colBuilder.substring(1) + " FROM " + tableName, NO_ARGS);
+
+		assertValues(c, expectedValues);
+	}
+
+	public void assertCount(String tableName, int expectedCount) {
+		assertEquals(expectedCount, count(tableName));
+	}
+
+	public void assertEmpty(String tableName) {
+		assertCount(tableName, 0);
+	}
+
+//> STATIC HELPERS
+	private void assertValues(Cursor c, Object... expectedValues) {
 		try {
 			int colCount = c.getColumnCount();
 			int expectedRowCount = expectedValues.length / colCount;
@@ -114,19 +135,6 @@ public class DbTestHelper {
 		}
 	}
 
-	public void assertCount(String tableName, int expectedCount) {
-		assertEquals(expectedCount, count(tableName));
-	}
-
-	public void assertEmpty(String tableName) {
-		assertCount(tableName, 0);
-	}
-
-	private Cursor getContents(String tableName) {
-		return raw.rawQuery("SELECT * FROM " + tableName, NO_ARGS);
-	}
-
-//> STATIC HELPERS
 	public static String[] args(String... args) {
 		return args;
 	}
