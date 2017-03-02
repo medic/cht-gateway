@@ -1,13 +1,10 @@
 package medic.gateway.alert;
 
-import android.content.*;
-import android.database.sqlite.*;
-import android.util.*;
+import android.content.Context;
+import android.database.sqlite.SQLiteException;
 
-import java.text.*;
-import java.util.*;
-
-import static android.util.Log.*;
+import static android.util.Log.d;
+import static android.util.Log.i;
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
 
