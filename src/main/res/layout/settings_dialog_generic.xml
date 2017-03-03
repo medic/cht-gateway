@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:paddingLeft="16dp"
-		android:paddingRight="16dp"
-		android:orientation="vertical">
-	<EditText android:id="@+id/txtWebappUrl"
-			android:hint="@string/txtWebappUrl"
+		android:scrollbars="vertical"
+		android:fillViewport="true">
+	<LinearLayout
 			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:inputType="textUri"/>
-	<CheckBox android:id="@+id/cbxEnablePolling"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/txtWebappUrl"
-			android:layout_marginTop="16dp"
-			android:text="@string/cbxEnablePolling"
-			android:checked="true"/>
-	<Button android:id="@+id/btnCancelSettings"
-			android:text="@string/btnCancel"
-			android:onClick="cancelSettingsEdit"
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
 			android:paddingLeft="16dp"
 			android:paddingRight="16dp"
-			android:layout_alignParentBottom="true"
-			android:layout_toLeftOf="@+id/btnSaveSettings"/>
-	<Button android:id="@+id/btnSaveSettings"
-			android:text="@string/btnSave"
-			android:onClick="doSave"
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:paddingLeft="16dp"
-			android:paddingRight="16dp"
-			android:layout_alignParentRight="true"
-			android:layout_alignParentBottom="true"/>
-</RelativeLayout>
+			android:orientation="vertical">
+		<EditText android:id="@+id/txtWebappUrl"
+				android:hint="@string/txtWebappUrl"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:inputType="textUri"/>
+		<CheckBox android:id="@+id/cbxEnablePolling"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/txtWebappUrl"
+				android:layout_marginTop="16dp"
+				android:text="@string/cbxEnablePolling"
+				android:checked="true"/>
+		<RelativeLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:orientation="vertical">
+			<Button android:id="@+id/btnCancelSettings"
+					android:text="@string/btnCancel"
+					android:onClick="cancelSettingsEdit"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:paddingLeft="16dp"
+					android:paddingRight="16dp"
+					android:layout_alignParentBottom="true"
+					android:layout_toLeftOf="@+id/btnSaveSettings"/>
+			<Button android:id="@+id/btnSaveSettings"
+					android:text="@string/btnSave"
+					android:onClick="doSave"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:paddingLeft="16dp"
+					android:paddingRight="16dp"
+					android:layout_alignParentRight="true"
+					android:layout_alignParentBottom="true"/>
+		</RelativeLayout>
+	</LinearLayout>
+</ScrollView>
