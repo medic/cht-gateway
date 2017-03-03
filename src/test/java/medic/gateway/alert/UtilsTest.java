@@ -208,7 +208,7 @@ public class UtilsTest {
 			String initial = testData[i];
 
 			String expected = testData[i+1];
-			if(expected.equals(NO_CHANGE)) expected = initial;
+			if(expected == null) expected = initial;
 
 			assertEquals(expected, Utils.redactUrl(initial));
 		}
