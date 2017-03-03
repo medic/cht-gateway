@@ -15,6 +15,7 @@ import android.widget.TabHost;
 
 import static medic.gateway.alert.Capabilities.getCapabilities;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startSettingsActivity;
 import static medic.gateway.alert.Utils.toast;
@@ -58,6 +59,13 @@ public class MessageListsActivity extends TabActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		log("Starting...");
 		super.onCreate(savedInstanceState);
+
+		try {
+			String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+			setTitle(getTitle() + " " + versionName);
+		} catch(Exception ex) {
+			logException(ex, "Could not include the version number in the page title.");
+		}
 
 		TabHost tabHost = getTabHost();
 
