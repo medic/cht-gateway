@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteFullException;
 
 import static android.util.Log.d;
 import static android.util.Log.i;
+import static android.util.Log.w;
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
 
@@ -41,6 +42,12 @@ public final class GatewayLog {
 		message = String.format(message, extras);
 
 		i(LOG_TAG, message, ex);
+	}
+
+	public static void warnException(Exception ex, String message, Object... extras) {
+		message = String.format(message, extras);
+
+		w(LOG_TAG, message, ex);
 	}
 
 	private static void eventLogEntry(Context ctx, String message) {

@@ -134,7 +134,11 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(LOG_clmTIMESTAMP, System.currentTimeMillis());
 		v.put(LOG_clmMESSAGE, message);
 
-		db.insert(tblLOG, null, v);
+		try {
+			db.insertOrThrow(tblLOG, null, v);
+		} catch(SQLException ex) {
+			warnException(ex, "Exception writing log entry to db: %s", message);
+		}
 	}
 
 	Cursor getLogEntries() {
@@ -168,8 +172,13 @@ public final class Db extends SQLiteOpenHelper {
 //> WoMessage HANDLERS
 	boolean store(WoMessage m) {
 		log("store() :: %s", m);
-		long id = db.insert(tblWO_MESSAGE, null, getContentValues(m));
-		return id != -1;
+		try {
+			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
+			return id != -1;
+		} catch(SQLException ex) {
+			warnException(ex, "Exception writing WoMessage to db: %s", m);
+			return false;
+		}
 	}
 
 	void setFailed(WoMessage m, String failureReason) {
@@ -306,8 +315,13 @@ public final class Db extends SQLiteOpenHelper {
 
 	boolean store(WtMessage m) {
 		log("store() :: %s", m);
-		long id = db.insert(tblWT_MESSAGE, null, getContentValues(m));
-		return id != -1;
+		try {
+			long id = db.insertOrThrow(tblWT_MESSAGE, null, getContentValues(m));
+			return id != -1;
+		} catch(SQLException ex) {
+			warnException(ex, "Exception writing WtMessage to db: %s", m);
+			return false;
+		}
 	}
 
 	void updateStatusFrom(WtMessage.Status oldStatus, WtMessage m) {
