@@ -142,7 +142,7 @@ public final class Db extends SQLiteOpenHelper {
 				cols(LOG_clmID, LOG_clmTIMESTAMP, LOG_clmMESSAGE),
 				ALL, NO_ARGS,
 				NO_GROUP, NO_GROUP,
-				SortDirection.DESC.apply(LOG_clmTIMESTAMP),
+				SortDirection.DESC.apply(LOG_clmID),
 				logEntryLimitString);
 	}
 
