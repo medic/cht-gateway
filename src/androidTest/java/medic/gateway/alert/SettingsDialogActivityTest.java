@@ -241,6 +241,7 @@ public class SettingsDialogActivityTest {
 		recreateActivityFor(activityTestRule);
 
 		// then
+		onView(withId(R.id.divScrollMe)).perform(actionOnItemAtPosition(0, swipeUp()));
 		onView(withId(id.btnCancelSettings))
 				.check(matches(isDisplayed()));
 	}

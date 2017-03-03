@@ -4,7 +4,7 @@
 		android:layout_height="fill_parent"
 		android:scrollbars="vertical"
 		android:fillViewport="true">
-	<LinearLayout
+	<LinearLayout android:id="@+id/divScrollMe"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:paddingLeft="16dp"
