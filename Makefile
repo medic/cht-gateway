@@ -9,7 +9,7 @@ ifdef ComSpec	 # Windows
   GRADLEW := $(subst /,\,${GRADLEW})
 endif
 
-.PHONY: default assets build clean test deploy uninstall emulator kill logs force
+.PHONY: default build clean test deploy uninstall emulator kill logs force
 .PHONY: all build-all deploy-all
 
 default:
