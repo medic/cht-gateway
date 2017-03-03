@@ -6,7 +6,7 @@
 		android:fillViewport="true">
 	<LinearLayout
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
+			android:layout_height="wrap_content"
 			android:paddingLeft="16dp"
 			android:paddingRight="16dp"
 			android:orientation="vertical">
@@ -17,21 +17,18 @@
 				android:layout_marginTop="16dp"/>
 		<EditText android:id="@+id/txtWebappUsername"
 				android:hint="@string/txtWebappUsername"
-				android:layout_below="@id/txtWebappInstanceName"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="16dp"/>
 		<EditText android:id="@+id/txtWebappPassword"
 				android:inputType="textPassword"
 				android:hint="@string/txtWebappPassword"
-				android:layout_below="@id/txtWebappUsername"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="16dp"/>
 		<CheckBox android:id="@+id/cbxEnablePolling"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@id/txtWebappPassword"
 				android:layout_marginTop="16dp"
 				android:text="@string/cbxEnablePolling"
 				android:checked="true"/>
