@@ -404,7 +404,7 @@ public class SettingsDialogActivityTest {
 	}
 
 	private void assertVisible(int viewId) {
-		onView(withId(viewId)).check(matches(isDisplayed()));
+		onView(withId(viewId)).perform(scrollTo()).check(matches(isDisplayed()));
 	}
 
 	@SuppressWarnings("PMD.EmptyCatchBlock")
