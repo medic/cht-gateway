@@ -47,7 +47,7 @@ public final class GatewayLog {
 		try {
 			Db.getInstance(ctx).storeLogEntry(message);
 		} catch(SQLiteException ex) {
-			logException(ctx, ex, "Could not write log entry to DB.");
+			logException(ex, "Could not write log entry to DB.");
 		}
 	}
 }
