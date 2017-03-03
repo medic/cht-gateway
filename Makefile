@@ -10,9 +10,11 @@ ifdef ComSpec	 # Windows
 endif
 
 .PHONY: default assets build clean test deploy uninstall emulator kill logs force
+.PHONY: all build-all deploy-all
 
 default:
 	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
+all: build-all deploy-all
 
 force: build uninstall
 	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-medic-debug.apk
