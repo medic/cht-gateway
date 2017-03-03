@@ -40,7 +40,7 @@ public final class GatewayLog {
 	public static void logException(Exception ex, String message, Object... extras) {
 		message = String.format(message, extras);
 
-		d(LOG_TAG, message, ex);
+		i(LOG_TAG, message, ex);
 	}
 
 	private static void eventLogEntry(Context ctx, String message) {
