@@ -103,6 +103,7 @@ public class DbTestHelper {
 	}
 
 //> STATIC HELPERS
+	@SuppressWarnings("PMD.UnusedPrivateMethod") // looks like a bug in PMD
 	private void assertValues(Cursor c, Object... expectedValues) {
 		try {
 			int colCount = c.getColumnCount();
