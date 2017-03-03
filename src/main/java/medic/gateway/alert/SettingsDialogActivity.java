@@ -18,6 +18,7 @@ import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.redactUrl;
 import static medic.gateway.alert.Utils.showSpinner;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
@@ -193,7 +194,7 @@ public class SettingsDialogActivity extends Activity {
 	private boolean saveSettings(Settings s) {
 		try {
 			SettingsStore.in(this).save(s);
-			logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", s.getWebappUrl());
+			logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", redactUrl(s.getWebappUrl()));
 			return true;
 		} catch(final IllegalSettingsException ex) {
 			logException(ex, "SettingsDialogActivity.saveSettings()");

@@ -10,6 +10,7 @@ import org.json.*;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
+import static medic.gateway.alert.Utils.redactUrl;
 
 /**
  * <p>New and improved - SimpleJsonClient2 is SimpleJsonClient, but using <code>
@@ -30,12 +31,12 @@ public class SimpleJsonClient2 {
 
 //> PUBLIC METHODS
 	public SimpleResponse get(String url) throws MalformedURLException {
-		if(DEBUG) traceMethod("get", "url", url);
+		if(DEBUG) traceMethod("get", "url", redactUrl(url));
 		return get(new URL(url));
 	}
 
 	public SimpleResponse get(URL url) {
-		if(DEBUG) traceMethod("get", "url", url);
+		if(DEBUG) traceMethod("get", "url", redactUrl(url));
 		HttpURLConnection conn = null;
 		InputStream inputStream = null;
 		try {
@@ -59,12 +60,12 @@ public class SimpleJsonClient2 {
 	}
 
 	public SimpleResponse post(String url, JSONObject content) throws MalformedURLException {
-		if(DEBUG) traceMethod("post", "url", url);
+		if(DEBUG) traceMethod("post", "url", redactUrl(url));
 		return post(new URL(url), content);
 	}
 
 	public SimpleResponse post(URL url, JSONObject content) {
-		if(DEBUG) traceMethod("post", "url", url);
+		if(DEBUG) traceMethod("post", "url", redactUrl(url));
 		HttpURLConnection conn = null;
 		OutputStream outputStream = null;
 		InputStream inputStream = null;
@@ -168,12 +169,12 @@ public class SimpleJsonClient2 {
 	private static void traceMethod(String methodName, Object...args) {
 		StringBuilder bob = new StringBuilder();
 		for(int i=0; i<args.length; i+=2) {
+			bob.append(';');
 			bob.append(args[i]);
 			bob.append('=');
 			bob.append(args[i+1]);
-			bob.append(';');
 		}
-		log(methodName, bob.toString());
+		log(methodName, bob.length() > 0 ? bob.substring(1) : "");
 	}
 
 	private static void log(String methodName, String message, Object... extras) {

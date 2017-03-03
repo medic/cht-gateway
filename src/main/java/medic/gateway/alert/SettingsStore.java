@@ -9,6 +9,7 @@ import java.util.regex.*;
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
 import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.Utils.redactUrl;
 
 @SuppressWarnings("PMD.ShortMethodName")
 public class SettingsStore {
@@ -66,7 +67,7 @@ class Settings {
 	public final boolean pollingEnabled;
 
 	public Settings(String webappUrl, boolean pollingEnabled) {
-		log("Settings() webappUrl=%s", webappUrl);
+		log("Settings() webappUrl=%s", redactUrl(webappUrl));
 		this.webappUrl = webappUrl;
 		this.pollingEnabled = pollingEnabled;
 	}

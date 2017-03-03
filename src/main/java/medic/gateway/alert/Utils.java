@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.*;
 
@@ -36,6 +39,8 @@ public final class Utils {
 	private static final long ONE_WEEK = ONE_DAY * 7;
 	private static final long ONE_MONTH = ONE_WEEK * 4;
 	private static final long ONE_YEAR = ONE_MONTH * 12;
+
+	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
 
 	private Utils() {}
 
@@ -175,5 +180,19 @@ public final class Utils {
 			trace(ctx, "Starting settings activity...");
 			startSettingsActivity(ctx, getCapabilities());
 		}
+	}
+
+	public static String redactUrl(URL url) {
+		return redactUrl(url.toString());
+	}
+
+	public static String redactUrl(String url) {
+		if(url == null) return null;
+
+		Matcher m = AUTH_URL.matcher(url);
+		if(!m.matches()) return url;
+
+		return String.format("%s://%s:%s@%s",
+				m.group(1), m.group(2), "****", m.group(4));
 	}
 }
