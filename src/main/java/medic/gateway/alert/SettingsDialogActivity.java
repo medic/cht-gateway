@@ -85,7 +85,7 @@ public class SettingsDialogActivity extends Activity {
 			if(isBlank(R.id.txtWebappInstanceName)) {
 				showError(R.id.txtWebappInstanceName, R.string.errRequired);
 				hasBasicErrors = true;
-			} else if(!text(R.id.txtWebappInstanceName).matches("^\\w+(\\.\\w+)*$")) {
+			} else if(!text(R.id.txtWebappInstanceName).matches("^[\\w-_]+(\\.[\\w-_]+)*$")) {
 				showError(R.id.txtWebappInstanceName, R.string.errInvalidInstanceName);
 				hasBasicErrors = true;
 			}
