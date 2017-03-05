@@ -118,6 +118,8 @@ android {
 	applicationVariants.all {
 		buildConfigField "String", "LOG_TAG", '"MedicGateway"'
 		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
+
+		buildConfigField "boolean", "TRAVIS", "Boolean.parseBoolean(\"${System.env.TRAVIS}\")";
 		buildConfigField "boolean", "FORCE_SEED", "Boolean.parseBoolean(\"${System.env.FORCE_SEED}\")";
 		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")";
 	}
