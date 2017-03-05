@@ -43,8 +43,6 @@ public class SettingsDialogActivityTest {
 	public void setUp() throws Throwable {
 		clearAppSettings();
 		this.http = new HttpTestHelper();
-
-		System.out.println("TRAVIS ENV VAR: [" + System.getenv("TRAVIS") + "]");
 	}
 
 	@After
