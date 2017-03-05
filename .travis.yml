@@ -32,7 +32,7 @@ script: make travis
 deploy:
   provider: releases
   api_key: $GITHUB_OAUTH_TOKEN
-  file: build/outputs/apk/medic-gateway-${VERSION_TO_BUILD}-release.apk
+  file: build/outputs/apk/medic-gateway-${VERSION_TO_BUILD}-medic-release.apk
   skip_cleanup: true
   on:
     tags: true
