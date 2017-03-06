@@ -17,8 +17,6 @@ import static medic.gateway.alert.test.TestUtils.*;
 public class WebappPollerTest extends AndroidTestCase {
 	private static final String NO_REASON = null;
 
-	private WebappPoller poller;
-
 	private DbTestHelper db;
 	private HttpTestHelper http;
 
@@ -30,8 +28,6 @@ public class WebappPollerTest extends AndroidTestCase {
 
 		http = new HttpTestHelper();
 		http.configureAppSettings(getContext());
-
-		poller = new WebappPoller(getContext());
 	}
 
 	@After
@@ -61,7 +57,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
@@ -88,7 +84,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
@@ -110,7 +106,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertPostRequestMade_withJsonResponse();
@@ -129,7 +125,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		JSONObject response = http.assertPostRequestMade_withJsonResponse();
@@ -150,7 +146,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseError(500);
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();
@@ -163,7 +159,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("muhahaha not really json! {}");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();
@@ -176,7 +172,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();
@@ -189,7 +185,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{ \"messages\":null }");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();
@@ -202,7 +198,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.nextResponseJson("{ \"messages\":[] }");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();
@@ -219,7 +215,7 @@ public class WebappPollerTest extends AndroidTestCase {
 				"] }");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();
@@ -257,7 +253,7 @@ public class WebappPollerTest extends AndroidTestCase {
 				"] }");
 
 		// when
-		poller.pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		// then
 		http.assertSinglePostRequestMade();

@@ -21,20 +21,24 @@ public class WebappPoller {
 	private final Context ctx;
 	private final Db db;
 
+	private final GatewayRequest request;
+	private final String webappUrl;
+
 	public WebappPoller(Context ctx) {
 		this.ctx = ctx;
-		this.db = Db.getInstance(ctx);
-	}
+		db = Db.getInstance(ctx);
 
-	public void pollWebapp() throws JSONException, MalformedURLException {
-		GatewayRequest request = new GatewayRequest(
+		request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
 				db.getWoMessagesWithStatusChanges(MAX_WO_MESSAGES));
 
+		webappUrl = Settings.in(ctx).getWebappUrl();
+	}
+
+	public SimpleResponse pollWebapp() throws JSONException, MalformedURLException {
 		logEvent(ctx, "Polling webapp (forwarding %d messages & %d status updates)...",
 				request.wtMessageCount(), request.statusUpdateCount());
 
-		String webappUrl = Settings.in(ctx).getWebappUrl();
 		SimpleResponse response = new SimpleJsonClient2().post(webappUrl, request.getJson());
 		if(DEBUG) log(response.toString());
 
@@ -43,6 +47,8 @@ public class WebappPoller {
 		} else {
 			handleJsonResponse(request, ((JsonResponse) response).json);
 		}
+
+		return response;
 	}
 
 	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
