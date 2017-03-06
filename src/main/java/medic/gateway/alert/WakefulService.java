@@ -15,17 +15,19 @@ public class WakefulService extends WakefulIntentService {
 		try {
 			Db.getInstance(this).cleanLogs();
 		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to clean up event log: " + ex.getMessage());
+			logException(this, ex, "Exception caught trying to clean up event log: %s", ex.getMessage());
 		}
+
 		try {
 			new WebappPoller(this).pollWebapp();
 		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to poll webapp: " + ex.getMessage());
+			logException(this, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
 		}
+
 		try {
 			new SmsSender(this).sendUnsentSmses();
 		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to send SMSes: " + ex.getMessage());
+			logException(this, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
 		}
 	}
 }
