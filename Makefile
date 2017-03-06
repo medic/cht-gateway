@@ -14,7 +14,7 @@ endif
 
 default:
 	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
-all: build-all deploy-all
+all: clean build-all deploy-all
 
 force: build uninstall
 	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-medic-debug.apk
