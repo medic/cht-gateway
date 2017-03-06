@@ -42,10 +42,6 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WO_clmTO = "_to";
 	private static final String WO_clmCONTENT = "content";
 
-	/** a soft limit for the number of log entries to store in the system */
-	private int logEntryLimit;
-	private String logEntryLimitString;
-
 	private static final String TRUE = "1";
 	private static final String FALSE = "0";
 
@@ -66,10 +62,16 @@ public final class Db extends SQLiteOpenHelper {
 		return _instance;
 	}
 
+	private final Context ctx;
 	private final SQLiteDatabase db; // NOPMD
+
+	/** a soft limit for the number of log entries to store in the system */
+	private int logEntryLimit;
+	private String logEntryLimitString;
 
 	private Db(Context ctx) {
 		super(ctx, "medic_gateway", null, VERSION);
+		this.ctx = ctx;
 		db = getWritableDatabase();
 
 		setLogEntryLimit(200);
@@ -175,6 +177,13 @@ public final class Db extends SQLiteOpenHelper {
 		try {
 			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
 			return id != -1;
+		} catch(SQLiteConstraintException ex) {
+			// Likely this is because a message with this ID already exists.  If so,
+			// we should update that message so that its status is synched with the
+			// server.  This should stop the server from re-sending the same message
+			// repeatedly.
+			logEvent(ctx, "Message %s appears to be in database already; will be updated.", m);
+			return touch(m);
 		} catch(SQLException ex) {
 			warnException(ex, "Exception writing WoMessage to db: %s", m);
 			return false;
@@ -227,6 +236,16 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
 
 		db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, m.status));
+	}
+
+	private boolean touch(WoMessage m) {
+		log("touch() :: %s", m);
+
+		ContentValues v = new ContentValues();
+		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
+		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
+
+		return db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id)) > 0;
 	}
 
 	private ContentValues getContentValues(WoMessage m) {

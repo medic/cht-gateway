@@ -21,7 +21,7 @@ import static medic.gateway.alert.test.TestUtils.*;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
-@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.TooManyMethods"})
 public class DbTest {
 	private Db db;
 
@@ -121,6 +121,22 @@ public class DbTest {
 		// then
 		assertTrue(successReported);
 		dbHelper.assertCount("wo_message", 1);
+	}
+
+	@Test
+	public void store_WoMessage_duplicate_shouldMarkAsNeedsForwarding() {
+		// given: there is a message in the database which does NOT need forwarding
+		String id = randomUuid();
+		dbHelper.insert("wo_message",
+				cols("_id", "status", "status_needs_forwarding", "failure_reason", "last_action", "_to", "content"),
+				vals(id, WoMessage.Status.PENDING, false, null, 0, A_PHONE_NUMBER, SOME_CONTENT));
+
+		// when: try to store the same message again
+		db.store(new WoMessage(id, A_PHONE_NUMBER, SOME_CONTENT));
+
+		// then: none of the message details have changed except last action and needs forwarding
+		dbHelper.assertTable("wo_message",
+				id, "PENDING", true, null, GT_ZERO, A_PHONE_NUMBER, SOME_CONTENT);
 	}
 
 	@Test

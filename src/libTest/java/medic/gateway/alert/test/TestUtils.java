@@ -27,6 +27,7 @@ public final class TestUtils {
 	public static final String SOME_CONTENT = "Hello.";
 	public static final Pattern ANY_CONTENT = Pattern.compile(".*");
 	public static final Pattern ANY_NUMBER = Pattern.compile("\\d+");
+	public static final Pattern GT_ZERO = Pattern.compile("[1-9]+\\d*");
 	public static final Pattern ANY_ID = Pattern.compile("[a-f0-9-]+");
 
 	public static final byte[] A_VALID_GSM_PDU = {
