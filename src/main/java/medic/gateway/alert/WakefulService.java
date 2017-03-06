@@ -1,8 +1,6 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
+import android.content.Intent;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
