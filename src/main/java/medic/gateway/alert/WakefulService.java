@@ -5,6 +5,8 @@ import android.content.Intent;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 import java.net.SocketTimeoutException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 
 import static medic.gateway.alert.GatewayLog.*;
@@ -33,7 +35,9 @@ public class WakefulService extends WakefulIntentService {
 			if(resp instanceof ExceptionResponse) {
 				ExceptionResponse exResponse = (ExceptionResponse) resp;
 				if(exResponse.ex instanceof SocketTimeoutException ||
-						exResponse.ex instanceof UnknownHostException) {
+						exResponse.ex instanceof UnknownHostException ||
+						exResponse.ex instanceof ConnectException ||
+						exResponse.ex instanceof NoRouteToHostException) {
 					wifiMan = new WifiConnectionManager(this);
 					if(wifiMan.isWifiActive()) {
 						logEvent(this, "Disabling wifi and then retrying poll...");
