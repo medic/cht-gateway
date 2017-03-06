@@ -10,7 +10,7 @@ ifdef ComSpec	 # Windows
 endif
 
 .PHONY: default build clean test deploy uninstall emulator kill logs force
-.PHONY: all build-all deploy-all
+.PHONY: all build-all deploy-all uninstall-all
 
 default:
 	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
@@ -46,6 +46,8 @@ deploy-all: build-all
 
 uninstall:
 	adb uninstall medic.gateway.alert
+uninstall-all: uninstall
+	adb uninstall medic.gateway.alert.generic
 
 kill:
 	pkill -9 emulator64-arm
