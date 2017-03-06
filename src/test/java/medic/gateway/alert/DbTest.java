@@ -40,6 +40,7 @@ public class DbTest {
 		dbHelper.tearDown();
 	}
 
+//> TESTS
 	@Test
 	public void classParamsShouldBeInitialised() {
 		assertNotNull(db);
