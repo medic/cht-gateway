@@ -46,6 +46,14 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String FALSE = "0";
 
 	private static Db _instance;
+
+	private final Context ctx;
+	private final SQLiteDatabase db; // NOPMD
+
+	/** a soft limit for the number of log entries to store in the system */
+	private int logEntryLimit;
+	private String logEntryLimitString;
+
 	public static synchronized Db getInstance(Context ctx) { // NOPMD
 		if(_instance == null) {
 			_instance = new Db(ctx);
@@ -61,13 +69,6 @@ public final class Db extends SQLiteOpenHelper {
 
 		return _instance;
 	}
-
-	private final Context ctx;
-	private final SQLiteDatabase db; // NOPMD
-
-	/** a soft limit for the number of log entries to store in the system */
-	private int logEntryLimit;
-	private String logEntryLimitString;
 
 	private Db(Context ctx) {
 		super(ctx, "medic_gateway", null, VERSION);
