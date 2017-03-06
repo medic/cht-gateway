@@ -85,6 +85,9 @@ public class WebappPoller {
 		if(response instanceof JsonResponse) {
 			JsonResponse jsonResponse = (JsonResponse) response;
 			if(jsonResponse.json.has("message")) description = jsonResponse.json.getString("message");
+		} else {
+			ExceptionResponse errorResponse = (ExceptionResponse) response;
+			description = errorResponse.ex.toString();
 		}
 
 		logEvent(ctx, "Received error from server: %s: %s", response.status, description);
