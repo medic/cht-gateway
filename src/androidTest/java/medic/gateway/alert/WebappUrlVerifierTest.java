@@ -29,6 +29,7 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 
 	@After
 	public void tearDown() throws Exception {
+		super.tearDown();
 		http.tearDown();
 	}
 
