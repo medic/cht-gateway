@@ -40,7 +40,7 @@ public class DbTest {
 		dbHelper.tearDown();
 	}
 
-//> TESTS
+//> WtMessage TESTS
 	@Test
 	public void classParamsShouldBeInitialised() {
 		assertNotNull(db);
@@ -109,6 +109,23 @@ public class DbTest {
 		assertNotEquals(0, c.getLong(1));
 	}
 
+//> SmsMessage TESTS
+	@Test
+	public void canStoreSmsMessages() {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		SmsMessage m = anSmsWith(A_PHONE_NUMBER, SOME_CONTENT);
+
+		// when
+		boolean successReported = db.store(m);
+
+		// then
+		assertTrue(successReported);
+		dbHelper.assertTable("wt_message",
+				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
+//> WoMessage TESTS
 	@Test
 	public void canStoreWoMessages() {
 		// given
@@ -187,21 +204,7 @@ public class DbTest {
 		assertNotEquals(0, c.getLong(1));
 	}
 
-	@Test
-	public void canStoreSmsMessages() {
-		// given
-		dbHelper.assertEmpty("wt_message");
-		SmsMessage m = anSmsWith(A_PHONE_NUMBER, SOME_CONTENT);
-
-		// when
-		boolean successReported = db.store(m);
-
-		// then
-		assertTrue(successReported);
-		dbHelper.assertTable("wt_message",
-				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT);
-	}
-
+//> deleteOldData() TESTS
 	@Test
 	public void deleteOldData_shouldHaveNoEffectIfNoData() {
 		// given
@@ -308,6 +311,7 @@ public class DbTest {
 		dbHelper.assertEmpty("wt_message");
 	}
 
+//> cleanLogs() TESTS
 	@Test
 	public void cleanLogs_shouldNotComplainIfNoLogs() {
 		// given: nothing in the db
