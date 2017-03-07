@@ -75,6 +75,7 @@ public class WtListFragment extends ListFragment implements LoaderCallbacks<Curs
 		messageDetailDialog(m, position).show();
 	}
 
+	// TODO this probably should not be done on the UI thread
 	private AlertDialog messageDetailDialog(final WtMessage m, final int position) {
 		LinkedList<String> content = new LinkedList<>();
 

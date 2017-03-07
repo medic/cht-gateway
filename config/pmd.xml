@@ -60,6 +60,7 @@ Severity: HARD
 		<exclude name="TooFewBranchesForASwitchStatement"/>
 		<exclude name="ConstructorCallsOverridableMethod"/>
 		<exclude name="MissingBreakInSwitch"/>
+		<exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
 	</rule>
 
 	<rule ref="rulesets/java/empty.xml"/>

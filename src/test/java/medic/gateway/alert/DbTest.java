@@ -6,6 +6,7 @@ import android.database.sqlite.*;
 import android.telephony.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 import medic.gateway.alert.test.*;
 
@@ -202,6 +203,60 @@ public class DbTest {
 		Cursor c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
 		assertEquals("DELIVERED", c.getString(0));
 		assertNotEquals(0, c.getLong(1));
+	}
+
+//> WoMessage.StatusUpdate TESTS
+	@Test
+	public void woMessage_store_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
+		dbHelper.assertCount("wo_message", 0);
+		dbHelper.assertCount("wom_status", 0);
+
+		// when
+		db.store(m);
+
+		// then
+		dbHelper.assertTable("wom_status",
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, true);
+	}
+
+	@Test
+	public void updateStatus_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
+		db.store(m);
+		dbHelper.assertCount("wo_message", 1);
+		dbHelper.assertCount("wom_status", 1);
+
+		// when
+		db.updateStatus(m, WoMessage.Status.PENDING);
+
+		// then
+		dbHelper.assertTable("wom_status",
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER,
+				ANY_NUMBER, m.id, "PENDING", null, ANY_NUMBER);
+	}
+
+	@Test
+	public void statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+		// given
+		WoMessage m = aMessageWith("relevant", WoMessage.Status.SENT);
+		dbHelper.insert("wom_status",
+				cols("_id", "message_id", "status",  "timestamp"),
+				vals(1,     "random1",    "PENDING", 111),
+				vals(2,     "relevant",   "PENDING", 222),
+				vals(3,     "random2",    "UNSENT",  333),
+				vals(4,     "relevant",   "SENT",    444),
+				vals(5,     "random3",    "FAILED",  555));
+
+		// when
+		List<WoMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+
+		// then
+		assertEquals(updates,
+				new WoMessage.StatusUpdate("relevant", WoMessage.Status.PENDING, null, 223),
+				new WoMessage.StatusUpdate("relevant", WoMessage.Status.SENT, null, 445));
 	}
 
 //> deleteOldData() TESTS

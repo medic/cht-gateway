@@ -172,8 +172,8 @@ public class SettingsDialogActivity extends Activity {
 		final ProgressDialog spinner = showSpinner(this,
 				getString(R.string.txtSavingSettings));
 
-		new AsyncTask<Void, Void, Void>() {
-			protected Void doInBackground(Void..._) {
+		AsyncTask.execute(new Runnable() {
+			public void run() {
 				boolean savedOk = saveSettings(new Settings(webappUrl, false));
 
 				if(savedOk) startApp();
@@ -186,9 +186,8 @@ public class SettingsDialogActivity extends Activity {
 					});
 				}
 				spinner.dismiss();
-				return null;
 			}
-		}.execute();
+		});
 	}
 
 	private boolean saveSettings(Settings s) {

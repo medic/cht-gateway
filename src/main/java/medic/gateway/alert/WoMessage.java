@@ -1,6 +1,6 @@
 package medic.gateway.alert;
 
-import java.util.*;
+import static medic.gateway.alert.GatewayLog.trace;
 
 /**
  * WoMessage - Webapp-Originating Messages
@@ -14,6 +14,48 @@ class WoMessage {
 	public static enum Status {
 		UNSENT, PENDING, SENT, FAILED, DELIVERED;
 		boolean canBeRetried() { return this != UNSENT && this != SENT && this != DELIVERED; }
+	}
+
+	public static class StatusUpdate {
+		public final String messageId;
+		public final Status newStatus;
+		public final String failureReason;
+		public final long timestamp;
+		public StatusUpdate(String messageId, Status newStatus, String failureReason, long timestamp) {
+			this.messageId = messageId;
+			this.newStatus = newStatus;
+			this.failureReason = failureReason;
+			this.timestamp = timestamp;
+
+			if((newStatus == Status.FAILED) == (failureReason == null)) {
+				trace(this, "Attempting to set failure reason on a non-failed message: %s", this);
+			}
+		}
+		public String toString() {
+			if(newStatus == Status.FAILED) {
+				return String.format("%s@%s-%s[%s]-%s", getClass().getSimpleName(), messageId, newStatus, failureReason, timestamp);
+			} else {
+				return String.format("%s@%s-%s-%s", getClass().getSimpleName(), messageId, newStatus, timestamp);
+			}
+		}
+		public int hashCode() {
+			int p = 92821;
+			int h = 1;
+			h = h * p + (messageId == null ? 0 : messageId.hashCode());
+			h = h * p + (newStatus == null ? 0 : newStatus.hashCode());
+			h = h * p + (failureReason == null ? 0 : failureReason.hashCode());
+			h = h * p + (int)timestamp;
+			return h;
+		}
+		public boolean equals(Object _that) {
+			if(this == _that) return true;
+			if(!(_that instanceof StatusUpdate)) return false;
+			StatusUpdate that = (StatusUpdate) _that;
+			return this.messageId == null ? that.messageId == null : this.messageId.equals(that.messageId) &&
+					this.newStatus == that.newStatus &&
+					this.failureReason == null ? that.failureReason == null : this.failureReason.equals(that.messageId) &&
+					this.timestamp == that.timestamp;
+		}
 	}
 
 	public final String id;

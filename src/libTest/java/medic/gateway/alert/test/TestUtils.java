@@ -67,6 +67,11 @@ public final class TestUtils {
 		}
 	}
 
+	@SafeVarargs
+	public static <T> void assertEquals(List<T> actual, T...expected) {
+		assertArrayEquals(expected, actual.toArray());
+	}
+
 	public static String decodeBase64(String encodedString) {
 		try {
 			return new String(Base64.decode(encodedString, Base64.DEFAULT), "UTF-8");

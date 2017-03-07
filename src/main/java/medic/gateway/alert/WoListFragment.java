@@ -1,9 +1,11 @@
 package medic.gateway.alert;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +20,15 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.LinkedList;
 
+import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.relativeTimestamp;
 import static medic.gateway.alert.Utils.setText;
+import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.WoMessage.Status.FAILED;
 import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
@@ -71,34 +77,54 @@ public class WoListFragment extends ListFragment implements LoaderCallbacks<Curs
 		// more recently than the list
 		WoMessage m = Db.getInstance(getActivity()).getWoMessage(c.getString(0));
 
-		messageDetailDialog(m, position).show();
+		showMessageDetailDialog(m, position);
 	}
 
-	private AlertDialog messageDetailDialog(final WoMessage m, final int position) {
-		LinkedList<String> content = new LinkedList<>();
+	private void showMessageDetailDialog(final WoMessage m, final int position) {
+		final ProgressDialog spinner = showSpinner(getContext());
+		AsyncTask.execute(new Runnable() {
+			public void run() {
+				try {
+					LinkedList<String> content = new LinkedList<>();
 
-		content.add(string(R.string.lblTo, m.to));
-		if(m.status == FAILED) {
-			content.add(string(R.string.lblStatusWithCause, m.status, m.getFailureReason()));
-		} else {
-			content.add(string(R.string.lblStatus, m.status));
-		}
-		content.add(string(R.string.lblLastAction, relativeTimestamp(m.lastAction)));
-		content.add(string(R.string.lblContent, m.content));
+					content.add(string(R.string.lblTo, m.to));
+					content.add(string(R.string.lblContent, m.content));
+					content.add(string(R.string.lblStatusUpdates));
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-		if(m.status.canBeRetried()) {
-			dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					retry(m.id, position);
+					List<WoMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+					Collections.reverse(updates);
+					for(WoMessage.StatusUpdate u : updates) {
+						String status;
+						if(u.newStatus == FAILED) {
+							status = String.format("%s (%s)", u.newStatus, u.failureReason);
+						} else {
+							status = u.newStatus.toString();
+						}
+						content.add(String.format("%s: %s", relativeTimestamp(u.timestamp), status));
+					}
+
+					final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+					if(m.status.canBeRetried()) {
+						dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								retry(m.id, position);
+							}
+						});
+					}
+
+					dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
+
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() { dialog.create().show(); }
+					});
+				} catch(Exception ex) {
+					logException(getContext(), ex, "Failed to load WO message details.");
+				} finally {
+					spinner.dismiss();
 				}
-			});
-		}
-
-		dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
-
-		return dialog.create();
+			}
+		});
 	}
 
 	void retry(String id, int position) {

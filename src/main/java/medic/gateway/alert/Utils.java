@@ -56,6 +56,10 @@ public final class Utils {
 		Toast.makeText(ctx, String.format(message, args), Toast.LENGTH_LONG).show();
 	}
 
+	public static ProgressDialog showSpinner(Context ctx) {
+		return showSpinner(ctx, null);
+	}
+
 	public static ProgressDialog showSpinner(Context ctx, int messageId) {
 		return showSpinner(ctx, ctx.getString(messageId));
 	}

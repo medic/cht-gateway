@@ -16,10 +16,13 @@ import static medic.gateway.alert.Utils.*;
 
 @SuppressWarnings("PMD.GodClass")
 public final class Db extends SQLiteOpenHelper {
-	private static final int VERSION = 1;
+	private static final int VERSION = 2;
 
 	private static final String ALL = null, NO_GROUP = null;
 	private static final String[] NO_ARGS = {};
+	private static final String NO_CRITERIA = null;
+	private static final String NO_LIMIT = null;
+	private static final String DEFAULT_SORT_ORDER = null;
 
 	private static final String tblLOG = "log";
 	private static final String LOG_clmID = "_id";
@@ -41,6 +44,13 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WO_clmLAST_ACTION = "last_action";
 	private static final String WO_clmTO = "_to";
 	private static final String WO_clmCONTENT = "content";
+
+	private static final String tblWOM_STATUS = "wom_status";
+	private static final String WS_clmID = "_id";
+	private static final String WS_clmMESSAGE_ID = "message_id";
+	private static final String WS_clmSTATUS = "status";
+	private static final String WS_clmFAILURE_REASON = "failure_reason";
+	private static final String WS_clmTIMESTAMP = "timestamp";
 
 	private static final String TRUE = "1";
 	private static final String FALSE = "0";
@@ -102,12 +112,27 @@ public final class Db extends SQLiteOpenHelper {
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
 				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmFAILURE_REASON, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
+
+		createWoMessageStatusUpdateTable(db);
 	}
 
 	public void onUpgrade(SQLiteDatabase db,
 			int oldVersion,
 			int newVersion) {
-		// Handle DB upgrades here, once we start supporting released versions
+		if(oldVersion < 2) {
+			createWoMessageStatusUpdateTable(db);
+		}
+	}
+
+//> MIGRATIONS
+	private void createWoMessageStatusUpdateTable(SQLiteDatabase db) {
+		db.execSQL(String.format("CREATE TABLE %s (" +
+					"%s INTEGER PRIMARY KEY, " +
+					"%s TEXT NOT NULL, " +
+					"%s TEXT NOT NULL," +
+					"%s TEXT, " +
+					"%s INTEGER NOT NULL)",
+				tblWOM_STATUS, WS_clmID, WS_clmMESSAGE_ID, WS_clmSTATUS, WS_clmFAILURE_REASON, WS_clmTIMESTAMP));
 	}
 
 //> ACCESSORS
@@ -177,7 +202,13 @@ public final class Db extends SQLiteOpenHelper {
 		log("store() :: %s", m);
 		try {
 			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
-			return id != -1;
+
+			if(id != -1) {
+				storeStatusUpdate(m, m.status, null, m.lastAction);
+				return true;
+			} else {
+				return false;
+			}
 		} catch(SQLiteConstraintException ex) {
 			// Likely this is because a message with this ID already exists.  If so,
 			// we should update that message so that its status is synched with the
@@ -215,11 +246,13 @@ public final class Db extends SQLiteOpenHelper {
 					newStatus,
 					failureReason));
 
+		long timestamp = System.currentTimeMillis();
+
 		ContentValues v = new ContentValues();
 		v.put(WO_clmSTATUS, newStatus.toString());
 		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
 		v.put(WO_clmFAILURE_REASON, failureReason);
-		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
+		v.put(WO_clmLAST_ACTION, timestamp);
 
 		int affected;
 		if(oldStatus == null) {
@@ -227,7 +260,13 @@ public final class Db extends SQLiteOpenHelper {
 		} else {
 			affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, oldStatus));
 		}
-		return affected > 0;
+
+		if(affected > 0) {
+			storeStatusUpdate(m, newStatus, failureReason, timestamp);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	void setStatusForwarded(WoMessage m) {
@@ -249,6 +288,14 @@ public final class Db extends SQLiteOpenHelper {
 		return db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id)) > 0;
 	}
 
+	private void storeStatusUpdate(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp) {
+		try {
+			db.insertOrThrow(tblWOM_STATUS, null, getContentValues(m, newStatus, failureReason, timestamp));
+		} catch(SQLException ex) {
+			warnException(ex, "Exception writing StatusUpdate [%s] to db for WoMessage: %s", newStatus, m);
+		}
+	}
+
 	private ContentValues getContentValues(WoMessage m) {
 		ContentValues v = new ContentValues();
 		v.put(WO_clmID, m.id);
@@ -258,6 +305,15 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
 		v.put(WO_clmTO, m.to);
 		v.put(WO_clmCONTENT, m.content);
+		return v;
+	}
+
+	private ContentValues getContentValues(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp) {
+		ContentValues v = new ContentValues();
+		v.put(WS_clmMESSAGE_ID, m.id);
+		v.put(WS_clmSTATUS, newStatus.toString());
+		v.put(WS_clmFAILURE_REASON, failureReason);
+		v.put(WS_clmTIMESTAMP, timestamp);
 		return v;
 	}
 
@@ -318,6 +374,39 @@ public final class Db extends SQLiteOpenHelper {
 		return new WoMessage(id, status, failureReason, lastAction, to, content);
 	}
 
+	private static WoMessage.StatusUpdate woMessageStatusUpdateFrom(Cursor c) {
+		String messageId = c.getString(0);
+		WoMessage.Status status = WoMessage.Status.valueOf(c.getString(1));
+		String failureReason = c.getString(2);
+		long timestamp = c.getLong(3);
+
+		return new WoMessage.StatusUpdate(messageId, status, failureReason, timestamp);
+	}
+
+	public List<WoMessage.StatusUpdate> getStatusUpdates(WoMessage m) {
+		Cursor c = null;
+		try {
+			c = db.query(tblWOM_STATUS,
+				cols(WS_clmMESSAGE_ID, WS_clmSTATUS, WS_clmFAILURE_REASON, WS_clmTIMESTAMP),
+				eq(WS_clmMESSAGE_ID), args(m.id),
+				NO_GROUP, NO_GROUP,
+				DEFAULT_SORT_ORDER,
+				NO_LIMIT);
+
+			int count = c.getCount();
+			log("getStatusUpdates() :: item fetch count: %s", count);
+			ArrayList<WoMessage.StatusUpdate> list = new ArrayList<>(count);
+			c.moveToFirst();
+			while(count-- > 0) {
+				list.add(woMessageStatusUpdateFrom(c));
+				c.moveToNext();
+			}
+			return list;
+		} finally {
+			if(c != null) c.close();
+		}
+	}
+
 //> WtMessage HANDLERS
 	boolean store(MultipartSms sms) {
 		WtMessage m = new WtMessage(
@@ -371,7 +460,7 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	Cursor getWtMessages(int maxCount) {
-		return getWtMessageCursor(null, null, SortDirection.DESC, maxCount);
+		return getWtMessageCursor(NO_CRITERIA, NO_ARGS, SortDirection.DESC, maxCount);
 	}
 
 	List<WtMessage> getWtMessages(int maxCount, WtMessage.Status status) {
@@ -407,7 +496,7 @@ public final class Db extends SQLiteOpenHelper {
 				cols(WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, WT_clmFROM, WT_clmCONTENT),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
-				sort == null? null: sort.apply(WT_clmLAST_ACTION),
+				sort == null? DEFAULT_SORT_ORDER: sort.apply(WT_clmLAST_ACTION),
 				Integer.toString(maxCount));
 	}
 

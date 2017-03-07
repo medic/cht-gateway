@@ -79,7 +79,7 @@
 	<string name="lblFrom">From: %s</string>
 	<string name="lblLastAction">Last action: %s</string>
 	<string name="lblStatus">Status: %s</string>
-	<string name="lblStatusWithCause">Status: %1$s (%2$s)</string>
+	<string name="lblStatusUpdates">Status history:</string>
 	<string name="lblContent">Content: %s</string>
 
 	<string name="btnRetry">Retry</string>
