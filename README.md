@@ -25,11 +25,25 @@ Download the latest APK from https://github.com/medic/medic-gateway/releases
 
 ### Medic Mobile
 
-If you're configuring `medic-gateway` for use with [`medic-webapp`](https://github.com/medic/medic-webapp), set the webapp URL to `https://username:password@example.com/api/sms`.
+If you're configuring `medic-gateway` for use with hosted [`medic-webapp`](https://github.com/medic/medic-webapp), with a URL of e.g. `https://myproject.some-subdomain.medicmobile.org` and a username of `my_gateway_user` and a password of `topSecret`, fill in the settings as follows:
+
+#### Medic-branded gateway
+
+```
+Instance name: myproject.some-subdomain
+Username: my_gateway_user
+Password: topSecret
+```
+
+#### Generic-branded gateway
+
+```
+WebappUrl: https://my_gateway_user:topSecret@myproject.some-subdomain.medicmobile.org
+```
 
 ### Other
 
-If you're configuring `medic-gateway` for use with other services, you will need to find out the value for _webapp URL_ from your tech support.
+If you're configuring `medic-gateway` for use with other services, you will need to use the _generic_ build of `medic-gateway`, and find out the value for _webapp URL_ from your tech support.
 
 # API
 
