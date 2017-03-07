@@ -4,6 +4,9 @@ import java.util.*;
 
 import static medic.gateway.alert.Utils.randomUuid;
 
+/**
+ * WtMessage - Webapp-Terminating Messages
+ */
 class WtMessage {
 	public static enum Status {
 		WAITING, FORWARDED, FAILED;
