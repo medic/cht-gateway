@@ -5,7 +5,7 @@ import java.util.*;
 import static medic.gateway.alert.Utils.randomUuid;
 
 class WtMessage {
-	public enum Status {
+	public static enum Status {
 		WAITING, FORWARDED, FAILED;
 		boolean canBeRetried() { return this == FAILED; }
 	}

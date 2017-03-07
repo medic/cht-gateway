@@ -11,7 +11,7 @@ import java.util.*;
  * app on the device.
  */
 class WoMessage {
-	public enum Status {
+	public static enum Status {
 		UNSENT, PENDING, SENT, FAILED, DELIVERED;
 		boolean canBeRetried() { return this != UNSENT && this != SENT && this != DELIVERED; }
 	}
