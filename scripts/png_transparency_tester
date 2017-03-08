@@ -1,0 +1,49 @@
+#!/bin/bash -eu
+
+HTML='png_tester.html'
+
+cd "$(dirname "$0")/../"
+mkdir -p build/reports
+cd $_
+
+cat > $HTML << EOF
+	<html>
+		<head>
+			<title>PNG Transparency Tester</title>
+			<style>
+				body { font-size: .5em; }
+				#colour-picker div { width:2em; height:2em; display:inline-block; }
+				#pngs { background-color: green; }
+				#pngs div { border: 1px solid black; display:inline-block; }
+			</style>
+		</head>
+		<body>
+			<div id="colour-picker">
+			</div>
+			<div id="pngs">
+EOF
+
+for png in $(find '../../src' -name '*.png'); do
+	echo "<div><h3>${png:6}</h3><img src='$png'/></div>" >> $HTML
+done
+
+cat >> $HTML << EOF
+			</div>
+			<script>
+				['black', 'white', 'red', 'green', 'blue'].forEach(function(colour) {
+					var box = document.createElement('div');
+					box.onclick = function() { changeColour(colour); };
+					box.style.background = colour;
+					document.getElementById('colour-picker').append(box);
+				});
+
+				function changeColour(colour) {
+					console.log('Changing colour to: ' + colour);
+					document.getElementById('pngs').style.background = colour;
+				}
+			</script>
+		</body>
+	</html>
+EOF
+
+open "$HTML"
