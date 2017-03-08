@@ -161,7 +161,13 @@ class WoCursorAdapter extends ResourceCursorAdapter {
 	public void bindView(View v, final Context ctx, Cursor c) {
 		final WoMessage m = Db.woMessageFrom(c);
 
-		setText(v, R.id.txtWoStatus, m.status.toString());
+		String status;
+		if(m.status == FAILED) {
+			status = String.format("%s (%s)", m.status, m.getFailureReason());
+		} else {
+			status = m.status.toString();
+		}
+		setText(v, R.id.txtWoStatus, status);
 		setText(v, R.id.txtWoLastAction, relativeTimestamp(m.lastAction));
 		setText(v, R.id.txtWoTo, m.to);
 		setText(v, R.id.txtWoContent, m.content);
