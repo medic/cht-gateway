@@ -47,8 +47,10 @@ var port = process.env.PORT || 8000,
       '/app': function(req, res) {
         if(!handleAuth(req, res, datastore.auth)) return;
 
+        var storedReq;
+
         if(req.method === 'GET' || req.method === 'POST') {
-          datastore.requests.unshift({
+          datastore.requests.unshift(storedReq = {
             useragent: req.headers['user-agent'],
             method: req.method,
             time: new Date().toString(),
@@ -73,6 +75,8 @@ var port = process.env.PORT || 8000,
             return readBody(req)
               .then(JSON.parse)
               .then(function(json) {
+                storedReq.postBody = json;
+
                 push(datastore.webapp_terminating, json.messages);
                 push(datastore.status_updates, json.updates);
 
