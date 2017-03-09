@@ -216,15 +216,15 @@ To list the data stored on the server:
 
 To make the next good request to `/app` return an error:
 
-	curl -X POST http://localhost:8000/error --data '"Something failed!"'
+	curl --data '"Something failed!"' http://localhost:8000/error
 
 To add a webapp-originating message (to be send by `medic-gateway`):
 
-	curl -vvv -X POST -d '{ "id": "3E105262-070C-4913-949B-E7ACA4F42B71", "to": "+447123555888", "content": "hi" }' http://localhost:8000
+	curl -vvv --data '{ "id": "3E105262-070C-4913-949B-E7ACA4F42B71", "to": "+447123555888", "content": "hi" }' http://localhost:8000
 
 To simulate a request from `medic-gateway`:
 
-	curl -X POST http://localhost:8000/app -H "Accept: application/json" -H "Accept-Charset: utf-8" -H "Accept-Encoding: gzip" -H "Cache-Control: no-cache" -H "Content-Type: application/json" -d'{}'
+	curl http://localhost:8000/app -H "Accept: application/json" -H "Accept-Charset: utf-8" -H "Accept-Encoding: gzip" -H "Cache-Control: no-cache" -H "Content-Type: application/json" --data '{}'
 
 To clear the data stored on the server:
 
@@ -232,7 +232,7 @@ To clear the data stored on the server:
 
 To set a username and password on the demo server:
 
-	curl -X POST -d'{"username":"alice", "password":"secret"}' http://localhost:8000/auth
+	curl --data '{"username":"alice", "password":"secret"}' http://localhost:8000/auth
 
 ### Remote
 
