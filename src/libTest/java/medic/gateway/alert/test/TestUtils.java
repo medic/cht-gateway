@@ -56,6 +56,8 @@ public final class TestUtils {
 	}
 
 	public static void assertMatches(String failureMessage, Object pattern, Object actual) {
+		if(pattern == null) throw new IllegalArgumentException();
+		if(actual == null) fail(String.format("%s\"null\" did not match regex /%s/", failureMessage, pattern));
 		boolean matches = ((Pattern) pattern).matcher(actual.toString()).matches();
 		if(!matches) {
 			if(failureMessage == null) {

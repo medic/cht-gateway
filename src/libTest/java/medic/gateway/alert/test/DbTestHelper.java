@@ -23,21 +23,40 @@ public class DbTestHelper {
 	public static final String[] NO_ARGS = {};
 	public static final String ALL_ROWS = null;
 
-	public final Db db;
+	private static final Random RANDOM = new Random();
+
+	private Db db;
 	public final SQLiteDatabase raw;
 
+//> CONSTRUCTORS
+	public DbTestHelper(SQLiteDatabase raw) {
+		this.raw = raw;
+	}
+
+	public DbTestHelper(SQLiteOpenHelper sqliteOpenHelper) {
+		this.raw = sqliteOpenHelper.getWritableDatabase();
+	}
+
 	public DbTestHelper(Context ctx) throws Exception {
-		Constructor<?> constructor = Db.class.getDeclaredConstructors()[0];
+		Constructor<?> constructor = Db.class.getDeclaredConstructor(Context.class);
 		constructor.setAccessible(true);
 		db = (Db) constructor.newInstance(ctx);
 		raw = db.getWritableDatabase();
 	}
 
+//> ACCESSORS
+	public Db getDb() {
+		if(db == null) throw new IllegalStateException("Should not be trying to get db unless the DbTestHelper was constructed using a Context");
+		return db;
+	}
+
+//> TEST METHODS
 	public void tearDown() {
 		raw.delete("log", ALL_ROWS, NO_ARGS);
 		raw.delete("wt_message", ALL_ROWS, NO_ARGS);
 		raw.delete("wo_message", ALL_ROWS, NO_ARGS);
-		db.close();
+		raw.delete("wom_status", ALL_ROWS, NO_ARGS);
+		raw.close();
 		try {
 			Field dbInstanceField = Db.class.getDeclaredField("_instance");
 			dbInstanceField.setAccessible(true);
@@ -107,8 +126,13 @@ public class DbTestHelper {
 	private void assertValues(Cursor c, Object... expectedValues) {
 		try {
 			int colCount = c.getColumnCount();
+
+			if(expectedValues.length % colCount != 0)
+				throw new IllegalArgumentException("Wrong number of columns in expected values.");
 			int expectedRowCount = expectedValues.length / colCount;
+
 			assertEquals("Wrong number of rows in db.", expectedRowCount, c.getCount());
+
 			for(int i=0; i<expectedRowCount; ++i) {
 				c.moveToNext();
 
@@ -150,5 +174,9 @@ public class DbTestHelper {
 
 	public static String randomUuid() {
 		return randomUUID().toString();
+	}
+
+	public static long randomLong() {
+		return RANDOM.nextLong();
 	}
 }

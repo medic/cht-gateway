@@ -31,14 +31,14 @@ public class DbTest {
 	@Before
 	public void setUp() throws Exception {
 		dbHelper = new DbTestHelper(RuntimeEnvironment.application);
-		db = dbHelper.db;
+		db = dbHelper.getDb();
 
 		db.setLogEntryLimit(50);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		dbHelper.tearDown();
+		if(dbHelper != null) dbHelper.tearDown();
 	}
 
 //> WtMessage TESTS
@@ -144,17 +144,23 @@ public class DbTest {
 	@Test
 	public void store_WoMessage_duplicate_shouldMarkAsNeedsForwarding() {
 		// given: there is a message in the database which does NOT need forwarding
-		String id = randomUuid();
+		String messageId = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "failure_reason", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.PENDING, false, null, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",        "status",                 "failure_reason", "last_action", "_to",          "content"),
+				vals(messageId,    WoMessage.Status.PENDING, null,             0,             A_PHONE_NUMBER, SOME_CONTENT));
+		dbHelper.insert("wom_status",
+				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
+				vals(messageId,    WoMessage.Status.PENDING, null,             0,           false));
 
 		// when: try to store the same message again
-		db.store(new WoMessage(id, A_PHONE_NUMBER, SOME_CONTENT));
+		db.store(new WoMessage(messageId, A_PHONE_NUMBER, SOME_CONTENT));
 
 		// then: none of the message details have changed except last action and needs forwarding
 		dbHelper.assertTable("wo_message",
-				id, "PENDING", true, null, GT_ZERO, A_PHONE_NUMBER, SOME_CONTENT);
+				messageId, "PENDING", null, GT_ZERO, A_PHONE_NUMBER, SOME_CONTENT);
+		// and: the message's status has been marked as "needs forwarding"
+		dbHelper.assertTable("wom_status",
+				ANY_NUMBER, messageId, "PENDING", null, 0, true);
 	}
 
 	@Test
@@ -174,8 +180,11 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "failure_reason", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.FAILED, false, "failure-reason", 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "failure_reason", "last_action", "_to", "content"),
+				vals(id, WoMessage.Status.FAILED, "failure-reason", 0, A_PHONE_NUMBER, SOME_CONTENT));
+		dbHelper.insert("wom_status",
+				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
+				vals(id,           WoMessage.Status.FAILED,  null,             0,           false));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
 		// when
@@ -192,8 +201,11 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.PENDING, false, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "last_action", "_to", "content"),
+				vals(id, WoMessage.Status.PENDING, 0, A_PHONE_NUMBER, SOME_CONTENT));
+		dbHelper.insert("wom_status",
+				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
+				vals(id,           WoMessage.Status.PENDING, null,             0,           false));
 		WoMessage messageWithUpdatedStatus = aMessageWith(id, WoMessage.Status.PENDING);
 
 		// when
@@ -218,7 +230,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, true);
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, false);
 	}
 
 	@Test
@@ -234,8 +246,8 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER,
-				ANY_NUMBER, m.id, "PENDING", null, ANY_NUMBER);
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, false,
+				ANY_NUMBER, m.id, "PENDING", null, ANY_NUMBER, true);
 	}
 
 	@Test
@@ -243,20 +255,20 @@ public class DbTest {
 		// given
 		WoMessage m = aMessageWith("relevant", WoMessage.Status.SENT);
 		dbHelper.insert("wom_status",
-				cols("_id", "message_id", "status",  "timestamp"),
-				vals(1,     "random1",    "PENDING", 111),
-				vals(2,     "relevant",   "PENDING", 222),
-				vals(3,     "random2",    "UNSENT",  333),
-				vals(4,     "relevant",   "SENT",    444),
-				vals(5,     "random3",    "FAILED",  555));
+				cols("_id", "message_id", "status",  "timestamp", "needs_forwarding"),
+				vals(1,     "random1",    "PENDING", 111,         true),
+				vals(2,     "relevant",   "PENDING", 222,         true),
+				vals(3,     "random2",    "UNSENT",  333,         true),
+				vals(4,     "relevant",   "SENT",    444,         true),
+				vals(5,     "random3",    "FAILED",  555,         true));
 
 		// when
 		List<WoMessage.StatusUpdate> updates = db.getStatusUpdates(m);
 
 		// then
 		assertEquals(updates,
-				new WoMessage.StatusUpdate("relevant", WoMessage.Status.PENDING, null, 223),
-				new WoMessage.StatusUpdate("relevant", WoMessage.Status.SENT, null, 445));
+				new WoMessage.StatusUpdate(2, "relevant", WoMessage.Status.PENDING, null, 223),
+				new WoMessage.StatusUpdate(4, "relevant", WoMessage.Status.SENT, null, 445));
 	}
 
 //> deleteOldData() TESTS
@@ -302,11 +314,11 @@ public class DbTest {
 	public void deleteOldData_shouldDeleteOldWoMessagesButNotNewOnes() {
 		// given
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, false, now(), A_PHONE_NUMBER, "should keep 1"),
-				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(8), A_PHONE_NUMBER, "should delete 1"),
-				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(6), A_PHONE_NUMBER, "should keep 2"),
-				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(800), A_PHONE_NUMBER, "should delete 2"));
+				cols("_id",        "status",                 "last_action", "_to",          "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, now(),         A_PHONE_NUMBER, "should keep 1"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete 1"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6),    A_PHONE_NUMBER, "should keep 2"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800),  A_PHONE_NUMBER, "should delete 2"));
 		dbHelper.assertCount("wo_message", 4);
 
 		// when
@@ -315,8 +327,8 @@ public class DbTest {
 		// then
 		assertEquals(2, deletedCount);
 		dbHelper.assertTable("wo_message",
-				ANY_ID, "PENDING", false, null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 1",
-				ANY_ID, "PENDING", false, null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 2");
+				ANY_ID, "PENDING", null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 1",
+				ANY_ID, "PENDING", null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 2");
 	}
 
 	@Test
@@ -347,8 +359,8 @@ public class DbTest {
 				cols("_id", "timestamp", "message"),
 				vals(1, daysAgo(8), "Should be deleted"));
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, false, daysAgo(8), A_PHONE_NUMBER, "should delete"));
+				cols("_id", "status", "last_action", "_to", "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete"));
 		dbHelper.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"));
@@ -376,6 +388,19 @@ public class DbTest {
 
 		// then
 		dbHelper.assertEmpty("log");
+	}
+
+	@Test
+	public void cleanLogs_shouldNotDeleteAnythingIfHardlyAnyLogs() {
+		// given:
+		for(int i=0; i<3; ++i) dbHelper.insert("log", cols("timestamp", "message"), vals(now(), "entry: " + i));
+		dbHelper.assertCount("log", 3);
+
+		// when:
+		db.cleanLogs();
+
+		// then
+		dbHelper.assertCount("log", 3);
 	}
 
 	@Test
@@ -439,6 +464,82 @@ public class DbTest {
 				"entry: 495", "entry: 496", "entry: 497", "entry: 498", "entry: 499");
 	}
 
+//> MIGRATION TESTS
+	@Test
+	public void migrate_createTable_WoMessageStatusUpdate_shouldCreateStatusesFromTheWoMessageTable() {
+		// given: some messages exist
+		DbTestHelper dbHelper = anEmptyDbHelper();
+		dbHelper.raw.execSQL("CREATE TABLE wo_message (" +
+				"'_id' TEXT NOT NULL, " +
+				"'status' TEXT NOT NULL, " +
+				"'failure_reason' TEXT, " +
+				"'last_action' INTEGER NOT NULL, " +
+				"'status_needs_forwarding' INTEGER NOT NULL)");
+		dbHelper.insert("wo_message",
+				cols("_id", "status",                   "failure_reason", "last_action", "status_needs_forwarding"),
+				vals("a-1", WoMessage.Status.UNSENT,    null,              1,            0),
+				vals("b-2", WoMessage.Status.PENDING,   null,              2,            1),
+				vals("c-3", WoMessage.Status.SENT,      null,              3,            0),
+				vals("d-4", WoMessage.Status.FAILED,    "some-reason",     4,            1),
+				vals("e-5", WoMessage.Status.DELIVERED, null,              5,            0));
+
+		// when
+		Db.migrate_createTable_WoMessageStatusUpdate(dbHelper.raw, false);
+
+		// then
+		dbHelper.assertTable("wom_status",
+				ANY_NUMBER, "a-1", "UNSENT",    null,          1, 0,
+				ANY_NUMBER, "b-2", "PENDING",   null,          2, 1,
+				ANY_NUMBER, "c-3", "SENT",      null,          3, 0,
+				ANY_NUMBER, "d-4", "FAILED",    "some-reason", 4, 1,
+				ANY_NUMBER, "e-5", "DELIVERED", null,          5, 0);
+	}
+
+	@Test
+	public void migrate_create_WOS_clmNEEDS_FORWARDING() {
+		// given
+		DbTestHelper dbHelper = anEmptyDbHelper();
+		dbHelper.raw.execSQL("CREATE TABLE wo_message (" +
+				"'_id' TEXT NOT NULL, " +
+				"'status' TEXT NOT NULL, " +
+				"'failure_reason' TEXT, " +
+				"'last_action' INTEGER NOT NULL, " +
+				"'status_needs_forwarding' INTEGER NOT NULL)");
+		dbHelper.raw.execSQL("CREATE TABLE wom_status (" +
+				"'message_id' TEXT NOT NULL, " +
+				"'status' TEXT NOT NULL, " +
+				"'failure_reason' TEXT, " +
+				"'timestamp' INTEGER NOT NULL)");
+		dbHelper.insert("wo_message",
+				cols("_id", "status",                 "last_action", "status_needs_forwarding"),
+				vals("a-1", WoMessage.Status.UNSENT,   1,            0),
+				vals("b-2", WoMessage.Status.PENDING,  2,            1),
+				vals("c-3", WoMessage.Status.SENT,     3,            1),
+				vals("d-4", WoMessage.Status.SENT,     4,            1));
+		dbHelper.insert("wom_status",
+				cols("message_id", "status",                   "timestamp"),
+				vals("a-1",         WoMessage.Status.UNSENT,   1),
+				vals("b-2",         WoMessage.Status.UNSENT,   1),
+				vals("b-2",         WoMessage.Status.PENDING,  2),
+				vals("c-3",         WoMessage.Status.UNSENT,   1),
+				vals("c-3",         WoMessage.Status.PENDING,  2),
+				vals("c-3",         WoMessage.Status.SENT,     3),
+				vals("d-4",         WoMessage.Status.SENT,     1));
+
+		// when
+		Db.migrate_create_WOS_clmNEEDS_FORWARDING(dbHelper.raw);
+
+		// then
+		dbHelper.assertTable("wom_status",
+				"a-1", "UNSENT",  null, 1, 0,
+				"b-2", "UNSENT",  null, 1, 0,
+				"b-2", "PENDING", null, 2, 1,
+				"c-3", "UNSENT",  null, 1, 0,
+				"c-3", "PENDING", null, 2, 0,
+				"c-3", "SENT",    null, 3, 1,
+				"d-4", "SENT",    null, 1, 0);
+	}
+
 //> STATIC HELPERS
 	private static WtMessage aMessageWith(WtMessage.Status status) {
 		return aMessageWith(randomUuid(), status);
@@ -461,5 +562,14 @@ public class DbTest {
 		when(m.getMessageBody()).thenReturn(content);
 		when(m.getOriginatingAddress()).thenReturn(from);
 		return m;
+	}
+
+	private static DbTestHelper anEmptyDbHelper() {
+		@SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+		SQLiteOpenHelper openHelper = new SQLiteOpenHelper(RuntimeEnvironment.application, "test_db", null, 1) {
+			public void onCreate(SQLiteDatabase db) {}
+			public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+		};
+		return new DbTestHelper(openHelper);
 	}
 }

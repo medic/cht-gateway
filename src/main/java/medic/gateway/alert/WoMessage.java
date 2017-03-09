@@ -17,11 +17,13 @@ class WoMessage {
 	}
 
 	public static class StatusUpdate {
+		public final long id;
 		public final String messageId;
 		public final Status newStatus;
 		public final String failureReason;
 		public final long timestamp;
-		public StatusUpdate(String messageId, Status newStatus, String failureReason, long timestamp) {
+		public StatusUpdate(long id, String messageId, Status newStatus, String failureReason, long timestamp) {
+			this.id = id;
 			this.messageId = messageId;
 			this.newStatus = newStatus;
 			this.failureReason = failureReason;
@@ -41,17 +43,15 @@ class WoMessage {
 		public int hashCode() {
 			int p = 92821;
 			int h = 1;
-			h = h * p + (messageId == null ? 0 : messageId.hashCode());
-			h = h * p + (newStatus == null ? 0 : newStatus.hashCode());
-			h = h * p + (failureReason == null ? 0 : failureReason.hashCode());
-			h = h * p + (int)timestamp;
+			h = h * p + (int) id;
 			return h;
 		}
 		public boolean equals(Object _that) {
 			if(this == _that) return true;
 			if(!(_that instanceof StatusUpdate)) return false;
 			StatusUpdate that = (StatusUpdate) _that;
-			return this.messageId == null ? that.messageId == null : this.messageId.equals(that.messageId) &&
+			return this.id == that.id &&
+					this.messageId == null ? that.messageId == null : this.messageId.equals(that.messageId) &&
 					this.newStatus == that.newStatus &&
 					this.failureReason == null ? that.failureReason == null : this.failureReason.equals(that.messageId) &&
 					this.timestamp == that.timestamp;

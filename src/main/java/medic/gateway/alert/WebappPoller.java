@@ -16,7 +16,7 @@ import static medic.gateway.alert.Utils.json;
 
 public class WebappPoller {
 	private static final int MAX_WT_MESSAGES = 10;
-	private static final int MAX_WO_MESSAGES = 10;
+	private static final int MAX_WOM_STATUS_UPDATES = 20;
 
 	private final Context ctx;
 	private final Db db;
@@ -30,7 +30,7 @@ public class WebappPoller {
 
 		request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
-				db.getWoMessagesWithStatusChanges(MAX_WO_MESSAGES));
+				db.getWoMessageStatusUpdates(MAX_WOM_STATUS_UPDATES));
 
 		webappUrl = Settings.in(ctx).getWebappUrl();
 	}
@@ -60,11 +60,11 @@ public class WebappPoller {
 			}
 		}
 
-		for(WoMessage m : request.statusUpdates) {
+		for(WoMessage.StatusUpdate u : request.statusUpdates) {
 			try {
-				db.setStatusForwarded(m);
+				db.setStatusForwarded(u);
 			} catch(Exception ex) {
-				logException(ctx, ex, "WebappPoller::Error updating WO message %s status_forwarded value: %s", m.id, ex.getMessage());
+				logException(ctx, ex, "WebappPoller::Error updating WO message status %s as forwarded: %s", u, ex.getMessage());
 			}
 		}
 
@@ -116,9 +116,9 @@ public class WebappPoller {
 
 class GatewayRequest {
 	final List<WtMessage> messages;
-	final List<WoMessage> statusUpdates;
+	final List<WoMessage.StatusUpdate> statusUpdates;
 
-	GatewayRequest(List<WtMessage> messages, List<WoMessage> statusUpdates) {
+	GatewayRequest(List<WtMessage> messages, List<WoMessage.StatusUpdate> statusUpdates) {
 		this.messages = messages;
 		this.statusUpdates = statusUpdates;
 	}
@@ -156,14 +156,14 @@ class GatewayRequest {
 	private JSONArray getStatusUpdateJson() {
 		JSONArray json = new JSONArray();
 
-		for(WoMessage m : statusUpdates) {
+		for(WoMessage.StatusUpdate u : statusUpdates) {
 			try {
 				JSONObject deliveryUpdate = json(
-					"id", m.id,
-					"status", m.status.toString()
+					"id", u.messageId,
+					"status", u.newStatus.toString()
 				);
-				if(m.status == WoMessage.Status.FAILED) {
-					deliveryUpdate.put("reason", m.getFailureReason());
+				if(u.newStatus == WoMessage.Status.FAILED) {
+					deliveryUpdate.put("reason", u.failureReason);
 				}
 				json.put(deliveryUpdate);
 			} catch(Exception ex) {

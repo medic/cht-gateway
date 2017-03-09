@@ -62,14 +62,19 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
 		// when
 		aSendFailureReportArrivesFor(id, RESULT_ERROR_GENERIC_FAILURE, 99);
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", true, "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,                    ANY_NUMBER, false,
+				ANY_NUMBER, id, "FAILED",  "generic; errorCode=99", ANY_NUMBER, true);
 	}
 
 	@Test
@@ -78,14 +83,19 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
 		// when
 		aSendFailureReportArrivesFor(id, RESULT_ERROR_RADIO_OFF);
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", true, "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,        ANY_NUMBER, false,
+				ANY_NUMBER, id, "FAILED",  "radio-off", ANY_NUMBER, true);
 	}
 
 	@Test
@@ -94,14 +104,19 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
 		// when
 		aSendFailureReportArrivesFor(id, RESULT_ERROR_NO_SERVICE);
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", true, "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,         ANY_NUMBER, false,
+				ANY_NUMBER, id, "FAILED",  "no-service", ANY_NUMBER, true);
 	}
 
 	@Test
@@ -110,14 +125,19 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", ANY_NUMBER, null, false, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
 		// when
 		aSendFailureReportArrivesFor(id, RESULT_ERROR_NULL_PDU);
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", true, "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,       ANY_NUMBER, false,
+				ANY_NUMBER, id, "FAILED",  "null-pdu", ANY_NUMBER, true);
 	}
 
 	@Test
@@ -162,8 +182,11 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 //> HELPER METHODS
 	private void aWoMessageIsInDbWith(String id, WoMessage.Status status) {
 		db.insert("wo_message",
-				cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-				vals(id, status, false, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "last_action", "_to", "content"),
+				vals(id, status, 0, A_PHONE_NUMBER, SOME_CONTENT));
+		db.insert("wom_status",
+				cols("message_id", "status", "timestamp", "needs_forwarding"),
+				vals(id, status, 0, false));
 	}
 
 	private void assertDbStatusOf(String id, WoMessage.Status expectedStatus) {

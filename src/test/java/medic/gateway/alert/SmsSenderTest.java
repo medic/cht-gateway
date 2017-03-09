@@ -44,8 +44,8 @@ public class SmsSenderTest {
 		for(Status s : Status.values()) {
 			// create a WoMessage with each status
 			db.insert("wo_message",
-					cols("_id",     "status", "failure_reason", "status_needs_forwarding", "last_action", "_to", "content"),
-					vals("id-" + s, s,        null,             false,                     0,             "+1",  "testing: " + s));
+					cols("_id",     "status", "failure_reason", "last_action", "_to", "content"),
+					vals("id-" + s, s,        null,             0,             "+1",  "testing: " + s));
 		}
 
 		// when
@@ -53,11 +53,11 @@ public class SmsSenderTest {
 
 		// then
 		db.assertTable("wo_message",
-				"id-UNSENT",    "PENDING",   true,  null,  ANY_NUMBER, "+1", "testing: UNSENT",
-				"id-PENDING",   "PENDING",   false, null, 0,          "+1", "testing: PENDING",
-				"id-SENT",      "SENT",      false, null, 0,          "+1", "testing: SENT",
-				"id-FAILED",    "FAILED",    false, null, 0,          "+1", "testing: FAILED",
-				"id-DELIVERED", "DELIVERED", false, null, 0,          "+1", "testing: DELIVERED");
+				"id-UNSENT",    "PENDING",   null, ANY_NUMBER, "+1", "testing: UNSENT",
+				"id-PENDING",   "PENDING",   null, 0,          "+1", "testing: PENDING",
+				"id-SENT",      "SENT",      null, 0,          "+1", "testing: SENT",
+				"id-FAILED",    "FAILED",    null, 0,          "+1", "testing: FAILED",
+				"id-DELIVERED", "DELIVERED", null, 0,          "+1", "testing: DELIVERED");
 	}
 
 	@Test
@@ -66,8 +66,8 @@ public class SmsSenderTest {
 		for(Status s : Status.values()) {
 			// create a WoMessage with each status
 			db.insert("wo_message",
-					cols("_id", "status", "status_needs_forwarding", "last_action", "_to", "content"),
-					vals("id-" + s, s, false, 0, "+1", "testing: " + s));
+					cols("_id",     "status", "last_action", "_to", "content"),
+					vals("id-" + s, s,        0,             "+1",  "testing: " + s));
 		}
 
 		// when

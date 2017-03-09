@@ -14,9 +14,9 @@ import static medic.gateway.alert.BuildConfig.LOAD_SEED_DATA;
 import static medic.gateway.alert.GatewayLog.*;
 import static medic.gateway.alert.Utils.*;
 
-@SuppressWarnings("PMD.GodClass")
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
-	private static final int VERSION = 2;
+	private static final int SCHEMA_VERSION = 3;
 
 	private static final String ALL = null, NO_GROUP = null;
 	private static final String[] NO_ARGS = {};
@@ -37,22 +37,25 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WT_clmCONTENT = "content";
 
 	private static final String tblWO_MESSAGE = "wo_message";
-	private static final String WO_clmID = "_id";
-	private static final String WO_clmSTATUS = "status";
-	private static final String WO_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
-	private static final String WO_clmFAILURE_REASON = "failure_reason";
-	private static final String WO_clmLAST_ACTION = "last_action";
-	private static final String WO_clmTO = "_to";
-	private static final String WO_clmCONTENT = "content";
+	private static final String WOM_clmID = "_id";
+	private static final String WOM_clmSTATUS = "status";
+	private static final String WOM_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
+	private static final String WOM_clmFAILURE_REASON = "failure_reason";
+	private static final String WOM_clmLAST_ACTION = "last_action";
+	private static final String WOM_clmTO = "_to";
+	private static final String WOM_clmCONTENT = "content";
 
-	private static final String tblWOM_STATUS = "wom_status";
-	private static final String WS_clmID = "_id";
-	private static final String WS_clmMESSAGE_ID = "message_id";
-	private static final String WS_clmSTATUS = "status";
-	private static final String WS_clmFAILURE_REASON = "failure_reason";
-	private static final String WS_clmTIMESTAMP = "timestamp";
+	private static final String tblWO_STATUS = "wom_status";
+	private static final String WOS_clmID = "_id";
+	private static final String WOS_clmMESSAGE_ID = "message_id";
+	private static final String WOS_clmSTATUS = "status";
+	private static final String WOS_clmFAILURE_REASON = "failure_reason";
+	private static final String WOS_clmTIMESTAMP = "timestamp";
+	private static final String WOS_clmNEEDS_FORWARDING = "needs_forwarding";
+	private static final String[] WOS_SELECT_COLS = new String[] {
+		WOS_clmID, WOS_clmMESSAGE_ID, WOS_clmSTATUS, WOS_clmFAILURE_REASON, WOS_clmTIMESTAMP };
 
-	private static final String TRUE = "1";
+	private static final String TRUE  = "1";
 	private static final String FALSE = "0";
 
 	private static Db _instance;
@@ -81,7 +84,7 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	private Db(Context ctx) {
-		super(ctx, "medic_gateway", null, VERSION);
+		super(ctx, "medic_gateway", null, SCHEMA_VERSION);
 		this.ctx = ctx;
 		db = getWritableDatabase();
 
@@ -106,33 +109,60 @@ public final class Db extends SQLiteOpenHelper {
 		db.execSQL(String.format("CREATE TABLE %s (" +
 					"%s TEXT NOT NULL PRIMARY KEY, " +
 					"%s TEXT NOT NULL, " +
-					"%s INTEGER NOT NULL, " +
 					"%s TEXT, " +
 					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
-				tblWO_MESSAGE, WO_clmID, WO_clmSTATUS, WO_clmSTATUS_NEEDS_FORWARDING, WO_clmFAILURE_REASON, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT));
+				tblWO_MESSAGE, WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT));
 
-		createWoMessageStatusUpdateTable(db);
+		migrate_createTable_WoMessageStatusUpdate(db, true);
 	}
 
 	public void onUpgrade(SQLiteDatabase db,
 			int oldVersion,
 			int newVersion) {
+		trace(this, "onUpgrade() :: oldVersion=%s, newVersion=%s", oldVersion, newVersion);
 		if(oldVersion < 2) {
-			createWoMessageStatusUpdateTable(db);
+			migrate_createTable_WoMessageStatusUpdate(db, false);
+		}
+		if(oldVersion < 3) {
+			migrate_create_WOS_clmNEEDS_FORWARDING(db);
 		}
 	}
 
 //> MIGRATIONS
-	private void createWoMessageStatusUpdateTable(SQLiteDatabase db) {
+	static void migrate_createTable_WoMessageStatusUpdate(SQLiteDatabase db, boolean isCleanDb) {
+		trace(db, "onUpgrade() :: migrate_createTable_WoMessageStatusUpdate()");
 		db.execSQL(String.format("CREATE TABLE %s (" +
 					"%s INTEGER PRIMARY KEY, " +
 					"%s TEXT NOT NULL, " +
-					"%s TEXT NOT NULL," +
+					"%s TEXT NOT NULL, " +
 					"%s TEXT, " +
+					"%s INTEGER NOT NULL, " +
 					"%s INTEGER NOT NULL)",
-				tblWOM_STATUS, WS_clmID, WS_clmMESSAGE_ID, WS_clmSTATUS, WS_clmFAILURE_REASON, WS_clmTIMESTAMP));
+				tblWO_STATUS, WOS_clmID, WOS_clmMESSAGE_ID, WOS_clmSTATUS, WOS_clmFAILURE_REASON, WOS_clmTIMESTAMP, WOS_clmNEEDS_FORWARDING));
+
+		if(!isCleanDb) {
+			db.execSQL(String.format("INSERT INTO %s(%s, %s, %s, %s, %s) SELECT %s, %s, %s, %s, %s FROM %s",
+					tblWO_STATUS, WOS_clmMESSAGE_ID, WOS_clmSTATUS, WOS_clmFAILURE_REASON, WOS_clmTIMESTAMP, WOS_clmNEEDS_FORWARDING,
+							WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmSTATUS_NEEDS_FORWARDING, tblWO_MESSAGE));
+		}
+	}
+
+	static void migrate_create_WOS_clmNEEDS_FORWARDING(SQLiteDatabase db) {
+		trace(db, "onUpgrade() :: migrate_create_WOS_clmNEEDS_FORWARDING()");
+		db.execSQL(String.format("ALTER TABLE %s ADD COLUMN %s INTEGER NOT NULL DEFAULT(0)",
+				tblWO_STATUS, WOS_clmNEEDS_FORWARDING));
+		// copy need_forwarding column values from wo_message into wom_status
+		rawUpdateOrDelete(db, "UPDATE %s SET %s=1 WHERE (%s || '_' || %s || '_' || %s) " +
+						"IN(SELECT  (%s || '_' || %s || '_' || %s) FROM %s WHERE %s=1)",
+				cols(tblWO_STATUS, WOS_clmNEEDS_FORWARDING, WOS_clmMESSAGE_ID, WOS_clmSTATUS, WOS_clmTIMESTAMP,
+						WOM_clmID, WOM_clmSTATUS, WOM_clmLAST_ACTION, tblWO_MESSAGE, WOM_clmSTATUS_NEEDS_FORWARDING));
+
+		// We should now drop the status_needs_forwarding column from
+		// the wo_message table.  However, dropping columns is not
+		// directly supported in SQLite.  There seems little harm in
+		// leaving the column in place.
 	}
 
 //> ACCESSORS
@@ -148,7 +178,7 @@ public final class Db extends SQLiteOpenHelper {
 		int totalRecordsDeleted = 0;
 
 		totalRecordsDeleted += db.delete(tblLOG, lt(LOG_clmTIMESTAMP), args(oneWeekAgo));
-		totalRecordsDeleted += db.delete(tblWO_MESSAGE, lt(WO_clmLAST_ACTION), args(oneWeekAgo));
+		totalRecordsDeleted += db.delete(tblWO_MESSAGE, lt(WOM_clmLAST_ACTION), args(oneWeekAgo));
 		totalRecordsDeleted += db.delete(tblWT_MESSAGE, lt(WT_clmLAST_ACTION), args(oneWeekAgo));
 
 		// TODO do we need to VACUUM after deleting?
@@ -178,23 +208,10 @@ public final class Db extends SQLiteOpenHelper {
 				logEntryLimitString);
 	}
 
-	// TODO could these SQL statements be combined into 2 or even a single statement?
 	void cleanLogs() {
-		// TODO consider doing this on INSERT using a TRIGGER
-		long entryCount = count(tblLOG);
-
-		if(entryCount <= logEntryLimit) return;
-
-		long lastId;
-		try {
-			long lastRowIndex = entryCount - logEntryLimit - 1;
-			lastId = db.compileStatement("SELECT " + LOG_clmID + " FROM " + tblLOG + " LIMIT " + lastRowIndex + ",1").simpleQueryForLong();
-		} catch(SQLiteDoneException ex) {
-			// entry count is less than limit (must have changed since we checked!)
-			return;
-		}
-		db.compileStatement("DELETE FROM " + tblLOG + " WHERE " + LOG_clmID + "<='" + lastId + "'").execute();
-		// TODO do we need to VACUUM after deleting?
+		rawUpdateOrDelete("DELETE FROM %s WHERE %s < (SELECT %s FROM %s LIMIT (SELECT (COUNT(*) - ?) FROM %s),1)",
+				cols(tblLOG, LOG_clmID, LOG_clmID, tblLOG, tblLOG),
+				args(logEntryLimit));
 	}
 
 //> WoMessage HANDLERS
@@ -204,7 +221,7 @@ public final class Db extends SQLiteOpenHelper {
 			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
 
 			if(id != -1) {
-				storeStatusUpdate(m, m.status, null, m.lastAction);
+				storeStatusUpdate(m, m.status, null, m.lastAction, false);
 				return true;
 			} else {
 				return false;
@@ -249,48 +266,60 @@ public final class Db extends SQLiteOpenHelper {
 		long timestamp = System.currentTimeMillis();
 
 		ContentValues v = new ContentValues();
-		v.put(WO_clmSTATUS, newStatus.toString());
-		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
-		v.put(WO_clmFAILURE_REASON, failureReason);
-		v.put(WO_clmLAST_ACTION, timestamp);
+		v.put(WOM_clmSTATUS, newStatus.toString());
+		v.put(WOM_clmFAILURE_REASON, failureReason);
+		v.put(WOM_clmLAST_ACTION, timestamp);
 
 		int affected;
 		if(oldStatus == null) {
-			affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id));
+			affected = db.update(tblWO_MESSAGE, v, eq(WOM_clmID), args(m.id));
 		} else {
-			affected = db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, oldStatus));
+			affected = db.update(tblWO_MESSAGE, v, eq(WOM_clmID, WOM_clmSTATUS), args(m.id, oldStatus));
 		}
 
 		if(affected > 0) {
-			storeStatusUpdate(m, newStatus, failureReason, timestamp);
+			storeStatusUpdate(m, newStatus, failureReason, timestamp, true);
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	void setStatusForwarded(WoMessage m) {
-		log("setStatusForwarded() :: %s", m);
+	void setStatusForwarded(WoMessage.StatusUpdate u) {
+		log("setStatusForwarded() :: %s", u);
 
 		ContentValues v = new ContentValues();
-		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
+		v.put(WOS_clmNEEDS_FORWARDING, FALSE);
 
-		db.update(tblWO_MESSAGE, v, eq(WO_clmID, WO_clmSTATUS), args(m.id, m.status));
+		db.update(tblWO_STATUS, v, eq(WOS_clmID, WOS_clmSTATUS), args(u.id, u.newStatus));
 	}
 
 	private boolean touch(WoMessage m) {
 		log("touch() :: %s", m);
 
-		ContentValues v = new ContentValues();
-		v.put(WO_clmSTATUS_NEEDS_FORWARDING, TRUE);
-		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
+		ContentValues suV = new ContentValues();
+		suV.put(WOS_clmNEEDS_FORWARDING, TRUE);
 
-		return db.update(tblWO_MESSAGE, v, eq(WO_clmID), args(m.id)) > 0;
+		Cursor c = null;
+		try {
+			int affectedRows = rawUpdateOrDelete("UPDATE %s SET %s=? WHERE %s IN (SELECT %s FROM %s WHERE %s=? ORDER BY %s DESC LIMIT 1)",
+					cols(tblWO_STATUS, WOS_clmNEEDS_FORWARDING, WOS_clmID, WOS_clmID, tblWO_STATUS, WOS_clmMESSAGE_ID, WOS_clmID),
+					args(TRUE, m.id));
+			if(affectedRows > 0) {
+				ContentValues mV = new ContentValues();
+				mV.put(WOM_clmLAST_ACTION, System.currentTimeMillis());
+				db.update(tblWO_MESSAGE, mV, eq(WOM_clmID), args(m.id));
+
+				return true;
+			} else return false;
+		} finally {
+			if(c != null) c.close();
+		}
 	}
 
-	private void storeStatusUpdate(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp) {
+	private void storeStatusUpdate(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp, boolean needsForwarding) {
 		try {
-			db.insertOrThrow(tblWOM_STATUS, null, getContentValues(m, newStatus, failureReason, timestamp));
+			db.insertOrThrow(tblWO_STATUS, null, getContentValues(m, newStatus, failureReason, timestamp, needsForwarding));
 		} catch(SQLException ex) {
 			warnException(ex, "Exception writing StatusUpdate [%s] to db for WoMessage: %s", newStatus, m);
 		}
@@ -298,27 +327,27 @@ public final class Db extends SQLiteOpenHelper {
 
 	private ContentValues getContentValues(WoMessage m) {
 		ContentValues v = new ContentValues();
-		v.put(WO_clmID, m.id);
-		v.put(WO_clmSTATUS, m.status.toString());
-		v.put(WO_clmSTATUS_NEEDS_FORWARDING, FALSE);
-		v.put(WO_clmFAILURE_REASON, m.status == WoMessage.Status.FAILED ? m.getFailureReason() : null);
-		v.put(WO_clmLAST_ACTION, System.currentTimeMillis());
-		v.put(WO_clmTO, m.to);
-		v.put(WO_clmCONTENT, m.content);
+		v.put(WOM_clmID, m.id);
+		v.put(WOM_clmSTATUS, m.status.toString());
+		v.put(WOM_clmFAILURE_REASON, m.status == WoMessage.Status.FAILED ? m.getFailureReason() : null);
+		v.put(WOM_clmLAST_ACTION, System.currentTimeMillis());
+		v.put(WOM_clmTO, m.to);
+		v.put(WOM_clmCONTENT, m.content);
 		return v;
 	}
 
-	private ContentValues getContentValues(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp) {
+	private ContentValues getContentValues(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp, boolean needsForwarding) {
 		ContentValues v = new ContentValues();
-		v.put(WS_clmMESSAGE_ID, m.id);
-		v.put(WS_clmSTATUS, newStatus.toString());
-		v.put(WS_clmFAILURE_REASON, failureReason);
-		v.put(WS_clmTIMESTAMP, timestamp);
+		v.put(WOS_clmMESSAGE_ID, m.id);
+		v.put(WOS_clmSTATUS, newStatus.toString());
+		v.put(WOS_clmFAILURE_REASON, failureReason);
+		v.put(WOS_clmTIMESTAMP, timestamp);
+		v.put(WOS_clmNEEDS_FORWARDING, bool(needsForwarding));
 		return v;
 	}
 
 	WoMessage getWoMessage(String id) {
-		List<WoMessage> matches = getWoMessages(eq(WO_clmID), args(id), null, 1);
+		List<WoMessage> matches = getWoMessages(eq(WOM_clmID), args(id), null, 1);
 		if(matches.isEmpty()) return null;
 		return matches.get(0);
 	}
@@ -328,11 +357,31 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	List<WoMessage> getWoMessages(int maxCount, WoMessage.Status status) {
-		return getWoMessages(eq(WO_clmSTATUS), args(status), SortDirection.ASC, maxCount);
+		return getWoMessages(eq(WOM_clmSTATUS), args(status), SortDirection.ASC, maxCount);
 	}
 
-	List<WoMessage> getWoMessagesWithStatusChanges(int maxCount) {
-		return getWoMessages(eq(WO_clmSTATUS_NEEDS_FORWARDING), args(TRUE), SortDirection.ASC, maxCount);
+	List<WoMessage.StatusUpdate> getWoMessageStatusUpdates(int maxCount) {
+		Cursor c = null;
+		try {
+			c = db.query(tblWO_STATUS,
+					WOS_SELECT_COLS,
+					eq(WOS_clmNEEDS_FORWARDING), args(TRUE),
+					NO_GROUP, NO_GROUP,
+					DEFAULT_SORT_ORDER,
+					Integer.toString(maxCount));
+
+			int count = c.getCount();
+			log("getWoMessageStatusUpdates() :: item fetch count: %s", count);
+			ArrayList<WoMessage.StatusUpdate> list = new ArrayList<>(count);
+			c.moveToFirst();
+			while(count-- > 0) {
+				list.add(woMessageStatusUpdateFrom(c));
+				c.moveToNext();
+			}
+			return list;
+		} finally {
+			if(c != null) c.close();
+		}
 	}
 
 	private List<WoMessage> getWoMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
@@ -356,10 +405,10 @@ public final class Db extends SQLiteOpenHelper {
 
 	private Cursor getWoMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		return db.query(tblWO_MESSAGE,
-				cols(WO_clmID, WO_clmSTATUS, WO_clmFAILURE_REASON, WO_clmLAST_ACTION, WO_clmTO, WO_clmCONTENT),
+				cols(WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
-				sort == null? null: sort.apply(WO_clmLAST_ACTION),
+				sort == null? null: sort.apply(WOM_clmLAST_ACTION),
 				Integer.toString(maxCount));
 	}
 
@@ -375,23 +424,24 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	private static WoMessage.StatusUpdate woMessageStatusUpdateFrom(Cursor c) {
-		String messageId = c.getString(0);
-		WoMessage.Status status = WoMessage.Status.valueOf(c.getString(1));
-		String failureReason = c.getString(2);
-		long timestamp = c.getLong(3);
+		long id = c.getLong(0);
+		String messageId = c.getString(1);
+		WoMessage.Status status = WoMessage.Status.valueOf(c.getString(2));
+		String failureReason = c.getString(3);
+		long timestamp = c.getLong(4);
 
-		return new WoMessage.StatusUpdate(messageId, status, failureReason, timestamp);
+		return new WoMessage.StatusUpdate(id, messageId, status, failureReason, timestamp);
 	}
 
 	public List<WoMessage.StatusUpdate> getStatusUpdates(WoMessage m) {
 		Cursor c = null;
 		try {
-			c = db.query(tblWOM_STATUS,
-				cols(WS_clmMESSAGE_ID, WS_clmSTATUS, WS_clmFAILURE_REASON, WS_clmTIMESTAMP),
-				eq(WS_clmMESSAGE_ID), args(m.id),
-				NO_GROUP, NO_GROUP,
-				DEFAULT_SORT_ORDER,
-				NO_LIMIT);
+			c = db.query(tblWO_STATUS,
+					WOS_SELECT_COLS,
+					eq(WOS_clmMESSAGE_ID), args(m.id),
+					NO_GROUP, NO_GROUP,
+					DEFAULT_SORT_ORDER,
+					NO_LIMIT);
 
 			int count = c.getCount();
 			log("getStatusUpdates() :: item fetch count: %s", count);
@@ -454,7 +504,7 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	WtMessage getWtMessage(String id) {
-		List<WtMessage> matches = getWtMessages(eq(WO_clmID), args(id), null, 1);
+		List<WtMessage> matches = getWtMessages(eq(WOM_clmID), args(id), null, 1);
 		if(matches.isEmpty()) return null;
 		return matches.get(0);
 	}
@@ -510,11 +560,6 @@ public final class Db extends SQLiteOpenHelper {
 		return new WtMessage(id, status, lastAction, from, content);
 	}
 
-//> GENERAL HELPERS
-	private long count(String tableName) {
-		return db.compileStatement("SELECT COUNT(*) FROM " + tableName).simpleQueryForLong();
-	}
-
 //> DB SEEDING
 	private void seed() {
 		LogMessages: {
@@ -548,6 +593,10 @@ public final class Db extends SQLiteOpenHelper {
 		}
 	}
 
+	private int rawUpdateOrDelete(String statement, String[] cols, String... args) {
+		return rawUpdateOrDelete(db, statement, cols, args);
+	}
+
 //> STATIC HELPERS
 	private static String[] cols(String... args) {
 		return args;
@@ -567,8 +616,21 @@ public final class Db extends SQLiteOpenHelper {
 		return bob.substring(5);
 	}
 
+	private String bool(boolean value) {
+		return value ? TRUE : FALSE;
+	}
+
 	private void log(String message, Object... extras) {
 		trace(this, message, extras);
+	}
+
+	@SuppressWarnings("PMD.UnusedPrivateMethod") // it's used - PMD bug?
+	private static int rawUpdateOrDelete(SQLiteDatabase db, String statement, String[] cols, String... args) {
+		statement = String.format(statement, (String[]) cols);
+		SQLiteStatement s = db.compileStatement(statement);
+		for(int i=args.length; i>0; --i)
+			s.bindString(i, args[i-1]);
+		return s.executeUpdateDelete();
 	}
 }
 
