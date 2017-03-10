@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 	<string name="app_name">Medic Gateway</string>
 
 	<string name="txtWebappUrl">Webapp URL</string>
@@ -7,10 +7,13 @@
 	<string name="errWebappUrl_unauthorised">authorisation failed</string>
 	<string name="errWebappUrl_appNotFound">URL is not responding in the expected way</string>
 	<string name="txtWebappInstanceName">Instance name</string>
-	<string name="txtWebappUsername">Username</string>
-	<string name="txtWebappPassword">Password</string>
-	<string name="txtSavingSettings">Saving settings…</string>
+	<string name="txtWebappUsername"/>
+	<string name="txtWebappPassword"/>
+	<string name="txtSavingSettings"/>
 	<string name="txtValidatingWebappUrl">Validating %s…</string>
+
+	<string name="spnWebappSubdomain"/>
+	<string-array name="spnWebappSubdomain" tools:ignore="InconsistentArrays"/>
 
 	<string name="cbxEnablePolling">Enable polling</string>
 

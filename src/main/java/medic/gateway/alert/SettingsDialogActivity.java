@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.regex.Matcher;
@@ -24,9 +25,8 @@ import static medic.gateway.alert.Utils.startMainActivity;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsDialogActivity extends Activity {
-	private static final String MEDIC_HOST_SUFFIX = ".medicmobile.org";
-	private static final String MEDIC_URL_FORMATTER = "https://%s:%s@%s.medicmobile.org/api/sms";
-	private static final Pattern MEDIC_URL_PARSER = Pattern.compile("https://([^:]+):([^:]+)@(.+).medicmobile.org/api/sms");
+	private static final String MEDIC_URL_FORMATTER = "https://%s:%s@%s.%s.medicmobile.org/api/sms";
+	private static final Pattern MEDIC_URL_PARSER = Pattern.compile("https://([^:]+):([^:]+)@(.+)\\.([^.]+)\\.medicmobile.org/api/sms");
 
 	private boolean hasPreviousSettings;
 
@@ -115,10 +115,11 @@ public class SettingsDialogActivity extends Activity {
 
 	private String getWebappUrlFromFields() {
 		if(IS_MEDIC_FLAVOUR) {
-			String domain = text(R.id.txtWebappInstanceName);
+			String instanceName = text(R.id.txtWebappInstanceName);
+			String subdomain = spinnerVal(R.id.spnWebappSubdomain);
 			String username = text(R.id.txtWebappUsername);
 			String password = text(R.id.txtWebappPassword);
-			return String.format(MEDIC_URL_FORMATTER, username, password, domain);
+			return String.format(MEDIC_URL_FORMATTER, username, password, instanceName, subdomain);
 		} else return text(R.id.txtWebappUrl);
 	}
 
@@ -127,6 +128,7 @@ public class SettingsDialogActivity extends Activity {
 			Matcher m = MEDIC_URL_PARSER.matcher(appUrl);
 			if(m.matches()) {
 				text(R.id.txtWebappInstanceName, m.group(3));
+				spinnerVal(R.id.spnWebappSubdomain, m.group(4));
 				text(R.id.txtWebappUsername, m.group(1));
 				text(R.id.txtWebappPassword, m.group(2));
 			} else {
@@ -254,6 +256,20 @@ public class SettingsDialogActivity extends Activity {
 
 	private boolean isBlank(int componentId) {
 		return text(componentId).length() == 0;
+	}
+
+	private String spinnerVal(int componentId) {
+		return ((Spinner) findViewById(componentId)).getSelectedItem().toString();
+	}
+
+	private void spinnerVal(int componentId, String val) {
+		Spinner spinner = (Spinner) findViewById(componentId);
+		for(int i=spinner.getCount()-1; i>=0; --i) {
+			if(val.equals(spinner.getItemAtPosition(i).toString())) {
+				spinner.setSelection(i);
+				return;
+			}
+		}
 	}
 
 	private void showError(IllegalSetting error) {

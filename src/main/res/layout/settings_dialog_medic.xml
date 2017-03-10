@@ -10,11 +10,23 @@
 			android:paddingLeft="16dp"
 			android:paddingRight="16dp"
 			android:orientation="vertical">
-		<EditText android:id="@+id/txtWebappInstanceName"
-				android:hint="@string/txtWebappInstanceName"
+		<LinearLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="16dp"/>
+				android:layout_marginTop="16dp"
+				android:orientation="horizontal">
+			<EditText android:id="@+id/txtWebappInstanceName"
+					android:hint="@string/txtWebappInstanceName"
+					android:layout_weight="1"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"/>
+			<Spinner android:id="@+id/spnWebappSubdomain"
+					android:entries="@array/spnWebappSubdomain"
+					android:layout_weight="0"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="16dp"/>
+		</LinearLayout>
 		<EditText android:id="@+id/txtWebappUsername"
 				android:hint="@string/txtWebappUsername"
 				android:layout_width="fill_parent"

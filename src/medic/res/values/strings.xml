@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="txtWebappInstanceName">Instance name</string>
+	<string name="txtWebappUsername">Username</string>
+	<string name="txtWebappPassword">Password</string>
+	<string-array name="spnWebappSubdomain">
+		<item>app</item>
+		<item>dev</item>
+	</string-array>
+</resources>
