@@ -18,6 +18,7 @@ import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
 import static medic.gateway.alert.Utils.redactUrl;
 import static medic.gateway.alert.Utils.showSpinner;
 
@@ -32,6 +33,8 @@ public class SettingsDialogActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
+
+		includeVersionNameInActivityTitle(this);
 
 		SettingsStore store = SettingsStore.in(this);
 		hasPreviousSettings = store.hasSettings();

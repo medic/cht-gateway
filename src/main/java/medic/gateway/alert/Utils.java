@@ -1,6 +1,7 @@
 package medic.gateway.alert;
 
 import android.Manifest.permission;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -183,6 +184,15 @@ public final class Utils {
 		} else {
 			trace(ctx, "Starting settings activity...");
 			startSettingsActivity(ctx, getCapabilities());
+		}
+	}
+
+	public static void includeVersionNameInActivityTitle(Activity a) {
+		try {
+			String versionName = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
+			a.setTitle(a.getTitle() + " " + versionName);
+		} catch(Exception ex) {
+			logException(ex, "Could not include the version number in the page title.");
 		}
 	}
 
