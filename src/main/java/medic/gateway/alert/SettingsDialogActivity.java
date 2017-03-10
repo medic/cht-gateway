@@ -132,7 +132,7 @@ public class SettingsDialogActivity extends Activity {
 				text(R.id.txtWebappUsername, m.group(1));
 				text(R.id.txtWebappPassword, m.group(2));
 			} else {
-				trace(this, "URL not being parsed correctly: %s", appUrl);
+				trace(this, "URL not being parsed correctly: %s", redactUrl(appUrl));
 			}
 		} else text(R.id.txtWebappUrl, appUrl);
 	}
@@ -151,7 +151,7 @@ public class SettingsDialogActivity extends Activity {
 
 		new AsyncTask<Void, Void, WebappUrlVerififcation>() {
 			protected WebappUrlVerififcation doInBackground(Void..._) {
-				return new WebappUrlVerifier().verify(webappUrl);
+				return new WebappUrlVerifier(SettingsDialogActivity.this).verify(webappUrl);
 			}
 			protected void onPostExecute(WebappUrlVerififcation result) {
 				boolean savedOk = false;

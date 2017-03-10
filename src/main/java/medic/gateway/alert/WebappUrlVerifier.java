@@ -1,15 +1,22 @@
 package medic.gateway.alert;
 
-import java.io.*;
-import java.net.*;
-import org.json.*;
+import android.content.Context;
 
-import static medic.gateway.alert.R.string.*;
+import java.net.MalformedURLException;
+import javax.net.ssl.SSLException;
 
 import static medic.gateway.alert.BuildConfig.DISABLE_APP_URL_VALIDATION;
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logException;
+import static medic.gateway.alert.R.string.*;
+import static medic.gateway.alert.Utils.redactUrl;
 
 public class WebappUrlVerifier {
+	private final Context ctx;
+
+	WebappUrlVerifier(Context ctx) {
+		this.ctx = ctx;
+	}
+
 	public WebappUrlVerififcation verify(String webappUrl) {
 		if(DISABLE_APP_URL_VALIDATION) {
 			return WebappUrlVerififcation.ok(webappUrl);
@@ -34,6 +41,13 @@ public class WebappUrlVerifier {
 	}
 
 	private WebappUrlVerififcation handleFailResponse(String webappUrl, SimpleResponse response) {
+		if(response instanceof ExceptionResponse) {
+			ExceptionResponse exR = (ExceptionResponse) response;
+			if(exR.ex instanceof SSLException) {
+				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_badSsl);
+			}
+			logException(ctx, exR.ex, "Exception caught while trying to validate server URL: %s", redactUrl(webappUrl));
+		}
 		switch(response.status) {
 			case 401:
 				return WebappUrlVerififcation.failure(webappUrl, errWebappUrl_unauthorised);

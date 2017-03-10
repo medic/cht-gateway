@@ -5,7 +5,9 @@
 	<string name="txtWebappUrl">Webapp URL</string>
 	<string name="errWebappUrl_serverNotFound">unable to contact server</string>
 	<string name="errWebappUrl_unauthorised">authorisation failed</string>
-	<string name="errWebappUrl_appNotFound">URL is not responding in the expected way</string>
+	<string name="errWebappUrl_appNotFound">URL not responding in expected way</string>
+	<string name="errWebappUrl_badJson">unexpected response content</string>
+	<string name="errWebappUrl_badSsl">SSL connection failed</string>
 	<string name="txtWebappInstanceName">Instance name</string>
 	<string name="txtWebappUsername"/>
 	<string name="txtWebappPassword"/>

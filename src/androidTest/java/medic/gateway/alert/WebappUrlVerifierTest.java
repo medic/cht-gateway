@@ -24,7 +24,7 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 		http = new HttpTestHelper();
 		http.configureAppSettings(getContext());
 
-		verifier = new WebappUrlVerifier();
+		verifier = new WebappUrlVerifier(getContext());
 	}
 
 	@After
