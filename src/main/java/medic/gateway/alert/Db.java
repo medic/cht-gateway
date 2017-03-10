@@ -75,9 +75,10 @@ public final class Db extends SQLiteOpenHelper {
 				_instance.seed();
 			}
 
-			if(DEBUG) _instance.storeLogEntry("LOG MESSAGES: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong());
-			if(DEBUG) _instance.storeLogEntry("WO MESSAGES: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWO_MESSAGE).simpleQueryForLong());
-			if(DEBUG) _instance.storeLogEntry("WT MESSAGES: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWT_MESSAGE).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("Log entries: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("WT messages: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWT_MESSAGE).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("WO messages: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWO_MESSAGE).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("WO message status updates: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWO_STATUS).simpleQueryForLong());
 		}
 
 		return _instance;
