@@ -12,17 +12,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static java.util.UUID.randomUUID;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.Capabilities.getCapabilities;
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logException;
+import static medic.gateway.alert.GatewayLog.trace;
 
 @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
 		"PMD.NPathComplexity",
