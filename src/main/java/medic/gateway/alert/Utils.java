@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
@@ -179,10 +180,19 @@ public final class Utils {
 		tv.setText(text);
 	}
 
+	public static void startMainActivity(final Context ctx) {
+		AsyncTask.execute(new Runnable() {
+			public void run() {
+				AlarmListener.restart(ctx);
+			}
+		});
+		ctx.startActivity(new Intent(ctx, MessageListsActivity.class));
+	}
+
 	public static void startSettingsOrMainActivity(Context ctx) {
 		if(SettingsStore.in(ctx).hasSettings()) {
 			trace(ctx, "Starting MessageListsActivity...");
-			ctx.startActivity(new Intent(ctx, MessageListsActivity.class));
+			startMainActivity(ctx);
 		} else {
 			trace(ctx, "Starting settings activity...");
 			startSettingsActivity(ctx, getCapabilities());

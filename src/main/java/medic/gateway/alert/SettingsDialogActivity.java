@@ -2,7 +2,6 @@ package medic.gateway.alert;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +20,7 @@ import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
 import static medic.gateway.alert.Utils.redactUrl;
 import static medic.gateway.alert.Utils.showSpinner;
+import static medic.gateway.alert.Utils.startMainActivity;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsDialogActivity extends Activity {
@@ -136,7 +136,7 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 	private void backToMessageListsView() {
-		startActivity(new Intent(this, MessageListsActivity.class));
+		startMainActivity(this);
 		finish();
 	}
 
@@ -220,12 +220,7 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 	private void startApp() {
-		AsyncTask.execute(new Runnable() {
-			public void run() {
-				AlarmListener.restart(SettingsDialogActivity.this);
-			}
-		});
-		startActivity(new Intent(this, MessageListsActivity.class));
+		startMainActivity(this);
 		finish();
 	}
 
