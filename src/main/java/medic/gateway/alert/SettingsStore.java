@@ -63,6 +63,8 @@ class Settings {
 	public static final Pattern URL_PATTERN = Pattern.compile(
 			"http[s]?://([^/:]*)(:\\d*)?(.*)");
 
+	public static final long POLL_INTERVAL = 30 * 1000L;
+
 	public final String webappUrl;
 	public final boolean pollingEnabled;
 
@@ -72,16 +74,9 @@ class Settings {
 		this.pollingEnabled = pollingEnabled;
 	}
 
-//> ACCESSORS
-	public String getWebappUrl() { return webappUrl; }
-
-	public boolean isPollingEnabled() { return pollingEnabled; }
-
-	public long getPollInterval() { return 30 * 1000L; }
-
 //> PUBLIC
 	public void validate() throws IllegalSettingsException {
-		if(!isPollingEnabled()) return;
+		if(!pollingEnabled) return;
 
 		List<IllegalSetting> errors = new LinkedList<>();
 

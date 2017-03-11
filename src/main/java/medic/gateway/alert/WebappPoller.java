@@ -32,7 +32,7 @@ public class WebappPoller {
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
 				db.getWoMessageStatusUpdates(MAX_WOM_STATUS_UPDATES));
 
-		webappUrl = Settings.in(ctx).getWebappUrl();
+		webappUrl = Settings.in(ctx).webappUrl;
 	}
 
 	public SimpleResponse pollWebapp() throws JSONException, MalformedURLException {

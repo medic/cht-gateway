@@ -176,7 +176,7 @@ public class SettingsDialogActivityTest {
 
 		// then
 		assertTrue(settingsStore().hasSettings());
-		assertEquals(http.url(), settings().getWebappUrl());
+		assertEquals(http.url(), settings().webappUrl);
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class SettingsDialogActivityTest {
 
 		// then
 		assertTrue(settingsStore().hasSettings());
-		assertFalse(settings().isPollingEnabled());
+		assertFalse(settings().pollingEnabled);
 	}
 
 	@Test
@@ -212,7 +212,7 @@ public class SettingsDialogActivityTest {
 
 		// then
 		assertTrue(settingsStore().hasSettings());
-		assertTrue(settings().isPollingEnabled());
+		assertTrue(settings().pollingEnabled);
 	}
 
 //> MEDIC FLAVOUR TESTS
@@ -336,7 +336,7 @@ public class SettingsDialogActivityTest {
 
 		// then
 		assertTrue(settingsStore().hasSettings());
-		assertFalse(settings().isPollingEnabled());
+		assertFalse(settings().pollingEnabled);
 	}
 
 //> TEST HELPERS

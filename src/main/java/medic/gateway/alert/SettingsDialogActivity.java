@@ -44,8 +44,8 @@ public class SettingsDialogActivity extends Activity {
 		if(hasPreviousSettings) {
 			Settings settings = store.get();
 
-			populateWebappUrlFields(settings.getWebappUrl());
-			check(R.id.cbxEnablePolling, settings.isPollingEnabled());
+			populateWebappUrlFields(settings.webappUrl);
+			check(R.id.cbxEnablePolling, settings.pollingEnabled);
 		} else {
 			cancelButton().setVisibility(View.GONE);
 		}
@@ -198,7 +198,7 @@ public class SettingsDialogActivity extends Activity {
 	private boolean saveSettings(Settings s) {
 		try {
 			SettingsStore.in(this).save(s);
-			logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", redactUrl(s.getWebappUrl()));
+			logEvent(SettingsDialogActivity.this, "Settings saved.  Webapp URL: %s", redactUrl(s.webappUrl));
 			return true;
 		} catch(final IllegalSettingsException ex) {
 			logException(ex, "SettingsDialogActivity.saveSettings()");
