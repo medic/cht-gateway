@@ -156,7 +156,6 @@ android {
 
 	lintOptions {
 		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
-		disable 'IconMissingDensityFolder' // we don't care about nice icons at the moment
 		disable 'GradleDependency' // TODO update to latest support-v4 lib and re-enable this rule
 
 		warningsAsErrors true
