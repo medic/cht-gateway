@@ -1,7 +1,9 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.annotation.SuppressLint;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
