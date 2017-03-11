@@ -160,10 +160,11 @@ android {
 
 		warningsAsErrors true
 
+		xmlReport false
+
 		if(System.env.TRAVIS == 'true') {
 			abortOnError true
 			htmlReport false
-			xmlReport false
 			textReport true
 			textOutput 'stdout'
 		}
