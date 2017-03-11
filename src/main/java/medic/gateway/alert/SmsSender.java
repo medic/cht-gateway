@@ -1,11 +1,13 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.telephony.*;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.telephony.SmsManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static android.telephony.PhoneNumberUtils.isGlobalPhoneNumber;
 import static medic.gateway.alert.GatewayLog.*;
