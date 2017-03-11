@@ -45,6 +45,13 @@ WebappUrl: https://my_gateway_user:topSecret@myproject.some-subdomain.medicmobil
 
 If you're configuring `medic-gateway` for use with other services, you will need to use the _generic_ build of `medic-gateway`, and find out the value for _webapp URL_ from your tech support.
 
+### CDMA Compatibility Mode
+
+Some CDMA networks have limited support for multipart SMS messages.  This can occur within the same network, or only when sending SMS from a GSM network to a CDMA network.  Check this box if `medic-gateway` is running on a GSM network and:
+
+* multipart messages sent to CDMA phones never arrive; or
+* multipart messages sent to CDMA phones are truncated
+
 # API
 
 This is the API specification for communications between `medic-gateway` and a web server.  Messages in both directions are `application/json`.

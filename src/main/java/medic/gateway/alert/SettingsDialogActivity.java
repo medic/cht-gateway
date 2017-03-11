@@ -46,6 +46,7 @@ public class SettingsDialogActivity extends Activity {
 
 			populateWebappUrlFields(settings.webappUrl);
 			check(R.id.cbxEnablePolling, settings.pollingEnabled);
+			check(R.id.cbxEnableCdmaCompatMode, settings.cdmaCompatMode);
 		} else {
 			cancelButton().setVisibility(View.GONE);
 		}
@@ -144,6 +145,7 @@ public class SettingsDialogActivity extends Activity {
 
 	private void verifyAndSave() {
 		final String webappUrl = getWebappUrlFromFields();
+		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
 
 		final ProgressDialog spinner = showSpinner(this,
 				String.format(getString(R.string.txtValidatingWebappUrl),
@@ -157,7 +159,7 @@ public class SettingsDialogActivity extends Activity {
 				boolean savedOk = false;
 
 				if(result.isOk)
-					savedOk = saveSettings(new Settings(result.webappUrl, true));
+					savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode));
 				else
 					showError(IS_MEDIC_FLAVOUR ? R.id.txtWebappInstanceName : R.id.txtWebappUrl, result.failure);
 
@@ -173,13 +175,14 @@ public class SettingsDialogActivity extends Activity {
 
 	private void saveWithoutVerification() {
 		final String webappUrl = getWebappUrlFromFields();
+		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
 
 		final ProgressDialog spinner = showSpinner(this,
 				getString(R.string.txtSavingSettings));
 
 		AsyncTask.execute(new Runnable() {
 			public void run() {
-				boolean savedOk = saveSettings(new Settings(webappUrl, false));
+				boolean savedOk = saveSettings(new Settings(webappUrl, false, cdmaCompatMode));
 
 				if(savedOk) startApp();
 				else {

@@ -69,8 +69,7 @@ public final class TestUtils {
 		}
 	}
 
-	@SafeVarargs
-	public static <T> void assertEquals(List<T> actual, T...expected) {
+	public static <T> void assertListEquals(List<T> actual, T...expected) {
 		assertArrayEquals(expected, actual.toArray());
 	}
 

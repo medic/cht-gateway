@@ -21,7 +21,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
-import static medic.gateway.alert.BuildConfig.TRAVIS;
 import static medic.gateway.alert.R.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
@@ -59,6 +58,7 @@ public class SettingsDialogActivityTest {
 		// expect
 		assertVisible(id.txtWebappUrl);
 		assertVisible(id.cbxEnablePolling);
+		assertVisible(id.cbxEnableCdmaCompatMode);
 		assertVisible(id.btnSaveSettings);
 
 		assertDoesNotExist(id.txtWebappInstanceName);
@@ -71,14 +71,13 @@ public class SettingsDialogActivityTest {
 		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
 
 		// given
-		settingsStore().save(new Settings(http.url(), true));
+		settingsStore().save(new Settings(http.url(), true, false));
 
 		// when
 		recreateActivityFor(activityTestRule);
 
 		// then
-		onView(withId(id.btnCancelSettings))
-				.check(matches(isDisplayed()));
+		assertVisible(id.btnCancelSettings);
 	}
 
 	@Test
@@ -215,6 +214,42 @@ public class SettingsDialogActivityTest {
 		assertTrue(settings().pollingEnabled);
 	}
 
+	@Test
+	public void generic_cdmaCompat_shouldBeDisabledByDefault() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		assertFalse(settingsStore().hasSettings());
+		http.nextResponseJson("{ \"medic-gateway\": true }");
+		urlEnteredAs(http.url());
+		assertNotChecked(id.cbxEnableCdmaCompatMode);
+
+		// when
+		saveClicked();
+
+		// then
+		assertTrue(settingsStore().hasSettings());
+		assertFalse(settings().cdmaCompatMode);
+	}
+
+	@Test
+	public void generic_cdmaCompat_shouldBeEnablable() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		assertFalse(settingsStore().hasSettings());
+		http.nextResponseJson("{ \"medic-gateway\": true }");
+		urlEnteredAs(http.url());
+		checkCdmaCompatEnabled();
+
+		// when
+		saveClicked();
+
+		// then
+		assertTrue(settingsStore().hasSettings());
+		assertTrue(settings().cdmaCompatMode);
+	}
+
 //> MEDIC FLAVOUR TESTS
 	@Test
 	public void medic_shouldDisplayCorrectFields() throws Exception {
@@ -234,17 +269,15 @@ public class SettingsDialogActivityTest {
 	@Test
 	public void medic_shouldDisplayCancelButtonIfSettingsExist() throws Exception {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
-		if(TRAVIS) return; // TODO currently this test fails on travis CI.  It seems like this is due to a small screen size on the android emulator used by Travis
 
 		// given
-		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true));
+		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true, false));
 
 		// when
 		recreateActivityFor(activityTestRule);
 
 		// then
-		onView(withId(id.btnCancelSettings))
-				.check(matches(isDisplayed()));
+		assertVisible(id.btnCancelSettings);
 	}
 
 	@Test
@@ -376,6 +409,15 @@ public class SettingsDialogActivityTest {
 	private void uncheckPollingEnabled() {
 		onView(allOf(withId(id.cbxEnablePolling), isChecked()))
 				.perform(click());
+	}
+
+	private void checkCdmaCompatEnabled() {
+		onView(allOf(withId(id.cbxEnableCdmaCompatMode), isNotChecked()))
+				.perform(click());
+	}
+
+	private void assertNotChecked(int cbxId) {
+		onView(withId(cbxId)).check(matches(isNotChecked()));
 	}
 
 	private void saveClicked() {

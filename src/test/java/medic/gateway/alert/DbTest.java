@@ -266,7 +266,7 @@ public class DbTest {
 		List<WoMessage.StatusUpdate> updates = db.getStatusUpdates(m);
 
 		// then
-		assertEquals(updates,
+		assertListEquals(updates,
 				new WoMessage.StatusUpdate(2, "relevant", WoMessage.Status.PENDING, null, 223),
 				new WoMessage.StatusUpdate(4, "relevant", WoMessage.Status.SENT, null, 445));
 	}

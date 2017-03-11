@@ -44,6 +44,12 @@
 				android:layout_marginTop="16dp"
 				android:text="@string/cbxEnablePolling"
 				android:checked="true"/>
+		<CheckBox android:id="@+id/cbxEnableCdmaCompatMode"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:text="@string/cbxEnableCdmaCompatMode"
+				android:checked="false"/>
 		<RelativeLayout
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"

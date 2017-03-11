@@ -2,6 +2,8 @@ package medic.gateway.alert;
 
 import android.telephony.*;
 
+import java.util.*;
+
 import medic.gateway.alert.WoMessage.Status;
 import medic.gateway.alert.test.*;
 
@@ -75,6 +77,67 @@ public class SmsSenderTest {
 
 		// then
 		assertSmsSent("+1", "testing: UNSENT");
+	}
+
+	@Test
+	public void divideMessageForCdma_ascii_shouldLeaveSinglePartMessagesAlone() {
+		// given
+		String messageContent = "single message of 140 valid ascii chars";
+
+		// when
+		ArrayList<String> actual = SmsSender.divideMessageForCdma(messageContent);
+
+		// then
+		assertListEquals(actual, messageContent);
+	}
+
+	@Test
+	public void divideMessageForCdma_ascii_shouldDivideMultipartMessages() {
+		// given
+		String messageContent =
+				"part 1 starts here: message of 408 valid ascii chars -----------------------------------------------------------------------------------" +
+				"part 2 starts here: --------------------------------------------------------------------------------------------------------------------" +
+				"part 3 starts here: --------------------------------------------------------------------------------------------------------------------";
+
+		// when
+		ArrayList<String> actual = SmsSender.divideMessageForCdma(messageContent);
+
+		// then
+		assertListEquals(actual,
+				"1/3 part 1 starts here: message of 408 valid ascii chars -----------------------------------------------------------------------------------",
+				"2/3 part 2 starts here: --------------------------------------------------------------------------------------------------------------------",
+				"3/3 part 3 starts here: --------------------------------------------------------------------------------------------------------------------");
+	}
+
+	@Test
+	public void divideMessageForCdma_utf16_shouldLeaveSinglePartMessagesAlone() {
+		// given
+		String messageContent = "single message of 70 valid utf16 chars (नेपाल) 01234567890123456789012";
+
+		// when
+		ArrayList<String> actual = SmsSender.divideMessageForCdma(messageContent);
+
+		// then
+		assertListEquals(actual, messageContent);
+	}
+
+	@Test
+	public void divideMessageForCdma_utf16_shouldDivideMultipartMessages() {
+		// given
+		// N.B. string widths may appear weird - some of the "chars" are actually diacritics
+		String messageContent =
+				"part 1 starts here: message of 198 valid utf16 chars (नेपाल) -----" +
+				"part 2 starts here: ----------------------------------------------" +
+				"part 3 starts here: ----------------------------------------------";
+
+		// when
+		ArrayList<String> actual = SmsSender.divideMessageForCdma(messageContent);
+
+		// then
+		assertListEquals(actual,
+				"1/3 part 1 starts here: message of 198 valid utf16 chars (नेपाल) -----",
+				"2/3 part 2 starts here: ----------------------------------------------",
+				"3/3 part 3 starts here: ----------------------------------------------");
 	}
 
 //> PRIVATE HELPERS

@@ -21,10 +21,11 @@ public class SettingsStore {
 
 //> ACCESSORS
 	public Settings get() {
-		final String webappUrl = prefs.getString("app-url", null);
-		final boolean pollingEnabled = prefs.getBoolean("polling-enabled", true);
+		Settings s = new Settings(
+				prefs.getString("app-url", null),
+				prefs.getBoolean("polling-enabled", true),
+				prefs.getBoolean("cdma-compat-enabled", false));
 
-		Settings s = new Settings(webappUrl, pollingEnabled);
 		try {
 			s.validate();
 		} catch(IllegalSettingsException ex) {
@@ -43,6 +44,7 @@ public class SettingsStore {
 		SharedPreferences.Editor ed = prefs.edit();
 		ed.putString("app-url", s.webappUrl);
 		ed.putBoolean("polling-enabled", s.pollingEnabled);
+		ed.putBoolean("cdma-compat-enabled", s.cdmaCompatMode);
 		if(!ed.commit()) throw new SettingsException(
 				"Failed to save to SharedPreferences.");
 	}
@@ -67,11 +69,13 @@ class Settings {
 
 	public final String webappUrl;
 	public final boolean pollingEnabled;
+	public final boolean cdmaCompatMode;
 
-	public Settings(String webappUrl, boolean pollingEnabled) {
+	public Settings(String webappUrl, boolean pollingEnabled, boolean cdmaCompatMode) {
 		log("Settings() webappUrl=%s", redactUrl(webappUrl));
 		this.webappUrl = webappUrl;
 		this.pollingEnabled = pollingEnabled;
+		this.cdmaCompatMode = cdmaCompatMode;
 	}
 
 //> PUBLIC
