@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Telephony;
 
+import static medic.gateway.alert.BuildConfig.APPLICATION_ID;
+
 @SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal") //should be final, but needs not to be so it can be mocked in tests
 public class Capabilities {
 	private Capabilities() {}
@@ -12,7 +14,7 @@ public class Capabilities {
 	@TargetApi(19)
 	public boolean isDefaultSmsProvider(Context ctx) {
 		if(!canBeDefaultSmsProvider()) throw new IllegalStateException();
-		return Utils.class.getPackage().getName().equals(Telephony.Sms.getDefaultSmsPackage(ctx));
+		return APPLICATION_ID.equals(Telephony.Sms.getDefaultSmsPackage(ctx));
 	}
 
 	/**
