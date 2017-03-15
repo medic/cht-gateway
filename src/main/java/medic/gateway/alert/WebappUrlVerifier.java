@@ -29,6 +29,7 @@ public class WebappUrlVerifier {
 				return handleJsonResponse(webappUrl, (JsonResponse) response);
 			else return handleFailResponse(webappUrl, response);
 		} catch(MalformedURLException ex) {
+			logException(ctx, ex, "Problem verifying url: %s", redactUrl(webappUrl));
 			return WebappUrlVerififcation.failure(webappUrl, errInvalidUrl);
 		}
 	}
