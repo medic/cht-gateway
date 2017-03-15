@@ -149,7 +149,7 @@ public class SettingsDialogActivity extends Activity {
 
 		final ProgressDialog spinner = showSpinner(this,
 				String.format(getString(R.string.txtValidatingWebappUrl),
-						webappUrl));
+						redactUrl(webappUrl)));
 
 		new AsyncTask<Void, Void, WebappUrlVerififcation>() {
 			protected WebappUrlVerififcation doInBackground(Void..._) {
