@@ -58,7 +58,11 @@ public class SettingsDialogActivity extends Activity {
 
 		boolean syncEnabled = checked(R.id.cbxEnablePolling);
 
-		if(syncEnabled && requiredFieldsMissing()) return;
+		if(syncEnabled) {
+			boolean hasErrors = requiredFieldsMissing();
+			hasErrors |= illegalCharsInTextfields();
+			if(hasErrors) return;
+		}
 
 		submitButton().setEnabled(false);
 		cancelButton().setEnabled(false);
@@ -112,6 +116,23 @@ public class SettingsDialogActivity extends Activity {
 			}
 			return false;
 		}
+	}
+
+	private boolean illegalCharsInTextfields() {
+		if(!IS_MEDIC_FLAVOUR) return false;
+
+		boolean illegalCharsFound = false;
+
+		if(text(R.id.txtWebappUsername).matches(".*[/#?@:].*")) {
+			showError(R.id.txtWebappUsername, R.string.errUsername_illegalChar);
+			illegalCharsFound = true;
+		}
+		if(text(R.id.txtWebappPassword).contains(".*[/#?@].*")) {
+			showError(R.id.txtWebappPassword, R.string.errPassword_illegalChar);
+			illegalCharsFound = true;
+		}
+
+		return illegalCharsFound;
 	}
 
 	private String getWebappUrlFromFields() {

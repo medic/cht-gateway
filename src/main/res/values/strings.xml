@@ -8,9 +8,12 @@
 	<string name="errWebappUrl_appNotFound">URL not responding in expected way</string>
 	<string name="errWebappUrl_badJson">unexpected response content</string>
 	<string name="errWebappUrl_badSsl">SSL connection failed</string>
+
 	<string name="txtWebappInstanceName">Instance name</string>
 	<string name="txtWebappUsername"/>
+	<string name="errUsername_illegalChar">cannot contain: /#?@:</string>
 	<string name="txtWebappPassword"/>
+	<string name="errPassword_illegalChar">cannot contain: /#?@</string>
 	<string name="txtSavingSettings"/>
 	<string name="txtValidatingWebappUrl">Validating %s…</string>
 
