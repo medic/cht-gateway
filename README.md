@@ -3,29 +3,26 @@
 
 <a href="https://travis-ci.org/medic/medic-gateway"><img src="https://travis-ci.org/medic/medic-gateway.svg?branch=master"/></a>
 
-Download APKs from: https://github.com/medic/medic-gateway/releases
+An SMS gateway for Android.  Send and receive SMS from your web service via an Android phone.
 
------
+	+---------+                 +-----------+
+	|   web   |                 |  medic-   | <-------- SMS
+	| service | <---- HTTP ---- |  gateway  |
+	|         |                 | (android) | --------> SMS
+	+---------+                 +-----------+
 
-An SMS gateway for Android.  Send and receive SMS from your webapp via an Android phone.
 
-	+--------+                 +-----------+
-	|  web   |                 |  medic-   | <-------- SMS
-	| server | <---- HTTP ---- |  gateway  |
-	|        |                 | (android) | --------> SMS
-	+--------+                 +-----------+
-
-# Use
+# Setup
 
 ## Installation
 
-Download the latest APK from https://github.com/medic/medic-gateway/releases
+Download APKs from: [https://github.com/medic/medic-gateway/releases](https://github.com/medic/medic-gateway/releases)
 
 ## Configuration
 
 ### Medic Mobile
 
-If you're configuring `medic-gateway` for use with hosted [`medic-webapp`](https://github.com/medic/medic-webapp), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `my_gateway_user` and a password of `topSecret`, fill in the settings as follows:
+If you're configuring `medic-gateway` for use with [`medic-api`](https://github.com/medic/medic-api), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `my_gateway_user` and a password of `topSecret`, fill in the settings as follows:
 
 #### Medic-branded gateway
 
@@ -52,56 +49,13 @@ Some CDMA networks have limited support for multipart SMS messages.  This can oc
 * multipart messages sent to CDMA phones never arrive; or
 * multipart messages sent to CDMA phones are truncated
 
-# API
+# HTTP API
 
-This is the API specification for communications between `medic-gateway` and a web server.  Messages in both directions are `application/json`.
+This is the API specification for communications between `medic-gateway` and a web service.  Request and response bodies in both directions are formatted in JSON.  
 
-Where a list of values is expected but there are no values provided, it is acceptable to:
+The the entire API should be implemented by a web service at a single endpoint, e.g. https://example.com/api/sms
 
-* provide a `null` value; or
-* provide an empty array (`[]`); or
-* omit the field completely
-
-Bar array behaviour specified above, `medic-gateway` _must_ include fields specified in this document, and the web server _must_ include all expected fields in its responses.  Either party _may_ include extra fields as they see fit.
-
-## Idempotence
-
-N.B. messages are cosidered duplicate by `medic-gateway` if they have identical values for `id`.  The webapp is expected to do the same.
-
-`medic-gateway` will not re-process duplicate webapp-originating messages.
-
-`medic-gateway` may forward a webapp-terminating message to the webapp multiple times.
-
-`medic-gateway` may forward a delivery status report to the webapp multiple times for the same message.  This should indicate a change of state, but duplicate delivery reports may be delivered in some circumstances, including:
-
-* the phone receives multiple delivery status reports from the mobile network for the same message
-* `medic-gateway` failed to process the webapp's response when the delivery report was last forwarded from `medic-gateway` to webapp
-
-## Authorisation
-
-`medic-gateway` supports [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication).  Just include the username and password for your web endpoint when configuring `medic-gateway`, e.g.:
-
-	https://username:password@example.com/medic-gateway-api-endpoint
-
-## Messages
-
-THe entire API should be implemented by a webapp at a single endpoint, e.g. https://exmaple.com/medic-gateway-api-endpoint
-
-### GET
-
-Expected response:
-
-	{
-		"medic-gateway": true
-	}
-
-### POST
-
-`medic-gateway` will accept and process any relevant data received in a response.  However, it may choose to only send certain types of information in a particular request (e.g. only provide a webapp-terminating SMS), and will also poll the web service periodically for webapp-originating messages, even if it has no new data to pass to the web service.
-
-### Request
-
-#### Headers
+## Headers
 
 The following headers will be set by requests:
 
@@ -114,6 +68,38 @@ header           | value
 `Content-Type`   | `application/json`
 
 Requests and responses may be sent with `Content-Encoding` set to `gzip`.
+
+## Message Status
+
+The status of a message is defined as follows.  On failure a detail or reason why it failed is also included.
+
+
+Status           | Description
+-----------------|-------------------
+PENDING | The message is saved on the gateway and is queued to be sent.
+SENT | The message has been sent to the SMS service.
+DELIVERED | The message has been received by the recipient.
+FAILED | The message processing (delivery or sending) has failed and will not be retried.  
+
+
+## Requests
+
+### GET
+
+The following response confirms the server supports the API.
+
+	{
+		"medic-gateway": true
+	}
+
+### POST
+
+Using the POST verb `medic-gateway` supports the following:
+
+ - accepts and processes relevant data received in a response
+ - provides the web service with server-terminiating SMS data 
+ - polls the web service periodically for server-originating messages
+
 
 #### Content
 
@@ -136,16 +122,41 @@ Requests and responses may be sent with `Content-Encoding` set to `gzip`.
 		],
 	}
 
-The status field is defined as follows.
 
-Status           | Description
------------------|-------------------
-PENDING | The message has been sent to the gateway's network
-SENT | The message has been sent to the recipient's network
-DELIVERED | The message has been received by the recipient's phone
-FAILED | The delivery has failed and will not be retried
 
-### Response
+
+## Content Values
+
+Where a list of values is expected but there are no values provided, it is acceptable to:
+
+* provide a `null` value; or
+* provide an empty array (`[]`); or
+* omit the field completely
+
+Bar array behaviour specified above, `medic-gateway` _must_ include fields specified in this document, and the web service _must_ include all expected fields in its responses.  Either party _may_ include extra fields as they see fit.
+
+## Idempotence
+
+Messages are identified by their `id` values.  Messages with identical `id` values are considered equivalent by `medic-gateway`.  The web service is expected to do the same.
+
+`medic-gateway` will not re-process service-originating messages with the same `id`.
+
+`medic-gateway` may forward a service-terminating message to the web service multiple times.
+
+`medic-gateway` may forward a delivery status report to the web service multiple times for the same message.  This should indicate a change of state, but duplicate delivery reports may be delivered in some circumstances, including:
+
+* `medic-gateway` receives multiple delivery status reports from the mobile network for the same message
+* `medic-gateway` failed to process the server's response when the delivery report was last forwarded from `medic-gateway` to webapp
+
+## Authorisation
+
+`medic-gateway` supports [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication).  Just include the username and password when configuring `medic-gateway`, e.g.:
+
+	https://username:password@example.com/medic-gateway-api-endpoint
+
+
+
+### Response Codes
 
 #### Success
 
