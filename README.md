@@ -53,7 +53,7 @@ Some CDMA networks have limited support for multipart SMS messages.  This can oc
 
 This is the API specification for communications between `medic-gateway` and a web service.  Request and response bodies in both directions are formatted in JSON.  
 
-The the entire API should be implemented by a web service at a single endpoint, e.g. https://example.com/api/sms
+The entire API should be implemented by a web service at a single endpoint, e.g. https://example.com/api/sms
 
 ## Headers
 
@@ -97,7 +97,7 @@ The following response confirms the server supports the API.
 Using the POST verb `medic-gateway` supports the following:
 
  - accepts and processes relevant data received in a response
- - provides the web service with server-terminiating SMS data 
+ - provides the web service with server-terminating SMS data 
  - polls the web service periodically for server-originating messages
 
 
