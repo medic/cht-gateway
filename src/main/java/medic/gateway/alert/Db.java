@@ -1,18 +1,28 @@
 package medic.gateway.alert;
 
-import android.content.*;
-import android.database.sqlite.*;
-import android.database.*;
-import android.telephony.*;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.telephony.SmsMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.UUID.randomUUID;
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.FORCE_SEED;
 import static medic.gateway.alert.BuildConfig.LOAD_SEED_DATA;
-import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.Utils.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.GatewayLog.warnException;
+import static medic.gateway.alert.Utils.args;
+import static medic.gateway.alert.Utils.randomPhoneNumber;
+import static medic.gateway.alert.Utils.randomSmsContent;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
