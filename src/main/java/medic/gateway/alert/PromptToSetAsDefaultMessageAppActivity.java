@@ -1,16 +1,14 @@
 package medic.gateway.alert;
 
-import android.app.*;
+import android.app.Activity;
 import android.annotation.TargetApi;
-import android.content.*;
-import android.os.*;
-import android.provider.*;
+import android.content.Intent;
+import android.os.Bundle;
 import android.provider.Telephony.Sms.Intents;
-import android.view.*;
+import android.view.View;
 
-import java.util.*;
-
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.getAppName;
 import static medic.gateway.alert.Utils.setText;
 
