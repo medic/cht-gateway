@@ -1,12 +1,22 @@
 package medic.gateway.alert;
 
-import android.os.*;
-import android.util.*;
+import android.os.Build;
+import android.util.Base64;
+import android.util.Log;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
