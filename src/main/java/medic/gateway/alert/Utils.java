@@ -13,7 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.Random;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +29,8 @@ import static medic.gateway.alert.Capabilities.getCapabilities;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 
-@SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
+@SuppressWarnings({"PMD.GodClass",
+		"PMD.ModifiedCyclomaticComplexity",
 		"PMD.NPathComplexity",
 		"PMD.StdCyclomaticComplexity"})
 public final class Utils {
@@ -104,6 +107,11 @@ public final class Utils {
 			bob.append(RANDOM_WORDS[r.nextInt(RANDOM_WORDS.length)]);
 		}
 		return bob.substring(1);
+	}
+
+	public static String absoluteTimestamp(long timestamp) {
+		return SimpleDateFormat.getDateTimeInstance()
+				.format(new Date(timestamp));
 	}
 
 	public static String relativeTimestamp(long timestamp) {

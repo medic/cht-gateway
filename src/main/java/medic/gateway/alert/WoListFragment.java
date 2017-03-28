@@ -26,6 +26,7 @@ import java.util.LinkedList;
 
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.relativeTimestamp;
 import static medic.gateway.alert.Utils.setText;
 import static medic.gateway.alert.Utils.showSpinner;
@@ -100,7 +101,7 @@ public class WoListFragment extends ListFragment implements LoaderCallbacks<Curs
 						} else {
 							status = u.newStatus.toString();
 						}
-						content.add(String.format("%s: %s", relativeTimestamp(u.timestamp), status));
+						content.add(String.format("%s: %s", absoluteTimestamp(u.timestamp), status));
 					}
 
 					final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());

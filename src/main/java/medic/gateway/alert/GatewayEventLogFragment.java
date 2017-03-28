@@ -12,9 +12,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.setText;
 
 public class GatewayEventLogFragment extends ListFragment implements LoaderCallbacks<Cursor> {
@@ -56,13 +54,8 @@ class GatewayEventLogEntryCursorAdapter extends ResourceCursorAdapter {
 	}
 
 	public void bindView(View v, Context ctx, Cursor c) {
-		setText(v, R.id.txtGatewayEventLogDate, formatDate(c.getLong(1)));
+		setText(v, R.id.txtGatewayEventLogDate, absoluteTimestamp(c.getLong(1)));
 		setText(v, R.id.txtGatewayEventLogMessage, c.getString(2));
-	}
-
-	private String formatDate(long timestamp) {
-		return SimpleDateFormat.getDateTimeInstance()
-				.format(new Date(timestamp));
 	}
 }
 
