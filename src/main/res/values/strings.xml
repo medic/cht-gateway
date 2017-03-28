@@ -68,21 +68,26 @@
 	<string name="btnRetrySelected">Retry</string>
 	<string name="btnSelectNewer">Select newer</string>
 
-	<string name="txtDefaultMessageAppPrompt"><b>Warning: <tt>medic-gateway</tt> is not set as the default messaging app on this device.</b>\n
-		\n
-		\nThe app may not perform as expected unless it is set as the default messaging app:\n
-		\n<li>the SMS inbox may fill up and prevent new messages arriving</li>
-		\n\n
-		\nOn the other hand, if you set <tt>medic-gateway</tt> as the default messaging app, you may find:\n
-		\n<li>composing SMS through the normal Messages app is no longer possible</li>
-		\n<li>sending and receiving MMS (picture messages) no longer works</li>
+	<string name="txtDefaultMessageAppPrompt">
+		<![CDATA[
+		<b>Warning: <i>%1$s</i> is not set as the default messaging app on this device.</b><br>
+		<br>
+		<br>The app may not perform as expected unless it is set as the default messaging app:<br>
+		<br>- the SMS inbox may fill up and prevent new messages arriving
+		<br><br>
+		<br>On the other hand, if you set <i>%1$s</i> as the default messaging app, you may find:<br>
+		<br>- composing SMS through the normal Messages app is no longer possible<br>
+		<br>- sending and receiving MMS (picture messages) no longer works
+		]]>
 	</string>
 	<string name="btnHelpMeSetDefaultMessagingApp">Help me change</string>
 	<string name="btnIDontCare">I don\'t care</string>
 
-	<string name="txtPermissionsPrompt"><b>Warning: <tt>medic-gateway</tt> does not currently have permissions to send and receive SMS.</b>\n
-		\n
-		\nThe app may not perform as expected.
+	<string name="txtPermissionsPrompt">
+		<![CDATA[
+		<b>Warning: <i>%1$s</i> does not currently have permissions to send and receive SMS.</b><br>
+		<br>The app may not perform as expected.
+		]]>
 	</string>
 
 	<string name="lblTo">To: %s</string>

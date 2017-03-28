@@ -7,12 +7,12 @@ import android.os.*;
 import android.provider.*;
 import android.provider.Telephony.Sms.Intents;
 import android.view.*;
-import android.widget.*;
 
 import java.util.*;
 
 import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.Utils.*;
+import static medic.gateway.alert.Utils.getAppName;
+import static medic.gateway.alert.Utils.setText;
 
 @TargetApi(19)
 public class PromptToSetAsDefaultMessageAppActivity extends Activity {
@@ -38,6 +38,8 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 		log("Current default SMS app is %s", currentDefaultSmsApp);
 
 		setContentView(R.layout.set_as_default_messaging_app);
+
+		setText(this, R.id.txtDefaultMessageAppPrompt, R.string.txtDefaultMessageAppPrompt, getAppName(this));
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

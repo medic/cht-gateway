@@ -3,9 +3,11 @@ package medic.gateway.alert;
 import android.Manifest.permission;
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 import android.support.v4.app.ActivityCompat;
+import android.view.View;
 
+import static medic.gateway.alert.Utils.getAppName;
+import static medic.gateway.alert.Utils.setText;
 import static medic.gateway.alert.Utils.startSettingsOrMainActivity;
 
 /**
@@ -21,6 +23,8 @@ public class PromptForSmsPermissionsActivity extends Activity implements Activit
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.prompt_for_permissions);
+
+		setText(this, R.id.txtPermissionsPrompt, R.string.txtPermissionsPrompt, getAppName(this));
 	}
 
 	public void triggerPermissionRequest(View v) {

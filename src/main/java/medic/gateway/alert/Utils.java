@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +51,10 @@ public final class Utils {
 	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
 
 	private Utils() {}
+
+	public static String getAppName(Context ctx) {
+		return ctx.getResources().getString(R.string.app_name);
+	}
 
 	public static String randomUuid() {
 		return randomUUID().toString();
@@ -186,6 +191,11 @@ public final class Utils {
 	public static void setText(View v, int textViewId, String text) {
 		TextView tv = (TextView) v.findViewById(textViewId);
 		tv.setText(text);
+	}
+
+	public static void setText(Activity a, int textViewId, int stringId, Object... args) {
+		TextView text = (TextView) a.findViewById(textViewId);
+		text.setText(Html.fromHtml(a.getResources().getString(stringId, args)));
 	}
 
 	public static void startMainActivity(final Context ctx) {
