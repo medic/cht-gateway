@@ -54,6 +54,7 @@ public class DbTestHelper {
 	public void tearDown() {
 		raw.delete("log", ALL_ROWS, NO_ARGS);
 		raw.delete("wt_message", ALL_ROWS, NO_ARGS);
+		raw.delete("wtm_status", ALL_ROWS, NO_ARGS);
 		raw.delete("wo_message", ALL_ROWS, NO_ARGS);
 		raw.delete("wom_status", ALL_ROWS, NO_ARGS);
 		raw.close();

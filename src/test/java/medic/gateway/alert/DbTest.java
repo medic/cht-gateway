@@ -72,6 +72,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wtm_status");
 	}
 
 	@Test
@@ -108,6 +109,62 @@ public class DbTest {
 		Cursor c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
 		assertEquals("FORWARDED", c.getString(0));
 		assertNotEquals(0, c.getLong(1));
+	}
+
+//> WtMessage.StatusUpdate TESTS
+	@Test
+	public void wtMessage_store_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		WtMessage m = aMessageWith(WtMessage.Status.WAITING);
+		dbHelper.assertCount("wt_message", 0);
+		dbHelper.assertCount("wtm_status", 0);
+
+		// when
+		db.store(m);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, m.id, "WAITING", ANY_NUMBER);
+	}
+
+	@Test
+	public void updateStatusFrom_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		String id = randomUuid();
+		WtMessage m = aMessageWith(id, WtMessage.Status.WAITING);
+		db.store(m);
+		dbHelper.assertCount("wt_message", 1);
+		dbHelper.assertCount("wtm_status", 1);
+
+		// when
+		db.updateStatusFrom(WtMessage.Status.WAITING,
+				aMessageWith(id, WtMessage.Status.FORWARDED));
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, m.id, "WAITING",   ANY_NUMBER,
+				ANY_NUMBER, m.id, "FORWARDED", ANY_NUMBER);
+	}
+
+	@Test
+	public void wt_statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+		// given
+		WtMessage m = aMessageWith("relevant", WtMessage.Status.FORWARDED);
+		dbHelper.insert("wtm_status",
+				cols("_id", "message_id", "status",    "timestamp"),
+				vals(1,     "random1",    "WAITING",   111),
+				vals(2,     "relevant",   "WAITING",   222),
+				vals(3,     "random2",    "FAILED",    333),
+				vals(4,     "relevant",   "FORWARDED", 444),
+				vals(5,     "random3",    "FAILED",    555));
+
+		// when
+		List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+
+		// then
+		assertListEquals(updates,
+				new WtMessage.StatusUpdate(2, "relevant", WtMessage.Status.WAITING, 222),
+				new WtMessage.StatusUpdate(4, "relevant", WtMessage.Status.FORWARDED, 444));
 	}
 
 //> SmsMessage TESTS
@@ -252,7 +309,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+	public void wo_statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
 		// given
 		WoMessage m = aMessageWith("relevant", WoMessage.Status.SENT);
 		dbHelper.insert("wom_status",
@@ -494,6 +551,30 @@ public class DbTest {
 				ANY_NUMBER, "c-3", "SENT",      null,          3, 0,
 				ANY_NUMBER, "d-4", "FAILED",    "some-reason", 4, 1,
 				ANY_NUMBER, "e-5", "DELIVERED", null,          5, 0);
+	}
+
+	@Test
+	public void migrate_createTable_WtMessageStatusUpdate_shouldCreateStatusesFromTheWtMessageTable() {
+		// given: some messages exist
+		DbTestHelper dbHelper = anEmptyDbHelper();
+		dbHelper.raw.execSQL("CREATE TABLE wt_message (" +
+				"'_id' TEXT NOT NULL, " +
+				"'status' TEXT NOT NULL, " +
+				"'last_action' INTEGER NOT NULL)");
+		dbHelper.insert("wt_message",
+				cols("_id", "status",                   "last_action"),
+				vals("a-1", WtMessage.Status.WAITING,   1),
+				vals("b-2", WtMessage.Status.FORWARDED, 2),
+				vals("c-3", WtMessage.Status.FAILED,    3));
+
+		// when
+		Db.migrate_createTable_WtMessageStatusUpdate(dbHelper.raw, false);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, "a-1", "WAITING",   1,
+				ANY_NUMBER, "b-2", "FORWARDED", 2,
+				ANY_NUMBER, "c-3", "FAILED",    3);
 	}
 
 	@Test
