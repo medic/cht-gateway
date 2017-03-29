@@ -26,7 +26,7 @@ import static medic.gateway.alert.Utils.randomSmsContent;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
-	private static final int SCHEMA_VERSION = 3;
+	private static final int SCHEMA_VERSION = 4;
 
 	private static final String ALL = null, NO_GROUP = null;
 	private static final String[] NO_ARGS = {};
@@ -45,6 +45,12 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WT_clmLAST_ACTION = "last_action";
 	private static final String WT_clmFROM = "_from";
 	private static final String WT_clmCONTENT = "content";
+
+	private static final String tblWT_STATUS = "wtm_status";
+	private static final String WTS_clmID = "_id";
+	private static final String WTS_clmMESSAGE_ID = "message_id";
+	private static final String WTS_clmSTATUS = "status";
+	private static final String WTS_clmTIMESTAMP = "timestamp";
 
 	private static final String tblWO_MESSAGE = "wo_message";
 	private static final String WOM_clmID = "_id";
@@ -87,6 +93,7 @@ public final class Db extends SQLiteOpenHelper {
 
 			if(DEBUG) _instance.storeLogEntry("Log entries: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblLOG).simpleQueryForLong());
 			if(DEBUG) _instance.storeLogEntry("WT messages: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWT_MESSAGE).simpleQueryForLong());
+			if(DEBUG) _instance.storeLogEntry("WT message status updates: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWT_STATUS).simpleQueryForLong());
 			if(DEBUG) _instance.storeLogEntry("WO messages: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWO_MESSAGE).simpleQueryForLong());
 			if(DEBUG) _instance.storeLogEntry("WO message status updates: " + _instance.db.compileStatement("SELECT COUNT(*) FROM " + tblWO_STATUS).simpleQueryForLong());
 		}
@@ -127,6 +134,7 @@ public final class Db extends SQLiteOpenHelper {
 				tblWO_MESSAGE, WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT));
 
 		migrate_createTable_WoMessageStatusUpdate(db, true);
+		migrate_createTable_WtMessageStatusUpdate(db, true);
 	}
 
 	public void onUpgrade(SQLiteDatabase db,
@@ -138,6 +146,9 @@ public final class Db extends SQLiteOpenHelper {
 		}
 		if(oldVersion < 3) {
 			migrate_create_WOS_clmNEEDS_FORWARDING(db);
+		}
+		if(oldVersion < 4) {
+			migrate_createTable_WtMessageStatusUpdate(db, false);
 		}
 	}
 
@@ -157,6 +168,22 @@ public final class Db extends SQLiteOpenHelper {
 			db.execSQL(String.format("INSERT INTO %s(%s, %s, %s, %s, %s) SELECT %s, %s, %s, %s, %s FROM %s",
 					tblWO_STATUS, WOS_clmMESSAGE_ID, WOS_clmSTATUS, WOS_clmFAILURE_REASON, WOS_clmTIMESTAMP, WOS_clmNEEDS_FORWARDING,
 							WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmSTATUS_NEEDS_FORWARDING, tblWO_MESSAGE));
+		}
+	}
+
+	static void migrate_createTable_WtMessageStatusUpdate(SQLiteDatabase db, boolean isCleanDb) {
+		trace(db, "onUpgrade() :: migrate_createTable_WtMessageStatusUpdate()");
+		db.execSQL(String.format("CREATE TABLE %s (" +
+					"%s INTEGER PRIMARY KEY, " +
+					"%s TEXT NOT NULL, " +
+					"%s TEXT NOT NULL, " +
+					"%s INTEGER NOT NULL)",
+				tblWT_STATUS, WTS_clmID, WTS_clmMESSAGE_ID, WTS_clmSTATUS, WTS_clmTIMESTAMP));
+
+		if(!isCleanDb) {
+			db.execSQL(String.format("INSERT INTO %s(%s, %s, %s) SELECT %s, %s, %s FROM %s",
+					tblWT_STATUS, WTS_clmMESSAGE_ID, WTS_clmSTATUS, WTS_clmTIMESTAMP,
+							WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, tblWT_MESSAGE));
 		}
 	}
 

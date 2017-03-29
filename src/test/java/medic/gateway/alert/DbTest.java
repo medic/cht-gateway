@@ -496,6 +496,30 @@ public class DbTest {
 	}
 
 	@Test
+	public void migrate_createTable_WtMessageStatusUpdate_shouldCreateStatusesFromTheWtMessageTable() {
+		// given: some messages exist
+		DbTestHelper dbHelper = anEmptyDbHelper();
+		dbHelper.raw.execSQL("CREATE TABLE wt_message (" +
+				"'_id' TEXT NOT NULL, " +
+				"'status' TEXT NOT NULL, " +
+				"'last_action' INTEGER NOT NULL");
+		dbHelper.insert("wt_message",
+				cols("_id", "status",                   "last_action"),
+				vals("a-1", WtMessage.Status.WAITING,   1),
+				vals("b-2", WtMessage.Status.FORWARDED, 2),
+				vals("c-3", WtMessage.Status.FAILED,    3));
+
+		// when
+		Db.migrate_createTable_WtMessageStatusUpdate(dbHelper.raw, false);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, "a-1", "UNSENT",    1,
+				ANY_NUMBER, "b-2", "PENDING",   2,
+				ANY_NUMBER, "c-3", "FAILED",    3);
+	}
+
+	@Test
 	public void migrate_create_WOS_clmNEEDS_FORWARDING() {
 		// given
 		DbTestHelper dbHelper = anEmptyDbHelper();
