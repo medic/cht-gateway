@@ -502,7 +502,7 @@ public class DbTest {
 		dbHelper.raw.execSQL("CREATE TABLE wt_message (" +
 				"'_id' TEXT NOT NULL, " +
 				"'status' TEXT NOT NULL, " +
-				"'last_action' INTEGER NOT NULL");
+				"'last_action' INTEGER NOT NULL)");
 		dbHelper.insert("wt_message",
 				cols("_id", "status",                   "last_action"),
 				vals("a-1", WtMessage.Status.WAITING,   1),
@@ -514,8 +514,8 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wtm_status",
-				ANY_NUMBER, "a-1", "UNSENT",    1,
-				ANY_NUMBER, "b-2", "PENDING",   2,
+				ANY_NUMBER, "a-1", "WAITING",    1,
+				ANY_NUMBER, "b-2", "FORWARDED",   2,
 				ANY_NUMBER, "c-3", "FAILED",    3);
 	}
 
