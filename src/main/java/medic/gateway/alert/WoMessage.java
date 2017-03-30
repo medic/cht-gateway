@@ -40,22 +40,6 @@ class WoMessage {
 				return String.format("%s@%s-%s-%s", getClass().getSimpleName(), messageId, newStatus, timestamp);
 			}
 		}
-		public int hashCode() {
-			int p = 92821;
-			int h = 1;
-			h = h * p + (int) id;
-			return h;
-		}
-		public boolean equals(Object _that) {
-			if(this == _that) return true;
-			if(!(_that instanceof StatusUpdate)) return false;
-			StatusUpdate that = (StatusUpdate) _that;
-			return this.id == that.id &&
-					this.messageId == null ? that.messageId == null : this.messageId.equals(that.messageId) &&
-					this.newStatus == that.newStatus &&
-					this.failureReason == null ? that.failureReason == null : this.failureReason.equals(that.messageId) &&
-					this.timestamp == that.timestamp;
-		}
 	}
 
 	public final String id;
