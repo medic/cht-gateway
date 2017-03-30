@@ -267,6 +267,7 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
+	@SuppressLint("AuthLeak")
 	public void medic_shouldDisplayCancelButtonIfSettingsExist() throws Exception {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
 

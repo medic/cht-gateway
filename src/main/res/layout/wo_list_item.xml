@@ -41,7 +41,7 @@
 					android:textSize="@dimen/lstSubText"
 					android:textColor="@android:color/tertiary_text_dark"
 					android:ellipsize="end"
-					android:singleLine="true"
+					android:maxLines="1"
 					/>
 			<TextView android:id="@+id/txtWoLastAction"
 					android:layout_width="wrap_content"

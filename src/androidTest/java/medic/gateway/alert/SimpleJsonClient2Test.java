@@ -29,6 +29,7 @@ public class SimpleJsonClient2Test {
 	}
 
 	@Test
+	@SuppressLint("AuthLeak")
 	public void test_basicAuth_simplePassword() throws Exception {
 		// given
 		String url = String.format("http://uname:pword@localhost:%s/some-path", server.getPort());
