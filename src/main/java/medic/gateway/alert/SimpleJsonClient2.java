@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
@@ -31,6 +32,12 @@ import static medic.gateway.alert.Utils.redactUrl;
  */
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class SimpleJsonClient2 {
+	static {
+		// HTTP connection reuse which was buggy pre-froyo
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
+			System.setProperty("http.keepAlive", "false");
+		}
+	}
 
 //> PUBLIC METHODS
 	public SimpleResponse get(String url) throws MalformedURLException {

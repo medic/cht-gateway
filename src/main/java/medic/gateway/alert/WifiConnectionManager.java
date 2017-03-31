@@ -44,6 +44,6 @@ class WifiConnectionManager {
 	}
 
 	private WifiManager getWifiManager() {
-		return (WifiManager) ctx.getApplicationContext().getSystemService(WIFI_SERVICE);
+		return (WifiManager) ctx.getSystemService(WIFI_SERVICE);
 	}
 }

@@ -112,7 +112,6 @@ public class WebappUrlVerifierTest extends AndroidTestCase {
 	}
 
 	@Test
-	@SuppressLint("AuthLeak")
 	public void test_verify_shouldSendAuthorisaztionHeaderIfIncludedInUrl() throws Exception {
 		// given
 		http.nextResponseJson("{\"medic-gateway\":true}");
