@@ -1,11 +1,9 @@
 package medic.gateway.alert;
 
-import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 import android.telephony.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 import medic.gateway.alert.test.*;
@@ -108,6 +106,42 @@ public class DbTest {
 		Cursor c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
 		assertEquals("FORWARDED", c.getString(0));
 		assertNotEquals(0, c.getLong(1));
+	}
+
+//> WtMessage.StatusUpdate TESTS
+	@Test
+	public void wtMessage_store_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		WtMessage m = aMessageWith(WtMessage.Status.WAITING);
+		dbHelper.assertCount("wt_message", 0);
+		dbHelper.assertCount("wtm_status", 0);
+
+		// when
+		db.store(m);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, m.id, "WAITING", ANY_NUMBER);
+	}
+
+	@Test
+	public void wt_updateStatusFrom_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		String id = randomUuid();
+		WtMessage messageWithOriginalStatus = aMessageWith(id, WtMessage.Status.WAITING);
+		db.store(messageWithOriginalStatus);
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, id, "WAITING", ANY_NUMBER);
+		WtMessage messageWithUpdatedStatus =
+				cloneWithUpdatedStatus(messageWithOriginalStatus, WtMessage.Status.FORWARDED);
+
+		// when
+		db.updateStatusFrom(WtMessage.Status.WAITING, messageWithUpdatedStatus);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, messageWithUpdatedStatus.id, "WAITING", ANY_NUMBER,
+				ANY_NUMBER, messageWithUpdatedStatus.id, "FORWARDED", ANY_NUMBER);
 	}
 
 //> SmsMessage TESTS
@@ -234,7 +268,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldCreateNewStatusUpdateTableEntry() {
+	public void wo_updateStatus_shouldCreateNewStatusUpdateTableEntry() {
 		// given
 		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
 		db.store(m);
@@ -579,6 +613,10 @@ public class DbTest {
 
 	private static WoMessage aMessageWith(String id, WoMessage.Status status) {
 		return new WoMessage(id, status, null, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
+	private static WtMessage cloneWithUpdatedStatus(WtMessage message, WtMessage.Status newStatus) {
+		return new WtMessage(message.id, newStatus, System.currentTimeMillis(), message.from, message.content);
 	}
 
 	private static SmsMessage anSmsWith(String from, String content) {

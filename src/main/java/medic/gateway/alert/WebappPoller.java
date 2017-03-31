@@ -1,10 +1,7 @@
 package medic.gateway.alert;
 
-import android.app.*;
 import android.content.*;
-import android.os.*;
 
-import java.io.*;
 import java.net.*;
 import java.util.*;
 

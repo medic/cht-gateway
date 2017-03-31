@@ -18,11 +18,14 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import medic.gateway.alert.WtMessage.Status;
 
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.relativeTimestamp;
 import static medic.gateway.alert.Utils.setText;
 import static medic.gateway.alert.WtMessage.Status.WAITING;
@@ -80,9 +83,15 @@ public class WtListFragment extends ListFragment implements LoaderCallbacks<Curs
 		LinkedList<String> content = new LinkedList<>();
 
 		content.add(string(R.string.lblFrom, m.from));
-		content.add(string(R.string.lblStatus, m.getStatus()));
-		content.add(string(R.string.lblLastAction, relativeTimestamp(m.getLastAction())));
 		content.add(string(R.string.lblContent, m.content));
+		content.add(string(R.string.lblStatusUpdates));
+
+		List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+		Collections.reverse(updates);
+		for(WtMessage.StatusUpdate u : updates) {
+			content.add(String.format(
+				"%s: %s", absoluteTimestamp(u.timestamp), u.newStatus.toString()));
+		}
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 

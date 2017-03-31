@@ -51,6 +51,8 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WTS_clmMESSAGE_ID = "message_id";
 	private static final String WTS_clmSTATUS = "status";
 	private static final String WTS_clmTIMESTAMP = "timestamp";
+	private static final String[] WTS_SELECT_COLS = new String[] {
+		WTS_clmID, WTS_clmMESSAGE_ID, WTS_clmSTATUS, WTS_clmTIMESTAMP };
 
 	private static final String tblWO_MESSAGE = "wo_message";
 	private static final String WOM_clmID = "_id";
@@ -258,12 +260,11 @@ public final class Db extends SQLiteOpenHelper {
 		try {
 			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
 
-			if(id != -1) {
-				storeStatusUpdate(m, m.status, null, m.lastAction, false);
-				return true;
-			} else {
+			if (id == -1) {
 				return false;
 			}
+			storeStatusUpdate(m, m.status, null, m.lastAction, false);
+			return true;
 		} catch(SQLiteConstraintException ex) {
 			// Likely this is because a message with this ID already exists.  If so,
 			// we should update that message so that its status is synched with the
@@ -359,7 +360,7 @@ public final class Db extends SQLiteOpenHelper {
 		try {
 			db.insertOrThrow(tblWO_STATUS, null, getContentValues(m, newStatus, failureReason, timestamp, needsForwarding));
 		} catch(SQLException ex) {
-			warnException(ex, "Exception writing StatusUpdate [%s] to db for WoMessage: %s", newStatus, m);
+			warnException(ex, "Exception writing WO StatusUpdate [%s] to db for WoMessage: %s", newStatus, m);
 		}
 	}
 
@@ -482,7 +483,7 @@ public final class Db extends SQLiteOpenHelper {
 					NO_LIMIT);
 
 			int count = c.getCount();
-			log("getStatusUpdates() :: item fetch count: %s", count);
+			log("getStatusUpdates(WoMessage) :: item fetch count: %s", count);
 			ArrayList<WoMessage.StatusUpdate> list = new ArrayList<>(count);
 			c.moveToFirst();
 			while(count-- > 0) {
@@ -514,21 +515,59 @@ public final class Db extends SQLiteOpenHelper {
 		log("store() :: %s", m);
 		try {
 			long id = db.insertOrThrow(tblWT_MESSAGE, null, getContentValues(m));
-			return id != -1;
+
+			if (id == -1) {
+				return false;
+			}
+			storeStatusUpdate(m, m.status, m.lastAction);
+			return true;
 		} catch(SQLException ex) {
 			warnException(ex, "Exception writing WtMessage to db: %s", m);
 			return false;
 		}
 	}
 
-	void updateStatusFrom(WtMessage.Status oldStatus, WtMessage m) {
-		log("updateStatusFrom() :: %s :: %s -> %s", m, oldStatus, m.getStatus());
+	boolean updateStatusFrom(WtMessage.Status oldStatus, WtMessage m) {
+		WtMessage.Status newStatus = m.getStatus();
+		log("WT updateStatus() :: %s :: %s -> %s", m, oldStatus, newStatus);
+
+		long timestamp = System.currentTimeMillis();
 
 		ContentValues v = new ContentValues();
 		v.put(WT_clmSTATUS, m.getStatus().toString());
 		v.put(WT_clmLAST_ACTION, m.getLastAction());
 
-		db.update(tblWT_MESSAGE, v, eq(WT_clmID, WT_clmSTATUS), args(m.id, oldStatus));
+		int affected;
+		if(oldStatus == null) {
+			affected = db.update(tblWT_MESSAGE, v, eq(WT_clmID), args(m.id));
+		} else {
+			affected = db.update(tblWT_MESSAGE, v, eq(WT_clmID, WT_clmSTATUS), args(m.id, oldStatus));
+		}
+
+		if(affected > 0) {
+			storeStatusUpdate(m, newStatus, timestamp);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private void storeStatusUpdate(
+			WtMessage m, WtMessage.Status newStatus, long timestamp) {
+		try {
+			db.insertOrThrow(tblWT_STATUS, null, getContentValues(m, newStatus, timestamp));
+		} catch(SQLException ex) {
+			warnException(ex, "Exception writing WT StatusUpdate [%s] to db for WtMessage: %s", newStatus, m);
+		}
+	}
+
+	private ContentValues getContentValues(
+			WtMessage m, WtMessage.Status newStatus, long timestamp) {
+		ContentValues v = new ContentValues();
+		v.put(WTS_clmMESSAGE_ID, m.id);
+		v.put(WTS_clmSTATUS, newStatus.toString());
+		v.put(WTS_clmTIMESTAMP, timestamp);
+		return v;
 	}
 
 	private ContentValues getContentValues(WtMessage m) {
@@ -596,6 +635,39 @@ public final class Db extends SQLiteOpenHelper {
 		String content = c.getString(4);
 
 		return new WtMessage(id, status, lastAction, from, content);
+	}
+
+	private static WtMessage.StatusUpdate wtMessageStatusUpdateFrom(Cursor c) {
+		long id = c.getLong(0);
+		String messageId = c.getString(1);
+		WtMessage.Status status = WtMessage.Status.valueOf(c.getString(2));
+		long timestamp = c.getLong(3);
+
+		return new WtMessage.StatusUpdate(id, messageId, status, timestamp);
+	}
+
+	public List<WtMessage.StatusUpdate> getStatusUpdates(WtMessage m) {
+		Cursor c = null;
+		try {
+			c = db.query(tblWT_STATUS,
+					WTS_SELECT_COLS,
+					eq(WTS_clmMESSAGE_ID), args(m.id),
+					NO_GROUP, NO_GROUP,
+					DEFAULT_SORT_ORDER,
+					NO_LIMIT);
+
+			int count = c.getCount();
+			log("getStatusUpdates(WtMessage) :: item fetch count: %s", count);
+			ArrayList<WtMessage.StatusUpdate> list = new ArrayList<>(count);
+			c.moveToFirst();
+			while(count-- > 0) {
+				list.add(wtMessageStatusUpdateFrom(c));
+				c.moveToNext();
+			}
+			return list;
+		} finally {
+			if(c != null) c.close();
+		}
 	}
 
 //> DB SEEDING
