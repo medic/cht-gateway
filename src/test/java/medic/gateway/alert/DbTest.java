@@ -145,7 +145,28 @@ public class DbTest {
 				ANY_NUMBER, messageWithUpdatedStatus.id, "FORWARDED", ANY_NUMBER);
 	}
 
-//> SmsMessage TESTS
+	@Test
+	public void wt_statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+		// given
+		WtMessage m = aMessageWith("relevant", WtMessage.Status.FORWARDED);
+		dbHelper.insert("wtm_status",
+				cols("_id", "message_id", "status",  "timestamp"),
+				vals(1,     "random1",    "WAITING",   111),
+				vals(2,     "relevant",   "WAITING",   222),
+				vals(3,     "random2",    "FAILED",    333),
+				vals(4,     "relevant",   "FORWARDED", 444),
+				vals(5,     "random3",    "FAILED",    555));
+
+		// when
+		List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+
+		// then
+		assertListEquals(updates,
+				new WtMessage.StatusUpdate(2, "relevant", WtMessage.Status.WAITING, 222),
+				new WtMessage.StatusUpdate(4, "relevant", WtMessage.Status.FORWARDED, 444));
+	}
+
+	//> SmsMessage TESTS
 	@Test
 	public void canStoreSmsMessages() {
 		// given
