@@ -172,7 +172,8 @@ public class DbTest {
 		db.updateStatus(unsavedMessage, WoMessage.Status.PENDING, WoMessage.Status.DELIVERED);
 
 		// then
-		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wo_message");
+		dbHelper.assertEmpty("wom_status");
 	}
 
 	@Test
