@@ -173,6 +173,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertEmpty("wo_message");
+		dbHelper.assertEmpty("wom_status");
 	}
 
 	@Test
