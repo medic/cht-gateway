@@ -1,6 +1,5 @@
 package medic.gateway.alert;
 
-import android.annotation.SuppressLint;
 import android.support.test.espresso.*;
 import android.support.test.rule.*;
 import android.support.test.runner.*;

@@ -1,6 +1,5 @@
 package medic.gateway.alert;
 
-import android.annotation.SuppressLint;
 import android.test.*;
 
 import medic.gateway.alert.test.*;
