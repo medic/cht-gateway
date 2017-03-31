@@ -1,11 +1,9 @@
 package medic.gateway.alert;
 
-import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 import android.telephony.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 import medic.gateway.alert.test.*;
@@ -63,7 +61,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatusFrom_shouldFailSilentlyIfMessageNotInDb() {
+	public void wt_updateStatusFrom_shouldFailSilentlyIfMessageNotInDb() {
 		// given
 		WtMessage unsavedMessage = aMessageWith(WtMessage.Status.FORWARDED);
 
@@ -72,10 +70,11 @@ public class DbTest {
 
 		// then
 		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wtm_status");
 	}
 
 	@Test
-	public void updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
+	public void wt_updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
@@ -93,7 +92,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
+	public void wt_updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
@@ -110,7 +109,64 @@ public class DbTest {
 		assertNotEquals(0, c.getLong(1));
 	}
 
-//> SmsMessage TESTS
+	//> WtMessage.StatusUpdate TESTS
+	@Test
+	public void wtMessage_store_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		WtMessage m = aMessageWith(WtMessage.Status.WAITING);
+		dbHelper.assertCount("wt_message", 0);
+		dbHelper.assertCount("wtm_status", 0);
+
+		// when
+		db.store(m);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, m.id, "WAITING", ANY_NUMBER);
+	}
+
+	@Test
+	public void wt_updateStatusFrom_shouldCreateNewStatusUpdateTableEntry() {
+		// given
+		String id = randomUuid();
+		WtMessage messageWithOriginalStatus = aMessageWith(id, WtMessage.Status.WAITING);
+		db.store(messageWithOriginalStatus);
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, id, "WAITING", ANY_NUMBER);
+		WtMessage messageWithUpdatedStatus =
+				cloneWithUpdatedStatus(messageWithOriginalStatus, WtMessage.Status.FORWARDED);
+
+		// when
+		db.updateStatusFrom(WtMessage.Status.WAITING, messageWithUpdatedStatus);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, id, "WAITING", ANY_NUMBER,
+				ANY_NUMBER, id, "FORWARDED", ANY_NUMBER);
+	}
+
+	@Test
+	public void wt_statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+		// given
+		WtMessage m = aMessageWith("relevant", WtMessage.Status.FORWARDED);
+		dbHelper.insert("wtm_status",
+				cols("_id", "message_id", "status",  "timestamp"),
+				vals(1,     "random1",    "WAITING",   111),
+				vals(2,     "relevant",   "WAITING",   222),
+				vals(3,     "random2",    "FAILED",    333),
+				vals(4,     "relevant",   "FORWARDED", 444),
+				vals(5,     "random3",    "FAILED",    555));
+
+		// when
+		List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+
+		// then
+		assertListEquals(updates,
+				new WtMessage.StatusUpdate(2, "relevant", WtMessage.Status.WAITING, 222),
+				new WtMessage.StatusUpdate(4, "relevant", WtMessage.Status.FORWARDED, 444));
+	}
+
+	//> SmsMessage TESTS
 	@Test
 	public void canStoreSmsMessages() {
 		// given
@@ -164,7 +220,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldFailSilentlyIfMessageNotInDb() {
+	public void wo_updateStatus_shouldFailSilentlyIfMessageNotInDb() {
 		// given
 		WoMessage unsavedMessage = aMessageWith(WoMessage.Status.PENDING);
 
@@ -177,7 +233,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldFailSilentlyIfWrongStatusFound() {
+	public void wo_updateStatus_shouldFailSilentlyIfWrongStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
@@ -198,7 +254,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
+	public void wo_updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
@@ -235,7 +291,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldCreateNewStatusUpdateTableEntry() {
+	public void wo_updateStatus_shouldCreateNewStatusUpdateTableEntry() {
 		// given
 		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
 		db.store(m);
@@ -252,7 +308,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+	public void wo_statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
 		// given
 		WoMessage m = aMessageWith("relevant", WoMessage.Status.SENT);
 		dbHelper.insert("wom_status",
@@ -497,6 +553,30 @@ public class DbTest {
 	}
 
 	@Test
+	public void migrate_createTable_WtMessageStatusUpdate_shouldCreateStatusesFromTheWtMessageTable() {
+		// given: some messages exist
+		DbTestHelper dbHelper = anEmptyDbHelper();
+		dbHelper.raw.execSQL("CREATE TABLE wt_message (" +
+				"'_id' TEXT NOT NULL, " +
+				"'status' TEXT NOT NULL, " +
+				"'last_action' INTEGER NOT NULL)");
+		dbHelper.insert("wt_message",
+				cols("_id", "status",                   "last_action"),
+				vals("a-1", WtMessage.Status.WAITING,   1),
+				vals("b-2", WtMessage.Status.FORWARDED, 2),
+				vals("c-3", WtMessage.Status.FAILED,    3));
+
+		// when
+		Db.migrate_createTable_WtMessageStatusUpdate(dbHelper.raw, false);
+
+		// then
+		dbHelper.assertTable("wtm_status",
+				ANY_NUMBER, "a-1", "WAITING",    1,
+				ANY_NUMBER, "b-2", "FORWARDED",   2,
+				ANY_NUMBER, "c-3", "FAILED",    3);
+	}
+
+	@Test
 	public void migrate_create_WOS_clmNEEDS_FORWARDING() {
 		// given
 		DbTestHelper dbHelper = anEmptyDbHelper();
@@ -556,6 +636,10 @@ public class DbTest {
 
 	private static WoMessage aMessageWith(String id, WoMessage.Status status) {
 		return new WoMessage(id, status, null, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
+	}
+
+	private static WtMessage cloneWithUpdatedStatus(WtMessage message, WtMessage.Status newStatus) {
+		return new WtMessage(message.id, newStatus, System.currentTimeMillis(), message.from, message.content);
 	}
 
 	private static SmsMessage anSmsWith(String from, String content) {

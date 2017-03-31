@@ -92,8 +92,6 @@
 
 	<string name="lblTo">To: %s</string>
 	<string name="lblFrom">From: %s</string>
-	<string name="lblLastAction">Last action: %s</string>
-	<string name="lblStatus">Status: %s</string>
 	<string name="lblStatusUpdates">Status history:</string>
 	<string name="lblContent">Content: %s</string>
 
