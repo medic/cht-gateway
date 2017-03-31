@@ -141,8 +141,8 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wtm_status",
-				ANY_NUMBER, messageWithUpdatedStatus.id, "WAITING", ANY_NUMBER,
-				ANY_NUMBER, messageWithUpdatedStatus.id, "FORWARDED", ANY_NUMBER);
+				ANY_NUMBER, id, "WAITING", ANY_NUMBER,
+				ANY_NUMBER, id, "FORWARDED", ANY_NUMBER);
 	}
 
 	@Test

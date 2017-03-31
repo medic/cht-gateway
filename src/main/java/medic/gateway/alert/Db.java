@@ -519,7 +519,7 @@ public final class Db extends SQLiteOpenHelper {
 			if (id == -1) {
 				return false;
 			}
-			storeStatusUpdate(m, m.status, m.lastAction);
+			storeStatusUpdate(m, m.getStatus(), m.getLastAction());
 			return true;
 		} catch(SQLException ex) {
 			warnException(ex, "Exception writing WtMessage to db: %s", m);

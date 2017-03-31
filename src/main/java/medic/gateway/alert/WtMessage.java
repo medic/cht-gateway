@@ -45,8 +45,8 @@ class WtMessage {
 	}
 
 	public final String id;
-	public Status status;
-	public long lastAction;
+	private Status status;
+	private long lastAction;
 	public final String from;
 	public final String content;
 
