@@ -40,11 +40,11 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String LOG_clmMESSAGE = "message";
 
 	private static final String tblWT_MESSAGE = "wt_message";
-	private static final String WT_clmID = "_id";
-	private static final String WT_clmSTATUS = "status";
-	private static final String WT_clmLAST_ACTION = "last_action";
-	private static final String WT_clmFROM = "_from";
-	private static final String WT_clmCONTENT = "content";
+	private static final String WTM_clmID = "_id";
+	private static final String WTM_clmSTATUS = "status";
+	private static final String WTM_clmLAST_ACTION = "last_action";
+	private static final String WTM_clmFROM = "_from";
+	private static final String WTM_clmCONTENT = "content";
 
 	private static final String tblWT_STATUS = "wtm_status";
 	private static final String WTS_clmID = "_id";
@@ -124,7 +124,7 @@ public final class Db extends SQLiteOpenHelper {
 					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
 					"%s TEXT NOT NULL)",
-				tblWT_MESSAGE, WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, WT_clmFROM, WT_clmCONTENT));
+				tblWT_MESSAGE, WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT));
 
 		db.execSQL(String.format("CREATE TABLE %s (" +
 					"%s TEXT NOT NULL PRIMARY KEY, " +
@@ -185,7 +185,7 @@ public final class Db extends SQLiteOpenHelper {
 		if(!isCleanDb) {
 			db.execSQL(String.format("INSERT INTO %s(%s, %s, %s) SELECT %s, %s, %s FROM %s",
 					tblWT_STATUS, WTS_clmMESSAGE_ID, WTS_clmSTATUS, WTS_clmTIMESTAMP,
-							WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, tblWT_MESSAGE));
+					WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, tblWT_MESSAGE));
 		}
 	}
 
@@ -219,7 +219,7 @@ public final class Db extends SQLiteOpenHelper {
 
 		totalRecordsDeleted += db.delete(tblLOG, lt(LOG_clmTIMESTAMP), args(oneWeekAgo));
 		totalRecordsDeleted += db.delete(tblWO_MESSAGE, lt(WOM_clmLAST_ACTION), args(oneWeekAgo));
-		totalRecordsDeleted += db.delete(tblWT_MESSAGE, lt(WT_clmLAST_ACTION), args(oneWeekAgo));
+		totalRecordsDeleted += db.delete(tblWT_MESSAGE, lt(WTM_clmLAST_ACTION), args(oneWeekAgo));
 
 		// TODO do we need to VACUUM after deleting?
 
@@ -534,14 +534,14 @@ public final class Db extends SQLiteOpenHelper {
 		long timestamp = System.currentTimeMillis();
 
 		ContentValues v = new ContentValues();
-		v.put(WT_clmSTATUS, m.getStatus().toString());
-		v.put(WT_clmLAST_ACTION, m.getLastAction());
+		v.put(WTM_clmSTATUS, m.getStatus().toString());
+		v.put(WTM_clmLAST_ACTION, m.getLastAction());
 
 		int affected;
 		if(oldStatus == null) {
-			affected = db.update(tblWT_MESSAGE, v, eq(WT_clmID), args(m.id));
+			affected = db.update(tblWT_MESSAGE, v, eq(WTM_clmID), args(m.id));
 		} else {
-			affected = db.update(tblWT_MESSAGE, v, eq(WT_clmID, WT_clmSTATUS), args(m.id, oldStatus));
+			affected = db.update(tblWT_MESSAGE, v, eq(WTM_clmID, WTM_clmSTATUS), args(m.id, oldStatus));
 		}
 
 		if(affected > 0) {
@@ -572,11 +572,11 @@ public final class Db extends SQLiteOpenHelper {
 
 	private ContentValues getContentValues(WtMessage m) {
 		ContentValues v = new ContentValues();
-		v.put(WT_clmID, m.id);
-		v.put(WT_clmSTATUS, m.getStatus().toString());
-		v.put(WT_clmLAST_ACTION, m.getLastAction());
-		v.put(WT_clmFROM, m.from);
-		v.put(WT_clmCONTENT, m.content);
+		v.put(WTM_clmID, m.id);
+		v.put(WTM_clmSTATUS, m.getStatus().toString());
+		v.put(WTM_clmLAST_ACTION, m.getLastAction());
+		v.put(WTM_clmFROM, m.from);
+		v.put(WTM_clmCONTENT, m.content);
 		return v;
 	}
 
@@ -591,7 +591,7 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	List<WtMessage> getWtMessages(int maxCount, WtMessage.Status status) {
-		return getWtMessages(eq(WT_clmSTATUS), args(status), SortDirection.ASC, maxCount);
+		return getWtMessages(eq(WTM_clmSTATUS), args(status), SortDirection.ASC, maxCount);
 	}
 
 	private List<WtMessage> getWtMessages(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
@@ -620,10 +620,10 @@ public final class Db extends SQLiteOpenHelper {
 
 	private Cursor getWtMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		return db.query(tblWT_MESSAGE,
-				cols(WT_clmID, WT_clmSTATUS, WT_clmLAST_ACTION, WT_clmFROM, WT_clmCONTENT),
+				cols(WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
-				sort == null? DEFAULT_SORT_ORDER: sort.apply(WT_clmLAST_ACTION),
+				sort == null? DEFAULT_SORT_ORDER: sort.apply(WTM_clmLAST_ACTION),
 				Integer.toString(maxCount));
 	}
 
