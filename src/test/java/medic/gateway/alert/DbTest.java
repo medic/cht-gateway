@@ -61,7 +61,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatusFrom_shouldFailSilentlyIfMessageNotInDb() {
+	public void wt_updateStatusFrom_shouldFailSilentlyIfMessageNotInDb() {
 		// given
 		WtMessage unsavedMessage = aMessageWith(WtMessage.Status.FORWARDED);
 
@@ -70,10 +70,11 @@ public class DbTest {
 
 		// then
 		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wtm_status");
 	}
 
 	@Test
-	public void updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
+	public void wt_updateStatusFrom_shouldFailSilentlyIfWrongStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
@@ -91,7 +92,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
+	public void wt_updateStatusFrom_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
@@ -108,7 +109,7 @@ public class DbTest {
 		assertNotEquals(0, c.getLong(1));
 	}
 
-//> WtMessage.StatusUpdate TESTS
+	//> WtMessage.StatusUpdate TESTS
 	@Test
 	public void wtMessage_store_shouldCreateNewStatusUpdateTableEntry() {
 		// given
@@ -198,7 +199,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldFailSilentlyIfMessageNotInDb() {
+	public void wo_updateStatus_shouldFailSilentlyIfMessageNotInDb() {
 		// given
 		WoMessage unsavedMessage = aMessageWith(WoMessage.Status.PENDING);
 
@@ -210,7 +211,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldFailSilentlyIfWrongStatusFound() {
+	public void wo_updateStatus_shouldFailSilentlyIfWrongStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
@@ -231,7 +232,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
+	public void wo_updateStatus_shouldUpdateStatusOfMatchedMessageIfExpectedStatusFound() {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
@@ -285,7 +286,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
+	public void wo_statusUpdates_shouldBeReturnedInDbOrderForTheRelevantMessage() {
 		// given
 		WoMessage m = aMessageWith("relevant", WoMessage.Status.SENT);
 		dbHelper.insert("wom_status",
