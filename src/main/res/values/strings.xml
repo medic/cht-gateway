@@ -106,6 +106,8 @@
 		]]>
 	</string>
 
+	<string name="txtDemandPermissions"/>
+
 	<string name="lblTo">To: %s</string>
 	<string name="lblFrom">From: %s</string>
 	<string name="lblStatusUpdates">Status history:</string>
@@ -120,4 +122,6 @@
 		<item>From Webapp</item>
 		<item>To Webapp</item>
 	</string-array>
+
+	<string name="txtProcessingExternalLog">Processing external message log…</string>
 </resources>

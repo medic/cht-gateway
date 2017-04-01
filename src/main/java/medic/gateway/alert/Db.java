@@ -83,6 +83,8 @@ public final class Db extends SQLiteOpenHelper {
 	private final Context ctx;
 	private final SQLiteDatabase db; // NOPMD
 
+	private final ExternalLog external;
+
 	/** a soft limit for the number of log entries to store in the system */
 	private int logEntryLimit;
 	private String logEntryLimitString;
@@ -109,6 +111,8 @@ public final class Db extends SQLiteOpenHelper {
 		super(ctx, "medic_gateway", null, SCHEMA_VERSION);
 		this.ctx = ctx;
 		db = getWritableDatabase();
+
+		external = ExternalLog.getInstance(ctx);
 
 		setLogEntryLimit(200);
 	}
@@ -534,6 +538,7 @@ public final class Db extends SQLiteOpenHelper {
 
 	boolean store(WtMessage m) {
 		log("store() :: %s", m);
+		external.log(m);
 		try {
 			long id = db.insertOrThrow(tblWT_MESSAGE, null, getContentValues(m));
 
@@ -541,6 +546,25 @@ public final class Db extends SQLiteOpenHelper {
 				storeStatusUpdate(m, m.getStatus(), m.getLastAction());
 				return true;
 			} else {
+				return false;
+			}
+		} catch(SQLException ex) {
+			warnException(ex, "Exception writing WtMessage to db: %s", m);
+			return false;
+		}
+	}
+
+	boolean storeWithoutLoggingExternally(WtMessage m) {
+		log("storeWithoutLoggingExternally() :: %s", m);
+		try {
+			long id = db.insert(tblWT_MESSAGE, null, getContentValues(m));
+
+			if(id != -1) {
+				log("storeWithoutLoggingExternally() :: save successful.");
+				storeStatusUpdate(m, m.getStatus(), m.getLastAction());
+				return true;
+			} else {
+				log("storeWithoutLoggingExternally() :: save failed.");
 				return false;
 			}
 		} catch(SQLException ex) {

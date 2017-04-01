@@ -15,15 +15,14 @@
 		<TextView android:id="@+id/txtPermissionsPrompt"
 				android:textSize="24sp"
 				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:text="@string/txtPermissionsPrompt"/>
+				android:layout_height="wrap_content"/>
 		<RelativeLayout
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:layout_marginTop="16dp">
 			<Button
 					android:text="@string/btnOk"
-					android:onClick="triggerPermissionRequest"
+					android:onClick="btnOk_onClick"
 					android:layout_height="wrap_content"
 					android:layout_width="wrap_content"
 					android:paddingTop="16dp"

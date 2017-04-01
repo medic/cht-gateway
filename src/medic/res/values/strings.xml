@@ -7,4 +7,12 @@
 		<item>app</item>
 		<item>dev</item>
 	</string-array>
+
+	<string name="txtDemandPermissions">
+		<![CDATA[
+		<b>Warning: <i>%1$s</i> does not currently have all required permissions.</b><br>
+		<br>%1$s will <b>not</b> work without the required permissions.<br>
+		<br>Please enable all permissions.
+		]]>
+	</string>
 </resources>
