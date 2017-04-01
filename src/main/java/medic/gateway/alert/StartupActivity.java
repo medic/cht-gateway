@@ -1,23 +1,17 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.webkit.*;
-import android.os.*;
+import android.app.Activity;
+import android.os.Bundle;
 
-import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.Utils.*;
+import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.PromptForPermissionsActivity.startPermissionsRequestIfRequired;
 
 public class StartupActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
 
-		if(!hasRequiredPermissions(this)) {
-			startActivity(new Intent(this, PromptForSmsPermissionsActivity.class));
-		} else startSettingsOrMainActivity(this);
-
-		finish();
+		startPermissionsRequestIfRequired(this);
 	}
 
 	private void log(String message, Object...extras) {

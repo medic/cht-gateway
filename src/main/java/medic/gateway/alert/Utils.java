@@ -1,13 +1,10 @@
 package medic.gateway.alert;
 
-import android.Manifest.permission;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
@@ -155,12 +152,6 @@ public final class Utils {
 			activity = SettingsDialogActivity.class;
 		}
 		ctx.startActivity(new Intent(ctx, activity));
-	}
-
-	public static boolean hasRequiredPermissions(Context ctx) {
-		boolean canSend = ContextCompat.checkSelfPermission(ctx, permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
-		boolean canReceive = ContextCompat.checkSelfPermission(ctx, permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
-		return canSend && canReceive;
 	}
 
 	public static void setText(View v, int textViewId, String text) {

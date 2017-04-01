@@ -83,10 +83,17 @@
 	<string name="btnHelpMeSetDefaultMessagingApp">Help me change</string>
 	<string name="btnIDontCare">I don\'t care</string>
 
-	<string name="txtPermissionsPrompt">
+	<string name="txtPermissionsPrompt_sms">
 		<![CDATA[
 		<b>Warning: <i>%1$s</i> does not currently have permissions to send and receive SMS.</b><br>
 		<br>The app may not perform as expected.
+		]]>
+	</string>
+
+	<string name="txtPermissionsPrompt_fileAccess">
+		<![CDATA[
+		<b>Warning: <i>%1$s</i> does not currently have permissions to read or write files.</b><br>
+		<br>This permission is required so that %1$s can recover unsaved messages after a crash or re-install.
 		]]>
 	</string>
 
