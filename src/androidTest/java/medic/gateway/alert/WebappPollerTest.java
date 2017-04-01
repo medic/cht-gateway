@@ -46,14 +46,10 @@ public class WebappPollerTest extends AndroidTestCase {
 		// given
 		String waitingId = randomUuid();
 		db.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(waitingId, WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT));
-		db.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(randomUuid(), WtMessage.Status.FORWARDED, 0, A_PHONE_NUMBER, SOME_CONTENT));
-		db.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(randomUuid(), WtMessage.Status.FAILED, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",        "status",                   "last_action", "_from",        "content"),
+				vals(waitingId,    WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT));
 		http.nextResponseJson("{}");
 
 		// when
