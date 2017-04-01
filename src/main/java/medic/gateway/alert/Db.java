@@ -21,8 +21,8 @@ import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.GatewayLog.warnException;
 import static medic.gateway.alert.Utils.args;
-import static medic.gateway.alert.Utils.randomPhoneNumber;
-import static medic.gateway.alert.Utils.randomSmsContent;
+import static medic.gateway.alert.DebugUtils.randomPhoneNumber;
+import static medic.gateway.alert.DebugUtils.randomSmsContent;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
