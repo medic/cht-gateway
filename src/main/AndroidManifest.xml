@@ -26,6 +26,9 @@
 	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
+	<!-- File permissions for log of unprocessed WT messages.  READ is implied by WRITE. -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 	<!-- Required internally for sending multipart UCS2 messages - see:
 	       https://github.com/medic/medic-gateway/issues/103 -->
 	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
@@ -47,7 +50,7 @@
 		</activity>
 		<activity android:name="SettingsDialogActivity"/>
 		<activity android:name="PromptToSetAsDefaultMessageAppActivity"/>
-		<activity android:name="PromptForSmsPermissionsActivity"/>
+		<activity android:name="PromptForPermissionsActivity"/>
 		<activity android:name="MessageListsActivity"/>
 		<activity android:name="GatewayEventLogActivity"/>
 		<activity android:name="WoListActivity"/>
