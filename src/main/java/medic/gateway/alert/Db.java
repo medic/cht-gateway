@@ -26,7 +26,7 @@ import static medic.gateway.alert.DebugUtils.randomSmsContent;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
-	private static final int SCHEMA_VERSION = 4;
+	private static final int SCHEMA_VERSION = 5;
 
 	private static final String ALL = null, NO_GROUP = null;
 	private static final String[] NO_ARGS = {};
@@ -45,6 +45,8 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WTM_clmLAST_ACTION = "last_action";
 	private static final String WTM_clmFROM = "_from";
 	private static final String WTM_clmCONTENT = "content";
+	private static final String WTM_clmSMS_SENT = "sms_sent";
+	private static final String WTM_clmSMS_RECEIVED = "sms_received";
 
 	private static final String tblWT_STATUS = "wtm_status";
 	private static final String WTS_clmID = "_id";
@@ -121,8 +123,10 @@ public final class Db extends SQLiteOpenHelper {
 					"%s TEXT NOT NULL, " +
 					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
-					"%s TEXT NOT NULL)",
-				tblWT_MESSAGE, WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT));
+					"%s TEXT NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
+					"%s INTEGER NOT NULL)",
+				tblWT_MESSAGE, WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT, WTM_clmSMS_SENT, WTM_clmSMS_RECEIVED));
 
 		db.execSQL(String.format("CREATE TABLE %s (" +
 					"%s TEXT NOT NULL PRIMARY KEY, " +
@@ -149,6 +153,9 @@ public final class Db extends SQLiteOpenHelper {
 		}
 		if(oldVersion < 4) {
 			migrate_createTable_WtMessageStatusUpdate(db, false);
+		}
+		if(oldVersion < 5) {
+			migrate_create_WTM_clmSMS_SENT__clmSMS_RECEIVED(db);
 		}
 	}
 
@@ -201,6 +208,15 @@ public final class Db extends SQLiteOpenHelper {
 		// the wo_message table.  However, dropping columns is not
 		// directly supported in SQLite.  There seems little harm in
 		// leaving the column in place.
+	}
+
+	static void migrate_create_WTM_clmSMS_SENT__clmSMS_RECEIVED(SQLiteDatabase db) {
+		trace(db, "onUpgrade() :: migrate_create_WTM_clmSMS_SENT__clmSMS_RECEIVED()");
+		db.execSQL(String.format("ALTER TABLE %s ADD COLUMN %s,%s INTEGER NOT NULL DEFAULT(0), INTEGER NOT NULL DEFAULT(0)",
+				tblWT_MESSAGE, WTM_clmSMS_SENT, WTM_clmSMS_RECEIVED));
+
+		// These values were not stored for old messages, so we can't
+		// set a meaningful value for these columns for old messages.
 	}
 
 //> ACCESSORS
@@ -499,14 +515,16 @@ public final class Db extends SQLiteOpenHelper {
 	boolean store(MultipartSms sms) {
 		WtMessage m = new WtMessage(
 				sms.getOriginatingAddress(),
-				sms.getMessageBody());
+				sms.getMessageBody(),
+				sms.getTimestampMillis());
 		return store(m);
 	}
 
 	boolean store(SmsMessage sms) {
 		WtMessage m = new WtMessage(
 				sms.getOriginatingAddress(),
-				sms.getMessageBody());
+				sms.getMessageBody(),
+				sms.getTimestampMillis());
 		return store(m);
 	}
 
@@ -572,6 +590,8 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WTM_clmLAST_ACTION, m.getLastAction());
 		v.put(WTM_clmFROM, m.from);
 		v.put(WTM_clmCONTENT, m.content);
+		v.put(WTM_clmSMS_SENT, m.smsSent);
+		v.put(WTM_clmSMS_RECEIVED, m.smsReceived);
 		return v;
 	}
 
@@ -604,7 +624,9 @@ public final class Db extends SQLiteOpenHelper {
 						WtMessage.Status.valueOf(c.getString(1)),
 						c.getLong(2),
 						c.getString(3),
-						c.getString(4)));
+						c.getString(4),
+						c.getLong(5),
+						c.getLong(6)));
 				c.moveToNext();
 			}
 			return list;
@@ -615,7 +637,7 @@ public final class Db extends SQLiteOpenHelper {
 
 	private Cursor getWtMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		return db.query(tblWT_MESSAGE,
-				cols(WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT),
+				cols(WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT, WTM_clmSMS_SENT, WTM_clmSMS_RECEIVED),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
 				sort == null? DEFAULT_SORT_ORDER: sort.apply(WTM_clmLAST_ACTION),
@@ -628,8 +650,10 @@ public final class Db extends SQLiteOpenHelper {
 		long lastAction = c.getLong(2);
 		String from = c.getString(3);
 		String content = c.getString(4);
+		long smsSent = c.getLong(5);
+		long smsReceived = c.getLong(6);
 
-		return new WtMessage(id, status, lastAction, from, content);
+		return new WtMessage(id, status, lastAction, from, content, smsSent, smsReceived);
 	}
 
 	private static WtMessage.StatusUpdate wtMessageStatusUpdateFrom(Cursor c) {
@@ -675,13 +699,13 @@ public final class Db extends SQLiteOpenHelper {
 
 		WtMessages: {
 			for(int i=0; i<10; ++i) {
-				store(new WtMessage("+254789123123", "hello from kenya " + i));
-				store(new WtMessage("+34678123123", "hello from spain " + i));
-				store(new WtMessage("+447890123123", "hello from uk " + i));
+				store(new WtMessage("+254789123123", "hello from kenya " + i, i * 3600L * 24L));
+				store(new WtMessage("+34678123123", "hello from spain " + i, i * 3600L * 24L));
+				store(new WtMessage("+447890123123", "hello from uk " + i, i * 3600L * 24L));
 			}
 
 			for(int i=0; i<20; ++i) {
-				store(new WtMessage(randomPhoneNumber(), randomSmsContent()));
+				store(new WtMessage(randomPhoneNumber(), randomSmsContent(), 0));
 			}
 		}
 

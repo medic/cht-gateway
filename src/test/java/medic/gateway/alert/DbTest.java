@@ -80,8 +80,8 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(id, WtMessage.Status.FORWARDED, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status",                   "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(id,    WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
 		WtMessage messageWithUpdatedStatus = aMessageWith(id, WtMessage.Status.FAILED);
 
 		// when
@@ -98,8 +98,8 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(id, WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(id,    WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
 		WtMessage messageWithUpdatedStatus = aMessageWith(id, WtMessage.Status.FORWARDED);
 
 		// when
@@ -180,7 +180,7 @@ public class DbTest {
 		// then
 		assertTrue(successReported);
 		dbHelper.assertTable("wt_message",
-				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT);
+				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
 	}
 
 //> WoMessage TESTS
@@ -393,11 +393,11 @@ public class DbTest {
 	public void deleteOldData_shouldDeleteOldWtMessagesButNotNewOnes() {
 		// given
 		dbHelper.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, now(), A_PHONE_NUMBER, "should keep 1"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6), A_PHONE_NUMBER, "should keep 2"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800), A_PHONE_NUMBER, "should delete 2"));
+				cols("_id",        "status",                 "last_action", "_from",        "content",         "sms_sent",    "sms_received"),
+				vals(randomUuid(), WoMessage.Status.PENDING, now(),         A_PHONE_NUMBER, "should keep 1",   0,             0),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete 1", 0,             0),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6),    A_PHONE_NUMBER, "should keep 2",   0,             0),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800),  A_PHONE_NUMBER, "should delete 2", 0,             0));
 		dbHelper.assertCount("wt_message", 4);
 
 		// when
@@ -406,8 +406,8 @@ public class DbTest {
 		// then
 		assertEquals(2, deletedCount);
 		dbHelper.assertTable("wt_message",
-				ANY_ID, "PENDING", ANY_NUMBER, A_PHONE_NUMBER, "should keep 1",
-				ANY_ID, "PENDING", ANY_NUMBER, A_PHONE_NUMBER, "should keep 2");
+				ANY_ID, "PENDING", ANY_NUMBER, A_PHONE_NUMBER, "should keep 1", ANY_NUMBER, ANY_NUMBER,
+				ANY_ID, "PENDING", ANY_NUMBER, A_PHONE_NUMBER, "should keep 2", ANY_NUMBER, ANY_NUMBER);
 	}
 
 	@Test
@@ -420,8 +420,8 @@ public class DbTest {
 				cols("_id",        "status",                 "last_action", "_to",          "content"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete"));
 		dbHelper.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"));
+				cols("_id",        "status",                 "last_action", "_from",        "content",         "sms_sent", "sms_received"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete 1", 0,          0));
 		dbHelper.assertCount("log", 1);
 		dbHelper.assertCount("wo_message", 1);
 		dbHelper.assertCount("wt_message", 1);
@@ -628,7 +628,8 @@ public class DbTest {
 	}
 
 	private static WtMessage aMessageWith(String id, WtMessage.Status status) {
-		return new WtMessage(id, status, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
+		long timestamp = System.currentTimeMillis();
+		return new WtMessage(id, status, timestamp, A_PHONE_NUMBER, SOME_CONTENT, timestamp-2, timestamp-1);
 	}
 
 	private static WoMessage aMessageWith(WoMessage.Status status) {

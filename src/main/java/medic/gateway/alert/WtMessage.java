@@ -49,20 +49,26 @@ class WtMessage {
 	private long lastAction;
 	public final String from;
 	public final String content;
+	public final long smsSent;
+	public final long smsReceived;
 
-	public WtMessage(String from, String content) {
+	public WtMessage(String from, String content, long smsSent) {
 		this.id = randomUuid();
 		setStatus(Status.WAITING);
 		this.from = from;
 		this.content = content;
+		this.smsSent = smsSent;
+		this.smsReceived = lastAction;
 	}
 
-	public WtMessage(String id, Status status, long lastAction, String from, String content) {
+	public WtMessage(String id, Status status, long lastAction, String from, String content, long smsSent, long smsReceived) {
 		this.id = id;
 		this.status = status;
 		this.lastAction = lastAction;
 		this.from = from;
 		this.content = content;
+		this.smsSent = smsSent;
+		this.smsReceived = smsReceived;
 	}
 
 //> ACCESSORS
