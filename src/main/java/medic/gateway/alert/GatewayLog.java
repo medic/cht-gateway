@@ -20,6 +20,13 @@ public final class GatewayLog {
 		eventLogEntry(ctx, message);
 	}
 
+	public static void warnEvent(Context ctx, String message, Object... extras) {
+		message = String.format(message, extras);
+
+		w(LOG_TAG, message);
+		eventLogEntry(ctx, "WARNING: " + message);
+	}
+
 	public static void trace(Object caller, String message, Object... extras) {
 		if(!DEBUG) return;
 		message = String.format(message, extras);
