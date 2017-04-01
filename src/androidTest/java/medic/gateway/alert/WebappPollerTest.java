@@ -46,14 +46,10 @@ public class WebappPollerTest extends AndroidTestCase {
 		// given
 		String waitingId = randomUuid();
 		db.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(waitingId, WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT));
-		db.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(randomUuid(), WtMessage.Status.FORWARDED, 0, A_PHONE_NUMBER, SOME_CONTENT));
-		db.insert("wt_message",
-				cols("_id", "status", "last_action", "_from", "content"),
-				vals(randomUuid(), WtMessage.Status.FAILED, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",        "status",                   "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(waitingId,    WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 1,          2),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
 		http.nextResponseJson("{}");
 
 		// when
@@ -69,6 +65,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		assertEquals(waitingId, message.getString("id"));
 		assertEquals(A_PHONE_NUMBER, message.getString("from"));
 		assertEquals(SOME_CONTENT, message.getString("content"));
+		assertEquals(1, message.getLong("sms_sent"));
+		assertEquals(2, message.getLong("sms_received"));
 	}
 
 	@Test
