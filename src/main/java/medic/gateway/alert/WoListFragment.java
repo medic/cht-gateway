@@ -105,6 +105,7 @@ public class WoListFragment extends ListFragment implements LoaderCallbacks<Curs
 					}
 
 					final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+
 					if(m.status.canBeRetried()) {
 						dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
 							@Override

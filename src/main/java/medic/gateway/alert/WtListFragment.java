@@ -1,9 +1,11 @@
 package medic.gateway.alert;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +26,12 @@ import java.util.List;
 
 import medic.gateway.alert.WtMessage.Status;
 
+import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.relativeTimestamp;
 import static medic.gateway.alert.Utils.setText;
+import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.WtMessage.Status.WAITING;
 
 public class WtListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
@@ -75,37 +79,49 @@ public class WtListFragment extends ListFragment implements LoaderCallbacks<Curs
 		// more recently than the list
 		WtMessage m = Db.getInstance(getActivity()).getWtMessage(c.getString(0));
 
-		messageDetailDialog(m, position).show();
+		showMessageDetailDialog(m, position);
 	}
 
-	// TODO this probably should not be done on the UI thread
-	private AlertDialog messageDetailDialog(final WtMessage m, final int position) {
-		LinkedList<String> content = new LinkedList<>();
+	private void showMessageDetailDialog(final WtMessage m, final int position) {
+		final ProgressDialog spinner = showSpinner(getContext());
+		AsyncTask.execute(new Runnable() {
+			public void run() {
+				try {
+					LinkedList<String> content = new LinkedList<>();
 
-		content.add(string(R.string.lblFrom, m.from));
-		content.add(string(R.string.lblContent, m.content));
-		content.add(string(R.string.lblStatusUpdates));
+					content.add(string(R.string.lblFrom, m.from));
+					content.add(string(R.string.lblContent, m.content));
+					content.add(string(R.string.lblStatusUpdates));
 
-		List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
-		Collections.reverse(updates);
-		for(WtMessage.StatusUpdate u : updates) {
-			content.add(String.format("%s: %s", absoluteTimestamp(u.timestamp), u.newStatus));
-		}
+					List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
+					Collections.reverse(updates);
+					for(WtMessage.StatusUpdate u : updates) {
+						content.add(String.format("%s: %s", absoluteTimestamp(u.timestamp), u.newStatus));
+					}
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+					final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 
-		if(m.getStatus().canBeRetried()) {
-			dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					retry(m.id, position);
+					if(m.getStatus().canBeRetried()) {
+						dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								retry(m.id, position);
+							}
+						});
+					}
+
+					dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
+
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() { dialog.create().show(); }
+					});
+				} catch(Exception ex) {
+					logException(getContext(), ex, "Failed to load WO message details.");
+				} finally {
+					spinner.dismiss();
 				}
-			});
-		}
-
-		dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
-
-		return dialog.create();
+			}
+		});
 	}
 
 	void retry(String id, int position) {
