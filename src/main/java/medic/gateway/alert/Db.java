@@ -79,6 +79,8 @@ public final class Db extends SQLiteOpenHelper {
 	private final Context ctx;
 	private final SQLiteDatabase db; // NOPMD
 
+	private final ExternalLog external;
+
 	/** a soft limit for the number of log entries to store in the system */
 	private int logEntryLimit;
 	private String logEntryLimitString;
@@ -105,6 +107,8 @@ public final class Db extends SQLiteOpenHelper {
 		super(ctx, "medic_gateway", null, SCHEMA_VERSION);
 		this.ctx = ctx;
 		db = getWritableDatabase();
+
+		external = ExternalLog.getInstance(ctx);
 
 		setLogEntryLimit(200);
 	}
@@ -512,6 +516,7 @@ public final class Db extends SQLiteOpenHelper {
 
 	boolean store(WtMessage m) {
 		log("store() :: %s", m);
+		external.log(m);
 		try {
 			long id = db.insertOrThrow(tblWT_MESSAGE, null, getContentValues(m));
 

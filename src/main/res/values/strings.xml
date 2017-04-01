@@ -109,4 +109,6 @@
 		<item>From Webapp</item>
 		<item>To Webapp</item>
 	</string-array>
+
+	<string name="txtProcessingExternalLog">Processing external message log…</string>
 </resources>
