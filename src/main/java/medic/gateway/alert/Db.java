@@ -668,31 +668,31 @@ public final class Db extends SQLiteOpenHelper {
 //> DB SEEDING
 	private void seed() {
 		LogMessages: {
-			for(int i=0; i<500000; ++i) {
+			for(int i=0; i<50; ++i) {
 				storeLogEntry("Seed log entry " + i);
 			}
 		}
 
 		WtMessages: {
-			for(int i=0; i<100000; ++i) {
+			for(int i=0; i<10; ++i) {
 				store(new WtMessage("+254789123123", "hello from kenya " + i));
 				store(new WtMessage("+34678123123", "hello from spain " + i));
 				store(new WtMessage("+447890123123", "hello from uk " + i));
 			}
 
-			for(int i=0; i<200000; ++i) {
+			for(int i=0; i<20; ++i) {
 				store(new WtMessage(randomPhoneNumber(), randomSmsContent()));
 			}
 		}
 
 		WoMessages: {
-			for(int i=0; i<100000; ++i) {
+			for(int i=0; i<10; ++i) {
 				store(new WoMessage(randomUUID().toString(), "+254789123123", "hello kenya " + i));
 				store(new WoMessage(randomUUID().toString(), "+34678123123", "hello spain " + i));
 				store(new WoMessage(randomUUID().toString(), "+447890123123", "hello uk " + i));
 			}
 
-			for(int i=0; i<200000; ++i) {
+			for(int i=0; i<20; ++i) {
 				store(new WoMessage(randomUUID().toString(), randomPhoneNumber(), randomSmsContent()));
 			}
 		}
