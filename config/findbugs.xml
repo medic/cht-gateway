@@ -20,4 +20,8 @@
 		<Class name="medic.gateway.alert.SimpleJsonClient2"/>
 		<Bug pattern="NP_NULL_ON_SOME_PATH_EXCEPTION,DE_MIGHT_IGNORE"/>
         </Match>
+	<Match>
+		<!-- On Android, the default encoding is always UTF-8 -->
+		<Bug pattern="DM_DEFAULT_ENCODING"/>
+	</Match>
 </FindBugsFilter>
