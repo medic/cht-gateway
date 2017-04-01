@@ -105,7 +105,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		// given
 		String messageId = randomUuid();
 		db.insert("wo_message",
-				cols("_id",        "status",                   "last_action", "_to",          "content"),
+				cols("_id",     "status",                   "last_action", "_to",          "content"),
 				vals(messageId, WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT));
 		db.insert("wom_status",
 				cols("message_id", "status",                   "timestamp", "needs_forwarding"),
