@@ -92,6 +92,8 @@
 	<string name="lblFrom">From: %s</string>
 	<string name="lblStatusUpdates">Status history:</string>
 	<string name="lblContent">Content: %s</string>
+	<string name="lblSent">Sent: %s</string>
+	<string name="lblReceived">Received by gateway: %s</string>
 
 	<string name="btnRetry">Retry</string>
 
