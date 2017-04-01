@@ -415,10 +415,10 @@ public class DbTest {
 		// given
 		dbHelper.insert("log",
 				cols("_id", "timestamp", "message"),
-				vals(1, daysAgo(8), "Should be deleted"));
+				vals(1,     daysAgo(8),  "Should be deleted"));
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "last_action", "_to", "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete"));
+				cols("_id",        "status",                 "last_action", "_to",          "content"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete"));
 		dbHelper.insert("wt_message",
 				cols("_id", "status", "last_action", "_from", "content"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8), A_PHONE_NUMBER, "should delete 1"));
