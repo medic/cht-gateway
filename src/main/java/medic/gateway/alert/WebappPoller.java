@@ -141,7 +141,9 @@ class GatewayRequest {
 				json.put(json(
 					"id", m.id,
 					"from", m.from,
-					"content", m.content
+					"content", m.content,
+					"sms_sent", m.smsSent,
+					"sms_received", m.smsReceived
 				));
 				m.setStatus(WtMessage.Status.FORWARDED);
 			} catch(Exception ex) {

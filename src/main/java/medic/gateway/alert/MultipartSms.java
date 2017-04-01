@@ -37,6 +37,10 @@ final class MultipartSms {
 		return bob.toString();
 	}
 
+	long getTimestampMillis() {
+		return parts[0].getTimestampMillis();
+	}
+
 	List<SmsMessage> getParts() {
 		return Arrays.asList(parts);
 	}

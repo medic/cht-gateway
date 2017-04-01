@@ -69,6 +69,8 @@ public class WtListActivity extends FragmentActivity {
 
 					content.add(string(R.string.lblFrom, m.from));
 					content.add(string(R.string.lblContent, m.content));
+					content.add(string(R.string.lblSent, absoluteTimestamp(m.smsSent)));
+					content.add(string(R.string.lblReceived, absoluteTimestamp(m.smsReceived)));
 					content.add(string(R.string.lblStatusUpdates));
 
 					List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
