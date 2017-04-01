@@ -4,17 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import static medic.gateway.alert.GatewayLog.trace;
-import static medic.gateway.alert.PromptForPermissionsActivity.startPermissionsRequestIfRequired;
+import static medic.gateway.alert.PromptForPermissionsActivity.startPermissionsRequestChain;
 
 public class StartupActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		log("Starting...");
+		trace(this, "Starting...");
 
-		startPermissionsRequestIfRequired(this);
-	}
+		startPermissionsRequestChain(this);
 
-	private void log(String message, Object...extras) {
-		trace(this, message, extras);
+		finish();
 	}
 }

@@ -51,6 +51,7 @@
 		<activity android:name="SettingsDialogActivity"/>
 		<activity android:name="PromptToSetAsDefaultMessageAppActivity"/>
 		<activity android:name="PromptForPermissionsActivity"/>
+		<activity android:name="ExternalLogProcessorActivity"/>
 		<activity android:name="MessageListsActivity"/>
 		<activity android:name="GatewayEventLogActivity"/>
 		<activity android:name="WoListActivity"/>
