@@ -7,8 +7,7 @@
 		android:orientation="vertical">
 	<TextView android:id="@+id/txtPermissionsPrompt"
 			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/txtPermissionsPrompt"/>
+			android:layout_height="wrap_content"/>
 	<Button
 			android:text="@string/btnOk"
 			android:onClick="triggerPermissionRequest"
