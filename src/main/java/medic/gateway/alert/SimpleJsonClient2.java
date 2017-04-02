@@ -169,7 +169,7 @@ public class SimpleJsonClient2 {
 
 	private static String base64encode(String normal) {
 		try {
-			return Base64.encodeToString(normal.getBytes("UTF-8"), Base64.DEFAULT);
+			return Base64.encodeToString(normal.getBytes("UTF-8"), Base64.NO_WRAP);
 		} catch(UnsupportedEncodingException ex) {
 			// this should never happen on android
 			throw new RuntimeException(ex);
