@@ -162,17 +162,32 @@ public class SimpleJsonClient2 {
 		conn.setRequestProperty("User-Agent", userAgent);
 
 		if(url.getUserInfo() != null) {
-			conn.setRequestProperty("Authorization", "Basic " + base64encode(url.getUserInfo()));
+			conn.setRequestProperty("Authorization", "Basic " + encodeCredentials(url.getUserInfo()));
 		}
 		return conn;
 	}
 
-	private static String base64encode(String normal) {
+	/**
+	 * Base64-encode the {@code user-pass} component of HTTP {@code Authorization: Basic}
+	 * header.  Note that ISO-8859-1 encoding is used, unless the characterset is
+	 * unavailable, in which case UTF-8 is used instead.
+	 *
+	 * <strong>N.B. passwords with some special characters may not work.</strong>
+	 *
+	 * @see https://tools.ietf.org/html/rfc2617#section-2
+	 */
+	@SuppressWarnings("PMD.PreserveStackTrace")
+	private static String encodeCredentials(String normal) {
 		try {
-			return Base64.encodeToString(normal.getBytes("UTF-8"), Base64.NO_WRAP);
-		} catch(UnsupportedEncodingException ex) {
-			// this should never happen on android
-			throw new RuntimeException(ex);
+			return Base64.encodeToString(normal.getBytes("ISO-8859-1"), Base64.NO_WRAP);
+		} catch(UnsupportedEncodingException ignored) {
+			Log.i(LOG_TAG, "UnsupportedEncodingException thrown trying to encode HTTP basic auth credentials with ISO-8859-1.  Will try UTF-8.");
+			try {
+				return Base64.encodeToString(normal.getBytes("UTF-8"), Base64.NO_WRAP);
+			} catch(UnsupportedEncodingException why) {
+				// this should never happen on android, as UTF-8 is always the default encoding
+				throw new RuntimeException(why);
+			}
 		}
 	}
 
