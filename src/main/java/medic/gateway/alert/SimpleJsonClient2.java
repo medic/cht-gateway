@@ -152,6 +152,7 @@ public class SimpleJsonClient2 {
 	}
 
 //> STATIC HELPERS
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private static HttpURLConnection openConnection(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -162,7 +163,12 @@ public class SimpleJsonClient2 {
 		conn.setRequestProperty("User-Agent", userAgent);
 
 		if(url.getUserInfo() != null) {
-			conn.setRequestProperty("Authorization", "Basic " + encodeCredentials(url.getUserInfo()));
+			try {
+				conn.setRequestProperty("Authorization", "Basic " + encodeCredentials(url.getUserInfo()));
+			} catch(Exception ex) {
+				// Don't include exception details in case they include auth details
+				throw new RuntimeException(String.format("%s caught while setting Authorization header.", ex.getClass()));
+			}
 		}
 		return conn;
 	}
