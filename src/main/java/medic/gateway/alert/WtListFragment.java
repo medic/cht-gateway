@@ -1,12 +1,9 @@
 package medic.gateway.alert;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -18,29 +15,15 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import medic.gateway.alert.WtMessage.Status;
-
 import static medic.gateway.alert.GatewayLog.trace;
-import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.relativeTimestamp;
 import static medic.gateway.alert.Utils.setText;
-import static medic.gateway.alert.WtMessage.Status.WAITING;
 
 public class WtListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 	public static final int LOADER_ID = 2;
 
-	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
-
-	private Db db;
-
 	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		this.db = Db.getInstance(getActivity());
 
 		WtCursorAdapter adapter = new WtCursorAdapter(getCastActivity());
 		setListAdapter(adapter);
@@ -75,67 +58,18 @@ public class WtListFragment extends ListFragment implements LoaderCallbacks<Curs
 		// more recently than the list
 		WtMessage m = Db.getInstance(getActivity()).getWtMessage(c.getString(0));
 
-		messageDetailDialog(m, position).show();
-	}
-
-	// TODO this probably should not be done on the UI thread
-	private AlertDialog messageDetailDialog(final WtMessage m, final int position) {
-		LinkedList<String> content = new LinkedList<>();
-
-		content.add(string(R.string.lblFrom, m.from));
-		content.add(string(R.string.lblContent, m.content));
-		content.add(string(R.string.lblStatusUpdates));
-
-		List<WtMessage.StatusUpdate> updates = db.getStatusUpdates(m);
-		Collections.reverse(updates);
-		for(WtMessage.StatusUpdate u : updates) {
-			content.add(String.format("%s: %s", absoluteTimestamp(u.timestamp), u.newStatus));
-		}
-
-		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-
-		if(m.getStatus().canBeRetried()) {
-			dialog.setPositiveButton(R.string.btnRetry, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					retry(m.id, position);
-				}
-			});
-		}
-
-		dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
-
-		return dialog.create();
-	}
-
-	void retry(String id, int position) {
-		trace(this, "Retrying message at %d with id %s...", position, id);
-
-		WtMessage m = db.getWtMessage(id);
-
-		if(m.getStatus().canBeRetried()) {
-			Status oldStatus = m.getStatus();
-			m.setStatus(WAITING);
-			db.updateStatusFrom(oldStatus, m);
-
-			WtMessage updated = db.getWtMessage(id);
-
-			View v = getListView().getChildAt(position);
-			setText(v, R.id.txtWtStatus, updated.getStatus().toString());
-			setText(v, R.id.txtWtLastAction, relativeTimestamp(updated.getLastAction()));
-		}
-	}
-
-	private final String string(int stringId, Object...args) {
-		return String.format(getActivity().getString(stringId), args);
+		getCastActivity().showMessageDetailDialog(m, position);
 	}
 }
 
 class WtCursorAdapter extends ResourceCursorAdapter {
 	private static final int NO_FLAGS = 0;
 
-	public WtCursorAdapter(Context ctx) {
-		super(ctx, R.layout.wt_list_item, null, NO_FLAGS);
+	private final WtListActivity activity;
+
+	public WtCursorAdapter(WtListActivity activity) {
+		super(activity, R.layout.wt_list_item, null, NO_FLAGS);
+		this.activity = activity;
 	}
 
 	public void bindView(View v, final Context ctx, Cursor c) {
@@ -149,20 +83,12 @@ class WtCursorAdapter extends ResourceCursorAdapter {
 		CheckBox cbx = (CheckBox) v.findViewById(R.id.cbxMessage);
 		// Old list items get re-used, so we need to make sure that the
 		// checkbox is de-checked.
-		cbx.setChecked(false);
+		cbx.setChecked(activity.isChecked(m));
 		cbx.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
-				View listItem = (View) btn.getParent();
-				ViewGroup parent = (ViewGroup) listItem.getParent();
-
-				if(parent == null) return;
-
-				int listIndex = parent.indexOfChild(listItem);
-
-				trace(this, "Changed checkbox at %d to %s", listIndex, isChecked);
-
-				((WtListActivity) ctx).updateChecked(m.id, listIndex, isChecked);
+				trace(this, "Changed checkbox to %s", isChecked);
+				activity.updateChecked(m, isChecked);
 			}
 		});
 	}
