@@ -10,8 +10,6 @@
 	<string name="errWebappUrl_badSsl">SSL connection failed</string>
 
 	<string name="txtWebappInstanceName">Instance name</string>
-	<string name="txtWebappUsername"/>
-	<string name="errUsername_illegalChar">cannot contain: /#?@:</string>
 	<string name="txtWebappPassword"/>
 	<string name="errPassword_illegalChar"/>
 	<string name="txtSavingSettings"/>

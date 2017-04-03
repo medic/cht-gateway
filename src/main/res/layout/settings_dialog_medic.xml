@@ -28,12 +28,6 @@
 					android:layout_height="wrap_content"
 					android:layout_marginLeft="16dp"/>
 		</LinearLayout>
-		<EditText android:id="@+id/txtWebappUsername"
-				android:singleLine="true"
-				android:hint="@string/txtWebappUsername"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="16dp"/>
 		<EditText android:id="@+id/txtWebappPassword"
 				android:inputType="textPassword"
 				android:hint="@string/txtWebappPassword"

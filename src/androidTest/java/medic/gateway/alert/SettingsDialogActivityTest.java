@@ -62,7 +62,6 @@ public class SettingsDialogActivityTest {
 		assertVisible(id.btnSaveSettings);
 
 		assertDoesNotExist(id.txtWebappInstanceName);
-		assertDoesNotExist(id.txtWebappUsername);
 		assertDoesNotExist(id.txtWebappPassword);
 	}
 
@@ -257,7 +256,6 @@ public class SettingsDialogActivityTest {
 
 		// expect
 		assertVisible(id.txtWebappInstanceName);
-		assertVisible(id.txtWebappUsername);
 		assertVisible(id.txtWebappPassword);
 
 		assertVisible(id.cbxEnablePolling);
@@ -295,7 +293,6 @@ public class SettingsDialogActivityTest {
 
 		// given
 		webappInstanceNameEnteredAs("");
-		usernameEnteredAs("some-user");
 		passwordEnteredAs("some-password");
 
 		// when
@@ -306,28 +303,11 @@ public class SettingsDialogActivityTest {
 	}
 
 	@Test
-	public void medic_leavingUsernameBlankShouldShowError() {
-		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
-
-		// given
-		webappInstanceNameEnteredAs("some.instance");
-		usernameEnteredAs("");
-		passwordEnteredAs("some-password");
-
-		// when
-		saveClicked();
-
-		// then
-		assertErrorDisplayed(id.txtWebappUsername, string.errRequired);
-	}
-
-	@Test
 	public void medic_leavingPasswordBlankShouldShowError() {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
 
 		// given
 		webappInstanceNameEnteredAs("some.instance");
-		usernameEnteredAs("some-user");
 		passwordEnteredAs("");
 
 		// when
@@ -343,7 +323,6 @@ public class SettingsDialogActivityTest {
 
 		// given
 		webappInstanceNameEnteredAs("...");
-		usernameEnteredAs("user");
 		passwordEnteredAs("pass");
 
 		// when
@@ -360,7 +339,6 @@ public class SettingsDialogActivityTest {
 		// given
 		assertFalse(settingsStore().hasSettings());
 		webappInstanceNameEnteredAs("some.instance");
-		usernameEnteredAs("some-user");
 		passwordEnteredAs("some-password");
 		uncheckPollingEnabled();
 
@@ -383,12 +361,6 @@ public class SettingsDialogActivityTest {
 		if(NOT_MEDIC_FLAVOUR) throw new IllegalStateException();
 
 		enterText(id.txtWebappInstanceName, instanceName);
-	}
-
-	private void usernameEnteredAs(String username) {
-		if(NOT_MEDIC_FLAVOUR) throw new IllegalStateException();
-
-		enterText(id.txtWebappUsername, username);
 	}
 
 	private void passwordEnteredAs(String password) {

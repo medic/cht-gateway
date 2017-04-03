@@ -25,8 +25,8 @@ import static medic.gateway.alert.Utils.startMainActivity;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsDialogActivity extends Activity {
-	private static final String MEDIC_URL_FORMATTER = "https://%s:%s@%s.%s.medicmobile.org/api/sms";
-	private static final Pattern MEDIC_URL_PARSER = Pattern.compile("https://([^:]+):([^:]+)@(.+)\\.([^.]+)\\.medicmobile.org/api/sms");
+	private static final String MEDIC_URL_FORMATTER = "https://gateway:%s@%s.%s.medicmobile.org/api/sms";
+	private static final Pattern MEDIC_URL_PARSER = Pattern.compile("https://gateway:([^:]+)@(.+)\\.([^.]+)\\.medicmobile.org/api/sms");
 
 	private boolean hasPreviousSettings;
 
@@ -98,11 +98,6 @@ public class SettingsDialogActivity extends Activity {
 				hasBasicErrors = true;
 			}
 
-			if(isBlank(R.id.txtWebappUsername)) {
-				showError(R.id.txtWebappUsername, R.string.errRequired);
-				hasBasicErrors = true;
-			}
-
 			if(isBlank(R.id.txtWebappPassword)) {
 				showError(R.id.txtWebappPassword, R.string.errRequired);
 				hasBasicErrors = true;
@@ -123,10 +118,6 @@ public class SettingsDialogActivity extends Activity {
 
 		boolean illegalCharsFound = false;
 
-		if(text(R.id.txtWebappUsername).matches(".*[/#?@:].*")) {
-			showError(R.id.txtWebappUsername, R.string.errUsername_illegalChar);
-			illegalCharsFound = true;
-		}
 		if(text(R.id.txtWebappPassword).contains(".*[/#?@].*")) {
 			showError(R.id.txtWebappPassword, R.string.errPassword_illegalChar);
 			illegalCharsFound = true;
@@ -139,9 +130,8 @@ public class SettingsDialogActivity extends Activity {
 		if(IS_MEDIC_FLAVOUR) {
 			String instanceName = text(R.id.txtWebappInstanceName);
 			String subdomain = spinnerVal(R.id.spnWebappSubdomain);
-			String username = text(R.id.txtWebappUsername);
 			String password = text(R.id.txtWebappPassword);
-			return String.format(MEDIC_URL_FORMATTER, username, password, instanceName, subdomain);
+			return String.format(MEDIC_URL_FORMATTER, password, instanceName, subdomain);
 		} else return text(R.id.txtWebappUrl);
 	}
 
@@ -149,10 +139,9 @@ public class SettingsDialogActivity extends Activity {
 		if(IS_MEDIC_FLAVOUR) {
 			Matcher m = MEDIC_URL_PARSER.matcher(appUrl);
 			if(m.matches()) {
-				text(R.id.txtWebappInstanceName, m.group(3));
-				spinnerVal(R.id.spnWebappSubdomain, m.group(4));
-				text(R.id.txtWebappUsername, m.group(1));
-				text(R.id.txtWebappPassword, m.group(2));
+				text(R.id.txtWebappInstanceName, m.group(2));
+				spinnerVal(R.id.spnWebappSubdomain, m.group(3));
+				text(R.id.txtWebappPassword, m.group(1));
 			} else {
 				trace(this, "URL not being parsed correctly: %s", redactUrl(appUrl));
 			}

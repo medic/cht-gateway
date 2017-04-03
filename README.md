@@ -25,20 +25,21 @@ Download the latest APK from https://github.com/medic/medic-gateway/releases
 
 ### Medic Mobile
 
-If you're configuring `medic-gateway` for use with hosted [`medic-webapp`](https://github.com/medic/medic-webapp), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `my_gateway_user` and a password of `topSecret`, fill in the settings as follows:
+If you're configuring `medic-gateway` for use with hosted [`medic-webapp`](https://github.com/medic/medic-webapp), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `gateway` and a password of `topSecret`, fill in the settings as follows:
 
 #### Medic-branded gateway
 
+Please note that in the medic-branded build, the username is hard-coded as `gateway`, and cannot be changed.
+
 ```
 Instance name: myproject [dev]
-Username: my_gateway_user
 Password: topSecret
 ```
 
 #### Generic-branded gateway
 
 ```
-WebappUrl: https://my_gateway_user:topSecret@myproject.some-subdomain.medicmobile.org
+WebappUrl: https://gateway:topSecret@myproject.some-subdomain.medicmobile.org
 ```
 
 ### Other
