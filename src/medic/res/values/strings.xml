@@ -3,6 +3,7 @@
 	<string name="txtWebappInstanceName">Instance name</string>
 	<string name="txtWebappUsername">Username</string>
 	<string name="txtWebappPassword">Password</string>
+	<string name="errPassword_illegalChar">cannot contain: /#?@</string>
 	<string-array name="spnWebappSubdomain">
 		<item>app</item>
 		<item>dev</item>

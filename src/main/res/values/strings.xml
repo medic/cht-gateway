@@ -13,7 +13,7 @@
 	<string name="txtWebappUsername"/>
 	<string name="errUsername_illegalChar">cannot contain: /#?@:</string>
 	<string name="txtWebappPassword"/>
-	<string name="errPassword_illegalChar">cannot contain: /#?@</string>
+	<string name="errPassword_illegalChar"/>
 	<string name="txtSavingSettings"/>
 	<string name="txtValidatingWebappUrl">Validating %s…</string>
 
