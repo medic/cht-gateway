@@ -3,6 +3,7 @@ package medic.gateway.alert;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.telephony.SmsMessage;
 
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import static medic.gateway.alert.WoMessage.Status.SENT;
 public class IntentProcessor extends BroadcastReceiver {
 	static final String SENDING_REPORT = "medic.gateway.alert.SENDING_REPORT";
 	static final String DELIVERY_REPORT = "medic.gateway.alert.DELIVERY_REPORT";
+
+	private static final String STATUS_REPORT_REQUEST = "\\s*!!!STATUS!!!\\s*";
 
 	private final Capabilities app;
 
@@ -83,6 +86,11 @@ public class IntentProcessor extends BroadcastReceiver {
 				boolean success = db.store(m);
 				if(!success) {
 					logEvent(ctx, "Failed to save received SMS to db: %s", m);
+				}
+
+				if(m.getMessageBody().matches(STATUS_REPORT_REQUEST)) {
+					logEvent(ctx, "Status report requested by %s.", m.getOriginatingAddress());
+					AsyncTask.execute(new StatusReportProcessor(ctx, m));
 				}
 			}
 		}
