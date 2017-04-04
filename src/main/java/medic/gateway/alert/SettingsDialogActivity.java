@@ -30,7 +30,8 @@ public class SettingsDialogActivity extends Activity {
 
 	private boolean hasPreviousSettings;
 
-	public void onCreate(Bundle savedInstanceState) {
+//> EVENT HANDLERS
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
 
@@ -52,7 +53,7 @@ public class SettingsDialogActivity extends Activity {
 		}
 	}
 
-//> EVENT HANDLERS
+//> CUSTOM EVENT HANDLERS
 	public void doSave(View view) {
 		log("doSave");
 

@@ -24,6 +24,7 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 		this.app = Capabilities.getCapabilities();
 	}
 
+//> EVENT HANDLERS
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		log("Starting...");
@@ -55,7 +56,7 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 		}
 	}
 
-//> EVENT HANDLERS
+//> CUSTOM EVENT HANDLERS
 	public void dismissActivity(View v) {
 		continueToSettings();
 	}

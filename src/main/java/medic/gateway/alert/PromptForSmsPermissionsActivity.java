@@ -19,7 +19,8 @@ public class PromptForSmsPermissionsActivity extends Activity implements Activit
 	private static final String[] DESIRED_PERMISSIONS =
 			{ permission.SEND_SMS, permission.RECEIVE_SMS };
 
-	protected void onCreate(Bundle savedInstanceState) {
+//> EVENT HANDLERS
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.prompt_for_permissions);
@@ -27,15 +28,16 @@ public class PromptForSmsPermissionsActivity extends Activity implements Activit
 		setText(this, R.id.txtPermissionsPrompt, R.string.txtPermissionsPrompt, getAppName(this));
 	}
 
-	public void triggerPermissionRequest(View v) {
-		ActivityCompat.requestPermissions(this, DESIRED_PERMISSIONS, 0);
-	}
-
 	@SuppressWarnings("PMD.UseVarargs")
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+	@Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		// Whatever permissions the user granted (or failed to), we will carry on regardless.
 		// If some permissions are lacking, the warning will be displayed again next time the app is started.
 		startSettingsOrMainActivity(this);
 		finish();
+	}
+
+//> CUSTOM EVENT HANDLERS
+	public void triggerPermissionRequest(View v) {
+		ActivityCompat.requestPermissions(this, DESIRED_PERMISSIONS, 0);
 	}
 }

@@ -17,18 +17,17 @@ import java.util.Set;
 
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
-import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.absoluteTimestamp;
+import static medic.gateway.alert.Utils.showSpinner;
+import static medic.gateway.alert.Utils.NO_CLICK_LISTENER;
 import static medic.gateway.alert.WoMessage.Status.UNSENT;
 import static medic.gateway.alert.WoMessage.Status.FAILED;
 
 public class WoListActivity extends FragmentActivity {
-	private static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
-
 	private Db db;
 	private Set<String> checkedMessageIds;
 
-	public void onCreate(Bundle savedInstanceState) {
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message_list_wo);
 

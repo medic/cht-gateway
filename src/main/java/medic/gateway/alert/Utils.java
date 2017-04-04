@@ -4,6 +4,7 @@ import android.Manifest.permission;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -43,6 +44,8 @@ public final class Utils {
 	private static final long ONE_YEAR = ONE_MONTH * 12;
 
 	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
+
+	public static final DialogInterface.OnClickListener NO_CLICK_LISTENER = null;
 
 	private Utils() {}
 

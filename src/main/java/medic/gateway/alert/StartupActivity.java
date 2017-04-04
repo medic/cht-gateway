@@ -1,12 +1,12 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.webkit.*;
-import android.os.*;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 
-import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.Utils.*;
+import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.hasRequiredPermissions;
+import static medic.gateway.alert.Utils.startSettingsOrMainActivity;
 
 public class StartupActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {

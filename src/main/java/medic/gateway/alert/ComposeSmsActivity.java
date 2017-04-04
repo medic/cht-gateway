@@ -12,7 +12,9 @@ import static medic.gateway.alert.Utils.randomUuid;
 import static medic.gateway.alert.Utils.toast;
 
 public class ComposeSmsActivity extends Activity {
-	public void onCreate(Bundle savedInstanceState) {
+
+//> EVENT HANDLERS
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.composer);
@@ -23,17 +25,7 @@ public class ComposeSmsActivity extends Activity {
 		}
 	}
 
-	private String getSmsRecipient(Intent i) {
-		Uri triggerUri = i.getData();
-		if(triggerUri == null) return null;
-		String recipient = triggerUri.getSchemeSpecificPart();
-		if(recipient == null) return null;
-		recipient = recipient.trim();
-		if(recipient.length() == 0) return null;
-		return recipient.replaceAll(" ", "");
-	}
-
-//> EVENT HANDLERS
+//> CUSTOM EVENT HANDLERS
 	public void send(View view) {
 		String[] recipients = SmsComposerUtils.getRecipients(text(R.id.txtComposer_recipients));
 
@@ -56,6 +48,16 @@ public class ComposeSmsActivity extends Activity {
 	}
 
 //> PRIVATE HELPERS
+	private String getSmsRecipient(Intent i) {
+		Uri triggerUri = i.getData();
+		if(triggerUri == null) return null;
+		String recipient = triggerUri.getSchemeSpecificPart();
+		if(recipient == null) return null;
+		recipient = recipient.trim();
+		if(recipient.length() == 0) return null;
+		return recipient.replaceAll(" ", "");
+	}
+
 	private String text(int componentId) {
 		EditText field = (EditText) findViewById(componentId);
 		return field.getText().toString();

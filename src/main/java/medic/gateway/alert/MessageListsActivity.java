@@ -26,6 +26,7 @@ public class MessageListsActivity extends TabActivity {
 		GatewayEventLogActivity.class, WoListActivity.class, WtListActivity.class,
 	};
 
+//> CLICK LISTENERS
 	private final DialogInterface.OnClickListener deleteOldDataHandler = new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int which) {
 			final ProgressDialog spinner = showSpinner(MessageListsActivity.this, R.string.txtDeleteOldData_inProgress);
@@ -56,7 +57,8 @@ public class MessageListsActivity extends TabActivity {
 		}
 	};
 
-	public void onCreate(Bundle savedInstanceState) {
+//> EVENT HANDLERS
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		log("Starting...");
 		super.onCreate(savedInstanceState);
 
@@ -73,12 +75,12 @@ public class MessageListsActivity extends TabActivity {
 		}
 	}
 
-	public boolean onCreateOptionsMenu(Menu menu) {
+	@Override public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.message_list_menu, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	public boolean onOptionsItemSelected(MenuItem item) {
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.mnuCompose:
 				Intent composer;
@@ -105,6 +107,7 @@ public class MessageListsActivity extends TabActivity {
 		}
 	}
 
+//> PRIVATE HELPERS
 	private void openSettings() {
 		startSettingsActivity(this, getCapabilities());
 		finish();
