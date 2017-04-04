@@ -8,7 +8,7 @@ import javax.net.ssl.SSLException;
 import static medic.gateway.alert.BuildConfig.DISABLE_APP_URL_VALIDATION;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.R.string.*;
-import static medic.gateway.alert.Utils.redactUrl;
+import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 
 public class WebappUrlVerifier {
 	private final Context ctx;

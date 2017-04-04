@@ -18,8 +18,8 @@ import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
-import static medic.gateway.alert.Utils.redactUrl;
 import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startMainActivity;
 

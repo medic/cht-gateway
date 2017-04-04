@@ -9,7 +9,7 @@ import java.util.regex.*;
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
 import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.Utils.redactUrl;
+import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 
 @SuppressWarnings("PMD.ShortMethodName")
 public class SettingsStore {

@@ -14,13 +14,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
-import static medic.gateway.alert.Utils.redactUrl;
 
 /**
  * <p>New and improved - SimpleJsonClient2 is SimpleJsonClient, but using <code>
@@ -30,7 +31,7 @@ import static medic.gateway.alert.Utils.redactUrl;
  * @see java.net.HttpURLConnection
  * @see org.apache.http.impl.client.DefaultHttpClient
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings("PMD.GodClass")
 public class SimpleJsonClient2 {
 	static {
 		// HTTP connection reuse which was buggy pre-froyo
@@ -38,6 +39,8 @@ public class SimpleJsonClient2 {
 			System.setProperty("http.keepAlive", "false");
 		}
 	}
+
+	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
 
 //> PUBLIC METHODS
 	public SimpleResponse get(String url) throws MalformedURLException {
@@ -106,6 +109,20 @@ public class SimpleJsonClient2 {
 			closeSafely("post", inputStream);
 			closeSafely("post", conn);
 		}
+	}
+
+//> PUBLIC UTILS
+	public static String redactUrl(URL url) {
+		return redactUrl(url.toString());
+	}
+	public static String redactUrl(String url) {
+		if(url == null) return null;
+
+		Matcher m = AUTH_URL.matcher(url);
+		if(!m.matches()) return url;
+
+		return String.format("%s://%s:%s@%s",
+				m.group(1), m.group(2), "****", m.group(4));
 	}
 
 //> INSTANCE HELPERS
