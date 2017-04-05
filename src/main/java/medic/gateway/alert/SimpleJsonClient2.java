@@ -27,7 +27,7 @@ import static medic.gateway.alert.BuildConfig.LOG_TAG;
  * <p>New and improved - SimpleJsonClient2 is SimpleJsonClient, but using <code>
  * HttpURLConnection</code> instead of <code>DefaultHttpClient</code>.
  * <p>SimpleJsonClient2 should be used in preference to SimpleJsonClient on
- * Android 2.3 (API level 22/Gingerbread) and above.
+ * Android 2.3 (API level 9/Gingerbread) and above.
  * @see java.net.HttpURLConnection
  * @see org.apache.http.impl.client.DefaultHttpClient
  */
