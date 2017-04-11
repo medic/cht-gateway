@@ -19,7 +19,7 @@ An SMS gateway for Android.  Send and receive SMS from your webapp via an Androi
 
 ## Installation
 
-Download the latest APK from https://github.com/medic/medic-gateway/releases
+Install stable public releases from [the Google Play store](https://play.google.com/store/apps/details?id=medic.gateway.alert), or download the latest development APK from https://github.com/medic/medic-gateway/releases.
 
 ## Configuration
 
