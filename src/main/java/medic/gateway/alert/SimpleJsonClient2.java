@@ -4,13 +4,13 @@ import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
+import java.nio.charset.Charset;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,6 +40,7 @@ public class SimpleJsonClient2 {
 		}
 	}
 
+	private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
 
 //> PUBLIC METHODS
@@ -125,6 +126,22 @@ public class SimpleJsonClient2 {
 				m.group(1), m.group(2), "****", m.group(4));
 	}
 
+	public static boolean basicAuth_isValidUsername(String username) {
+		return basicAuth_isValidPassword(username) &&
+				username.indexOf(':') == -1;
+	}
+
+	public static boolean basicAuth_isValidPassword(String password) {
+		for(int i=password.length()-1; i>=0; --i) {
+			switch(password.charAt(i)) {
+				case '#': case '/': case '?': case '@':
+					return false;
+			}
+		}
+		String reEncoded = new String(password.getBytes(ISO_8859_1), ISO_8859_1);
+		return password.equals(reEncoded);
+	}
+
 //> INSTANCE HELPERS
 	private JSONObject jsonResponseFrom(String method, InputStream in) throws IOException, JSONException {
 		BufferedReader reader = null;
@@ -191,27 +208,12 @@ public class SimpleJsonClient2 {
 	}
 
 	/**
-	 * Base64-encode the {@code user-pass} component of HTTP {@code Authorization: Basic}
-	 * header.  Note that ISO-8859-1 encoding is used, unless the characterset is
-	 * unavailable, in which case UTF-8 is used instead.
-	 *
-	 * <strong>N.B. passwords with some special characters may not work.</strong>
-	 *
+	 * Base64-encode the {@code user-pass} component of HTTP {@code Authorization: Basic} header.
 	 * @see https://tools.ietf.org/html/rfc2617#section-2
 	 */
 	@SuppressWarnings("PMD.PreserveStackTrace")
 	private static String encodeCredentials(String normal) {
-		try {
-			return Base64.encodeToString(normal.getBytes("ISO-8859-1"), Base64.NO_WRAP);
-		} catch(UnsupportedEncodingException ignored) {
-			Log.i(LOG_TAG, "UnsupportedEncodingException thrown trying to encode HTTP basic auth credentials with ISO-8859-1.  Will try UTF-8.");
-			try {
-				return Base64.encodeToString(normal.getBytes("UTF-8"), Base64.NO_WRAP);
-			} catch(UnsupportedEncodingException why) {
-				// this should never happen on android, as UTF-8 is always the default encoding
-				throw new RuntimeException(why);
-			}
-		}
+		return Base64.encodeToString(normal.getBytes(ISO_8859_1), Base64.NO_WRAP);
 	}
 
 	private static void traceMethod(String methodName, Object...args) {

@@ -2,7 +2,7 @@
 <resources>
 	<string name="txtWebappInstanceName">Instance name</string>
 	<string name="txtWebappPassword">Password</string>
-	<string name="errPassword_illegalChar">cannot contain: /#?@</string>
+	<string name="errPassword_illegalChar">contains illegal characters</string>
 	<string-array name="spnWebappSubdomain">
 		<item>app</item>
 		<item>dev</item>

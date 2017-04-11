@@ -18,6 +18,83 @@ import static org.robolectric.Shadows.*;
 public class SimpleJsonClient2Test {
 	private static final String NO_CHANGE = null;
 
+	/**
+	 * The set of typable characters in ISO-8859-1, minus characters that
+	 * are illegal in basic auth usernames (:/#?@)
+	 */
+	private static final String ALL_ISO_8859_1_CHARS =
+			" !\"$%&'()*+,-." +
+			"0123456789;<=>" +
+			"ABCDEFGHIJKLMNO" +
+			"PQRSTUVWXYZ[\\]^_" +
+			"`abcdefghijklmno" +
+			"pqrstuvwxyz{|}~ " +
+			"¡¢£¤¥¦§¨©ª«¬®¯" +
+			"°±²³´µ¶·¸¹º»¼½¾¿" +
+			"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ" +
+			"ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß" +
+			"àáâãäåæçèéêëìíîï" +
+			"ðñòóôõö÷øùúûüýþÿ";
+
+	private static final String SIMPLE_NON_ISO_8859_1_CHARS =
+			"ĿŀĲĳŽžĆćĐđǋǌǈǉǅǆŠšČčẼẽĨĩŨũỸỹŐőŰűḂḃĊċḊḋḞḟĠġṀṁṠṡṪṫĀāĒēĪīŌōŪūĂăȘșȚțŢţİıĞğŞşẀẁẂẃŴŵŶŷ€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ";
+
+	@Test public void isValidBasicAuthUsername_validOptions() {
+		final String[] usernames = {
+			"alice", "bob", "username", "gateway",
+			ALL_ISO_8859_1_CHARS,
+		};
+
+		for(String u : usernames)
+			assertTrue("Wrongly rejected username: " + u,
+					SimpleJsonClient2.basicAuth_isValidUsername(u));
+	}
+
+	@Test public void isValidBasicAuthUsername_invalidOptions() {
+		final String[] usernames = {
+			": is bad", "the : is bad", "should fail for :",
+			"/ is bad", "the / is bad", "should fail for /",
+			"# is bad", "the # is bad", "should fail for #",
+			"? is bad", "the ? is bad", "should fail for ?",
+			"@ is bad", "the @ is bad", "should fail for @",
+		};
+
+		for(String u : usernames)
+			assertFalse("Wrongly accepted username: " + u,
+					SimpleJsonClient2.basicAuth_isValidUsername(u));
+	}
+
+	@Test public void isValidBasicAuthPassword_validOptions() {
+		final String[] passwords = {
+			"simplesecret", "password123", "top_secret!",
+			": is good", "the : is good", "should pass for :", ":::::",
+			ALL_ISO_8859_1_CHARS,
+		};
+
+		for(String p : passwords)
+			assertTrue("Wrongly rejected password: " + p,
+					SimpleJsonClient2.basicAuth_isValidPassword(p));
+	}
+
+	@Test public void isValidBasicAuthPassword_invalidOptions() {
+		final String[] passwords = {
+			"/ is bad", "the / is bad", "should fail for /",
+			"# is bad", "the # is bad", "should fail for #",
+			"? is bad", "the ? is bad", "should fail for ?",
+			"@ is bad", "the @ is bad", "should fail for @",
+		};
+
+		for(String p : passwords)
+			assertFalse("Wrongly accepted password: " + p,
+					SimpleJsonClient2.basicAuth_isValidPassword(p));
+
+		for(char c : SIMPLE_NON_ISO_8859_1_CHARS.toCharArray()) {
+			String p = "bad char: " + c;
+			assertFalse("Wrongly accepted password: " + p,
+					SimpleJsonClient2.basicAuth_isValidPassword(p));
+		}
+	}
+
 	@Test
 	public void redactUrl_shouldRemovePasswordsWhenProvided() {
 		final String[] testData = {

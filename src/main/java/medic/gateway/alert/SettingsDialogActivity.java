@@ -18,6 +18,7 @@ import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.SimpleJsonClient2.basicAuth_isValidPassword;
 import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
 import static medic.gateway.alert.Utils.showSpinner;
@@ -119,7 +120,7 @@ public class SettingsDialogActivity extends Activity {
 
 		boolean illegalCharsFound = false;
 
-		if(text(R.id.txtWebappPassword).contains(".*[/#?@].*")) {
+		if(!basicAuth_isValidPassword(text(R.id.txtWebappPassword))) {
 			showError(R.id.txtWebappPassword, R.string.errPassword_illegalChar);
 			illegalCharsFound = true;
 		}
