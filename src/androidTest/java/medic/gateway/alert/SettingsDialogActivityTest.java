@@ -70,7 +70,7 @@ public class SettingsDialogActivityTest {
 		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
 
 		// given
-		settingsStore().save(new Settings(http.url(), true, false));
+		settingsStore().save(new Settings(http.url(), true, false, false));
 
 		// when
 		recreateActivityFor(activityTestRule);
@@ -269,7 +269,7 @@ public class SettingsDialogActivityTest {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
 
 		// given
-		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true, false));
+		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true, false, false));
 
 		// when
 		recreateActivityFor(activityTestRule);

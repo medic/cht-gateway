@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static medic.gateway.alert.BuildConfig.IS_DUMMY_SEND_AVAILABLE;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
@@ -43,12 +46,17 @@ public class SettingsDialogActivity extends Activity {
 
 		setContentView(IS_MEDIC_FLAVOUR ? R.layout.settings_dialog_medic : R.layout.settings_dialog_generic);
 
+		if(IS_DUMMY_SEND_AVAILABLE) addDummySendCheckbox();
+
 		if(hasPreviousSettings) {
 			Settings settings = store.get();
 
 			populateWebappUrlFields(settings.webappUrl);
 			check(R.id.cbxEnablePolling, settings.pollingEnabled);
 			check(R.id.cbxEnableCdmaCompatMode, settings.cdmaCompatMode);
+
+			if(IS_DUMMY_SEND_AVAILABLE)
+				check(R.id.cbxEnableDummySendMode, settings.dummySendMode);
 		} else {
 			cancelButton().setVisibility(View.GONE);
 		}
@@ -158,6 +166,7 @@ public class SettingsDialogActivity extends Activity {
 	private void verifyAndSave() {
 		final String webappUrl = getWebappUrlFromFields();
 		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
+		final boolean dummySendMode = isDummySendModeChecked();
 
 		final ProgressDialog spinner = showSpinner(this,
 				String.format(getString(R.string.txtValidatingWebappUrl),
@@ -171,7 +180,7 @@ public class SettingsDialogActivity extends Activity {
 				boolean savedOk = false;
 
 				if(result.isOk)
-					savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode));
+					savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode, dummySendMode));
 				else
 					showError(IS_MEDIC_FLAVOUR ? R.id.txtWebappInstanceName : R.id.txtWebappUrl, result.failure);
 
@@ -188,13 +197,14 @@ public class SettingsDialogActivity extends Activity {
 	private void saveWithoutVerification() {
 		final String webappUrl = getWebappUrlFromFields();
 		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
+		final boolean dummySendMode = isDummySendModeChecked();
 
 		final ProgressDialog spinner = showSpinner(this,
 				getString(R.string.txtSavingSettings));
 
 		AsyncTask.execute(new Runnable() {
 			public void run() {
-				boolean savedOk = saveSettings(new Settings(webappUrl, false, cdmaCompatMode));
+				boolean savedOk = saveSettings(new Settings(webappUrl, false, cdmaCompatMode, dummySendMode));
 
 				if(savedOk) startApp();
 				else {
@@ -208,6 +218,10 @@ public class SettingsDialogActivity extends Activity {
 				spinner.dismiss();
 			}
 		});
+	}
+
+	private boolean isDummySendModeChecked() {
+		return IS_DUMMY_SEND_AVAILABLE ? checked(R.id.cbxEnableDummySendMode) : false;
 	}
 
 	private boolean saveSettings(Settings s) {
@@ -239,6 +253,16 @@ public class SettingsDialogActivity extends Activity {
 	private void startApp() {
 		startMainActivity(this);
 		finish();
+	}
+
+	private void addDummySendCheckbox() {
+		View prev = findViewById(R.id.cbxEnableCdmaCompatMode);
+		ViewGroup container = (ViewGroup) prev.getParent();
+
+		View cbx = LayoutInflater.from(this).inflate(R.layout.cbx_dummy_send_mode, container, false);
+
+		int insertIdx = 1 + container.indexOfChild(prev);
+		container.addView(cbx, insertIdx);
 	}
 
 	private Button cancelButton() {

@@ -31,7 +31,8 @@
 		<RelativeLayout
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:layout_marginTop="16dp">
 			<Button android:id="@+id/btnCancelSettings"
 					android:text="@string/btnCancel"
 					android:onClick="cancelSettingsEdit"

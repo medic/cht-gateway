@@ -2,6 +2,7 @@ package medic.gateway.alert;
 
 import android.telephony.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import medic.gateway.alert.WoMessage.Status;
@@ -22,7 +23,8 @@ import static org.robolectric.Shadows.*;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert",
-		"PMD.UnnecessaryFullyQualifiedName"})
+		"PMD.UnnecessaryFullyQualifiedName",
+		"PMD.SignatureDeclareThrowsException"})
 public class SmsSenderTest {
 	private DbTestHelper db;
 
@@ -140,6 +142,25 @@ public class SmsSenderTest {
 				"3/3 part 3 starts here: ----------------------------------------------");
 	}
 
+	@Test public void dummySendMode_noMessagesShouldBeSent() throws Exception {
+		// given
+		enableDummySendMode();
+		db.insert("wo_message",
+				cols("_id",    "status", "failure_reason", "last_action", "_to", "content"),
+				vals("id-123", UNSENT,   null,             0,             "+1",  "testing"));
+
+		// when
+		smsSender.sendUnsentSmses();
+
+		// then
+		db.assertTable("wo_message",
+				"id-123", "DELIVERED", null, ANY_NUMBER, "+1", "testing");
+		db.assertTable("wom_status",
+				ANY_ID, "id-123", "PENDING",   null, ANY_NUMBER, true,
+				ANY_ID, "id-123", "SENT",      null, ANY_NUMBER, true,
+				ANY_ID, "id-123", "DELIVERED", null, ANY_NUMBER, true);
+	}
+
 //> PRIVATE HELPERS
 	private void assertSmsSent(String to, String expectedContent) {
 		ShadowSmsManager shadowSmsManager = shadowOf(SmsManager.getDefault());
@@ -152,5 +173,12 @@ public class SmsSenderTest {
 		StringBuilder actualContent = new StringBuilder();
 		for(String part : last.getParts()) actualContent.append(part);
 		assertEquals(expectedContent, actualContent.toString());
+	}
+
+	private void enableDummySendMode() throws Exception {
+		// This reflection is ugly, but helps keep the prod code clean
+		Field dummySendMode = SmsSender.class.getDeclaredField("dummySendMode");
+		dummySendMode.setAccessible(true);
+		dummySendMode.set(smsSender, true);
 	}
 }

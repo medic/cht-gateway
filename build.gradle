@@ -122,6 +122,8 @@ android {
 		buildConfigField "boolean", "TRAVIS", "Boolean.parseBoolean(\"${System.env.TRAVIS}\")";
 		buildConfigField "boolean", "FORCE_SEED", "Boolean.parseBoolean(\"${System.env.FORCE_SEED}\")";
 		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")";
+
+		buildConfigField "boolean", "IS_DUMMY_SEND_AVAILABLE", "Boolean.parseBoolean(\"${System.env.ENABLE_DUMMY_SEND_OPTION}\")";
 	}
 
 	sourceSets {
@@ -183,10 +185,12 @@ android {
 	productFlavors {
 		generic {
 			applicationId = 'medic.gateway.alert.generic'
+			buildConfigField "boolean", "IS_GENERIC_FLAVOUR", "true"
 			buildConfigField "boolean", "IS_MEDIC_FLAVOUR", "false"
 		}
 		medic {
 			applicationId = 'medic.gateway.alert'
+			buildConfigField "boolean", "IS_GENERIC_FLAVOUR", "false"
 			buildConfigField "boolean", "IS_MEDIC_FLAVOUR", "true"
 		}
 	}

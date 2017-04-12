@@ -15,7 +15,9 @@ import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.IntentProcessor.DELIVERY_REPORT;
 import static medic.gateway.alert.IntentProcessor.SENDING_REPORT;
+import static medic.gateway.alert.WoMessage.Status.DELIVERED;
 import static medic.gateway.alert.WoMessage.Status.PENDING;
+import static medic.gateway.alert.WoMessage.Status.SENT;
 import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
 @SuppressWarnings("PMD.LooseCoupling")
@@ -36,6 +38,13 @@ public class SmsSender {
 	 */
 	private final boolean cdmaCompatMode;
 
+	/**
+	 * To aid testing of systems dealing with large numbers of messages, you
+	 * can enable "dummy send" mode, which will immediately set all outgoing
+	 * messages as SENT, instead of actually sending them.
+	 */
+	private final boolean dummySendMode;
+
 	public SmsSender(Context ctx) {
 		this.ctx = ctx;
 		this.db = Db.getInstance(ctx);
@@ -44,6 +53,7 @@ public class SmsSender {
 
 		Settings settings = SettingsStore.in(ctx).get();
 		this.cdmaCompatMode = settings == null ? false : settings.cdmaCompatMode;
+		this.dummySendMode = settings == null ? false : settings.dummySendMode;
 	}
 
 	public void sendUnsentSmses() {
@@ -57,7 +67,8 @@ public class SmsSender {
 			for(WoMessage m : smsForSending) {
 				try {
 					trace(this, "sendUnsentSmses() :: attempting to send %s", m);
-					sendSms(m);
+					if(dummySendMode) sendSms_dummy(m);
+					else sendSms(m);
 				} catch(Exception ex) {
 					logException(ex, "SmsSender.sendUnsentSmses() :: message=%s", m);
 					db.setFailed(m, String.format("Exception: %s; message: %s; cause: %s",
@@ -96,6 +107,13 @@ public class SmsSender {
 				db.setFailed(m, "destination.invalid");
 			}
 		}
+	}
+
+	private void sendSms_dummy(WoMessage m) {
+		logEvent(ctx, "sendSms_dummy() :: [%s] '%s'", m.to, m.content);
+		db.updateStatus(m, UNSENT, PENDING);
+		db.updateStatus(m, PENDING, SENT);
+		db.updateStatus(m, SENT, DELIVERED);
 	}
 
 	private ArrayList<PendingIntent> intentsFor(String intentType, WoMessage m, ArrayList<String> parts) {

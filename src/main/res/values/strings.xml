@@ -21,6 +21,7 @@
 	<string name="cbxEnablePolling">Enable polling</string>
 
 	<string name="cbxEnableCdmaCompatMode">CDMA compatibility mode</string>
+	<string name="cbxEnableDummySendMode">Dummy send mode</string>
 
 	<string name="errRequired">required</string>
 

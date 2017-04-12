@@ -26,7 +26,8 @@ public class SettingsStore {
 		Settings s = new Settings(
 				prefs.getString("app-url", null),
 				prefs.getBoolean("polling-enabled", true),
-				prefs.getBoolean("cdma-compat-enabled", false));
+				prefs.getBoolean("cdma-compat-enabled", false),
+				prefs.getBoolean("dummy-send-enabled", false));
 
 		try {
 			s.validate();
@@ -47,6 +48,7 @@ public class SettingsStore {
 		ed.putString("app-url", s.webappUrl);
 		ed.putBoolean("polling-enabled", s.pollingEnabled);
 		ed.putBoolean("cdma-compat-enabled", s.cdmaCompatMode);
+		ed.putBoolean("dummy-send-enabled", s.dummySendMode);
 		if(!ed.commit()) throw new SettingsException(
 				"Failed to save to SharedPreferences.");
 	}
@@ -72,12 +74,14 @@ class Settings {
 	public final String webappUrl;
 	public final boolean pollingEnabled;
 	public final boolean cdmaCompatMode;
+	public final boolean dummySendMode;
 
-	public Settings(String webappUrl, boolean pollingEnabled, boolean cdmaCompatMode) {
+	public Settings(String webappUrl, boolean pollingEnabled, boolean cdmaCompatMode, boolean dummySendMode) {
 		log("Settings() webappUrl=%s", redactUrl(webappUrl));
 		this.webappUrl = webappUrl;
 		this.pollingEnabled = pollingEnabled;
 		this.cdmaCompatMode = cdmaCompatMode;
+		this.dummySendMode = dummySendMode;
 	}
 
 //> PUBLIC
