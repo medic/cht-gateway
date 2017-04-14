@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Random;
 
 import static android.telephony.PhoneNumberUtils.isGlobalPhoneNumber;
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.logException;
+import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.IntentProcessor.DELIVERY_REPORT;
 import static medic.gateway.alert.IntentProcessor.SENDING_REPORT;
-import static medic.gateway.alert.Utils.*;
-import static medic.gateway.alert.WoMessage.Status.*;
+import static medic.gateway.alert.WoMessage.Status.PENDING;
+import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
 @SuppressWarnings("PMD.LooseCoupling")
 public class SmsSender {

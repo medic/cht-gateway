@@ -1,17 +1,18 @@
 package medic.gateway.alert;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
+import android.content.Context;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.MalformedURLException;
+import java.util.List;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.logException;
+import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.json;
 
 public class WebappPoller {

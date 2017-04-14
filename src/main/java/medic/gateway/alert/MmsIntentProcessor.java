@@ -1,12 +1,12 @@
 package medic.gateway.alert;
 
-import android.content.*;
-import android.net.*;
-import android.telephony.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 
-import static medic.gateway.alert.GatewayLog.*;
-import static medic.gateway.alert.SmsCompatibility.*;
-import static medic.gateway.alert.Utils.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.logException;
+import static medic.gateway.alert.SmsCompatibility.WAP_PUSH_DELIVER_ACTION;
 
 public class MmsIntentProcessor extends BroadcastReceiver {
 	public void onReceive(Context ctx, Intent intent) {

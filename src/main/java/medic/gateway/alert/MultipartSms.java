@@ -1,11 +1,15 @@
 package medic.gateway.alert;
 
-import android.telephony.*;
+import android.telephony.SmsMessage;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logException;
 
 final class MultipartSms {
 	private final int ref;

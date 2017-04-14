@@ -1,7 +1,5 @@
 package medic.gateway.alert;
 
-import java.util.*;
-
 import static medic.gateway.alert.Utils.randomUuid;
 
 /**

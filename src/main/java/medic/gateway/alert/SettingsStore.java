@@ -1,14 +1,16 @@
 package medic.gateway.alert;
 
-import android.content.*;
-import android.util.*;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 
-import java.util.*;
-import java.util.regex.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.LOG_TAG;
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 
 @SuppressWarnings("PMD.ShortMethodName")

@@ -7,7 +7,11 @@ import javax.net.ssl.SSLException;
 
 import static medic.gateway.alert.BuildConfig.DISABLE_APP_URL_VALIDATION;
 import static medic.gateway.alert.GatewayLog.logException;
-import static medic.gateway.alert.R.string.*;
+import static medic.gateway.alert.R.string.errInvalidUrl;
+import static medic.gateway.alert.R.string.errWebappUrl_appNotFound;
+import static medic.gateway.alert.R.string.errWebappUrl_badSsl;
+import static medic.gateway.alert.R.string.errWebappUrl_serverNotFound;
+import static medic.gateway.alert.R.string.errWebappUrl_unauthorised;
 import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 
 public class WebappUrlVerifier {
