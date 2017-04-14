@@ -149,7 +149,7 @@ public class SmsSender {
 	static final ArrayList<String> divideMessageForCdma(String content) {
 		ArrayList<String> parts = new ArrayList<>();
 
-		int perMessageCharLimit = onlyAscii(content) ? 140 : 70;
+		int perMessageCharLimit = onlyExtendedAscii(content) ? 140 : 70;
 
 		if(content.length() <= perMessageCharLimit) {
 			parts.add(content);
@@ -176,9 +176,13 @@ public class SmsSender {
 		return parts;
 	}
 
-	private static boolean onlyAscii(String s) {
+	/**
+	 * Assumes CDMA 8-bit is ISO-8859-1.  Java uses UTF-16 for char values,
+	 * which is identical to ISO-8859-1 in the first 256 characters.
+	 **/
+	private static boolean onlyExtendedAscii(String s) {
 		for(int i=s.length()-1; i>=0; --i)
-			if(s.charAt(i) > 127) return false;
+			if(s.charAt(i) > 255) return false;
 		return true;
 	}
 }
