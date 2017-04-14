@@ -27,24 +27,3 @@ TODONT
 * don't add support for blacklists
 * don't add support for reading config from a QR code
 * don't add support for changing the names of variables in the JSON schema
-
-
-THINGS TO TEST MANUALLY
-
-on each of:
-
-A. pre kitkat
-B. kitkat+ (not default sms app)
-C. kitkat+ (default sms app)
-D. marshmallow+ (not default sms app)
-E. marshmallow+ (default sms app)
-
-test:
-
-* do received SMS get forwarded to webapp?
-* do received SMS get deleted from inbox? (does not apply to `C`, `E`)
-* do messages provided by webapp get sent as SMS?
-* do deliery reports get propagated to webapp?
-* does all of the above work when the device is sleeping?
-* does the gateway/synch process restart when the phone is rebooted?
-* are multipart SMS received and stitched correctly?
