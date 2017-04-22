@@ -275,9 +275,50 @@ public class DbTest {
 		assertNotEquals(0, c.getLong(1));
 	}
 
+	@Test
+	public void setStatusForwarded_shouldUnsetNeedsForwardingFlag() {
+		// given: there is a message in the database which needs forwarding
+		String messageId = randomUuid();
+		long statusId = 123;
+		dbHelper.insert("wo_message",
+				cols("_id",        "status",                 "failure_reason", "last_action", "_to",          "content"),
+				vals(messageId,    WoMessage.Status.PENDING, null,             0,             A_PHONE_NUMBER, SOME_CONTENT));
+		dbHelper.insert("wom_status",
+				cols("_id",    "message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
+				vals(statusId,    messageId,  WoMessage.Status.PENDING, null,             0,           true));
+
+		WoMessage.StatusUpdate newStatus = new WoMessage.StatusUpdate(statusId, messageId, WoMessage.Status.SENT, null, 123456);
+
+		// when
+		db.setStatusForwarded(newStatus);
+
+		// Then
+		dbHelper.assertTable("wom_status",
+				ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, false);
+	}
+
+	@Test
+	public void updateStatus_shouldSetNeedsForwardingFlag() {
+		// given: there is a message in the database which does NOT need forwarding
+		String messageId = randomUuid();
+		dbHelper.insert("wo_message",
+				cols("_id",        "status",                 "failure_reason", "last_action", "_to",          "content"),
+				vals(messageId,    WoMessage.Status.PENDING, null,             0,             A_PHONE_NUMBER, SOME_CONTENT));
+		dbHelper.insert("wom_status",
+				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
+				vals(messageId,    WoMessage.Status.PENDING, null,             0,           false));
+
+		// when
+		db.updateStatus(aMessageWith(messageId, WoMessage.Status.PENDING), WoMessage.Status.SENT);
+
+		// then
+		dbHelper.assertTable("wom_status",
+				ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, true);
+	}
+
 //> WoMessage.StatusUpdate TESTS
 	@Test
-	public void woMessage_store_shouldCreateNewStatusUpdateTableEntry() {
+	public void wo_store_shouldCreateNewStatusUpdateTableEntry() {
 		// given
 		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
 		dbHelper.assertCount("wo_message", 0);
@@ -288,11 +329,11 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, false);
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, true);
 	}
 
 	@Test
-	public void updateStatus_shouldCreateNewStatusUpdateTableEntry() {
+	public void wo_updateStatus_shouldCreateNewStatusUpdateTableEntry() {
 		// given
 		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
 		db.store(m);
@@ -304,7 +345,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, false,
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, true,
 				ANY_NUMBER, m.id, "PENDING", null, ANY_NUMBER, true);
 	}
 
