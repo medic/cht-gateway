@@ -11,7 +11,9 @@ import android.database.SQLException;
 import android.telephony.SmsMessage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.UUID.randomUUID;
 import static medic.gateway.alert.BuildConfig.DEBUG;
@@ -728,6 +730,54 @@ public final class Db extends SQLiteOpenHelper {
 		return rawUpdateOrDelete(db, statement, cols, args);
 	}
 
+//> MESSAGE REPORT
+	@SuppressWarnings("PMD.UseConcurrentHashMap")
+	MessageReport generateMessageReport() {
+		long womCount = 0;
+		long wtmCount = 0;
+		Map<Object, Long> statusCounts = new HashMap<>();
+
+		WoMessages: {
+			Cursor c = null;
+			try {
+				c = db.rawQuery("SELECT " + WOM_clmSTATUS + ",COUNT(" + WOM_clmSTATUS + ") FROM " +
+								tblWO_MESSAGE + " GROUP BY " + WOM_clmSTATUS,
+						args());
+				while(c.moveToNext()) {
+					WoMessage.Status status = WoMessage.Status.valueOf(c.getString(0));
+					long count = c.getLong(1);
+
+					statusCounts.put(status, count);
+
+					womCount += count;
+				}
+			} finally {
+				if(c != null) c.close();
+			}
+		}
+
+		WtMessages: {
+			Cursor c = null;
+			try {
+				c = db.rawQuery("SELECT " + WTM_clmSTATUS + ",COUNT(" + WTM_clmSTATUS + ") FROM " +
+								tblWT_MESSAGE + " GROUP BY " + WTM_clmSTATUS,
+						args());
+				while(c.moveToNext()) {
+					WtMessage.Status status = WtMessage.Status.valueOf(c.getString(0));
+					long count = c.getLong(1);
+
+					statusCounts.put(status, count);
+
+					wtmCount += count;
+				}
+			} finally {
+				if(c != null) c.close();
+			}
+		}
+
+		return new MessageReport(womCount, wtmCount, statusCounts);
+	}
+
 //> STATIC HELPERS
 	private static String[] cols(String... args) {
 		return args;
@@ -770,5 +820,25 @@ enum SortDirection {
 
 	public String apply(String column) {
 		return column + " " + this.toString();
+	}
+}
+
+class MessageReport {
+	final long womCount;
+	final long wtmCount;
+	private final Map<Object, Long> statusCounts;
+
+	MessageReport(long womCount, long wtmCount, Map<Object, Long> statusCounts) {
+		this.womCount = womCount;
+		this.wtmCount = wtmCount;
+		this.statusCounts = statusCounts;
+	}
+
+	public long getCount(WoMessage.Status s) { return getSafely(s); }
+	public long getCount(WtMessage.Status s) { return getSafely(s); }
+
+	private long getSafely(Object k) {
+		Long val = statusCounts.get(k);
+		return val == null ? 0 : val;
 	}
 }

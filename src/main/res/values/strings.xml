@@ -49,6 +49,12 @@
 
 	<string name="mnuCompose">Compose</string>
 	<string name="mnuSettings">Settings</string>
+	<string name="mnuMessageStats">Message Statistics</string>
+
+	<string name="lblMessageStats_title">Message Stats</string>
+	<string name="lblMessageStats_wo_total">- Webapp originating: %d</string>
+	<string name="lblMessageStats_wt_total">- Webapp terminating: %d</string>
+	<string name="lblMessageStats_forStatus">--- %1$s: %2$d</string>
 
 	<string name="mnuDeleteOldData">Clear old data</string>
 	<string name="txtConfirmDeleteOldData_title">Clear old data</string>

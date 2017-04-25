@@ -22,7 +22,7 @@ import static medic.gateway.alert.test.TestUtils.*;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.GodClass", "PMD.JUnitTestsShouldIncludeAssert", "PMD.TooManyMethods"})
 public class DbTest {
 	private Db db;
 
@@ -520,6 +520,83 @@ public class DbTest {
 				"entry: 485", "entry: 486", "entry: 487", "entry: 488", "entry: 489",
 				"entry: 490", "entry: 491", "entry: 492", "entry: 493", "entry: 494",
 				"entry: 495", "entry: 496", "entry: 497", "entry: 498", "entry: 499");
+	}
+
+//> MESSAGE REPORT TESTS
+	@Test
+	public void generateMessageReport_forAnEmptyDatabase_shouldGiveZeroForEverything() {
+		// when
+		MessageReport r = db.generateMessageReport();
+
+		// then
+		assertEquals(0, r.womCount);
+		for(WoMessage.Status s : WoMessage.Status.values())
+			assertEquals(0, r.getCount(s));
+
+		assertEquals(0, r.wtmCount);
+		for(WtMessage.Status s : WtMessage.Status.values())
+			assertEquals(0, r.getCount(s));
+	}
+
+	@Test
+	public void generateMessageReport_shouldCountThingsReliably() {
+		// given
+		dbHelper.insert("wo_message",
+				cols("_id",        "status",                  "last_action", "_to",          "content"),
+				vals(randomUuid(), WoMessage.Status.UNSENT,   0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.PENDING,  0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.PENDING,  0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""));
+		dbHelper.insert("wt_message",
+				cols("_id",        "status",                   "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+
+		// when
+		MessageReport r = db.generateMessageReport();
+
+		// then
+		assertEquals(15, r.womCount);
+		assertEquals(1, r.getCount(WoMessage.Status.UNSENT));
+		assertEquals(2, r.getCount(WoMessage.Status.PENDING));
+		assertEquals(3, r.getCount(WoMessage.Status.SENT));
+		assertEquals(4, r.getCount(WoMessage.Status.FAILED));
+		assertEquals(5, r.getCount(WoMessage.Status.DELIVERED));
+
+		assertEquals(21, r.wtmCount);
+		assertEquals(6, r.getCount(WtMessage.Status.WAITING));
+		assertEquals(7, r.getCount(WtMessage.Status.FORWARDED));
+		assertEquals(8, r.getCount(WtMessage.Status.FAILED));
 	}
 
 //> MIGRATION TESTS

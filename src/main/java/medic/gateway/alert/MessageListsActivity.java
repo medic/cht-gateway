@@ -82,6 +82,9 @@ public class MessageListsActivity extends TabActivity {
 
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
+			case R.id.mnuMessageStats:
+				MessageStatsDialog.show(this);
+				return true;
 			case R.id.mnuCompose:
 				Intent composer;
 				if(getCapabilities().isDefaultSmsProvider(this)) {
