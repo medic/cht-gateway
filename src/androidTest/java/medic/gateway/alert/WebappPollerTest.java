@@ -70,6 +70,54 @@ public class WebappPollerTest extends AndroidTestCase {
 	}
 
 	@Test
+	public void test_pollWebapp_shouldNotDuplicateMessagesAcrossRequests() throws Exception {
+		// given
+		String waitingId = randomUuid();
+		db.insert("wt_message",
+				cols("_id",        "status",                   "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(randomUuid(), WtMessage.Status.FORWARDED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(waitingId,    WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 1,          2),
+				vals(randomUuid(), WtMessage.Status.FAILED,    0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+		http.queueResponses("{}", "{}");
+
+		// when
+		new WebappPoller(getContext()).pollWebapp();
+
+		// then
+		{
+			JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
+			assertEquals(1, requestBody.getJSONArray("messages").length());
+		}
+
+		// when
+		new WebappPoller(getContext()).pollWebapp();
+
+		// then
+		{
+			JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
+			assertEquals(0, requestBody.getJSONArray("messages").length());
+		}
+	}
+
+	@Test
+	public void test_pollWebapp_shouldMarkWaitingWtMessagesAsForwarded() throws Exception {
+		// given
+		String waitingId = randomUuid();
+		db.insert("wt_message",
+				cols("_id",     "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(waitingId, WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 1,          2));
+		http.nextResponseJson("{}");
+
+		// when
+		new WebappPoller(getContext()).pollWebapp();
+
+		// then
+		http.assertPostRequestMade_withJsonResponse();
+		db.assertTable("wt_message",
+				ANY_ID, "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, 1, 2);
+	}
+
+	@Test
 	public void test_pollWebapp_shouldOnlyIncludeStatusUpdatesThatNeedForwarding() throws Exception {
 		// given
 		String deliveredId = randomUuid();

@@ -47,7 +47,15 @@ public class HttpTestHelper {
 
 //> TEST HELPERS
 	public void nextResponseJson(String jsonString) {
+		queueResponse(jsonString);
+	}
+
+	public void queueResponse(String jsonString) {
 		server.enqueue(new MockResponse().setBody(jsonString));
+	}
+
+	public void queueResponses(String... jsonStrings) {
+		for(String s : jsonStrings) queueResponse(s);
 	}
 
 	public void nextResponseError(int httpResponseCode) {
