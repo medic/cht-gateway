@@ -25,7 +25,7 @@ public class DbTestHelper {
 
 	private static final Random RANDOM = new Random();
 
-	private Db db;
+	private Db appDb;
 	public final SQLiteDatabase raw;
 
 //> CONSTRUCTORS
@@ -40,14 +40,14 @@ public class DbTestHelper {
 	public DbTestHelper(Context ctx) throws Exception {
 		Constructor<?> constructor = Db.class.getDeclaredConstructor(Context.class);
 		constructor.setAccessible(true);
-		db = (Db) constructor.newInstance(ctx);
-		raw = db.getWritableDatabase();
+		appDb = (Db) constructor.newInstance(ctx);
+		raw = appDb.getWritableDatabase();
 	}
 
 //> ACCESSORS
-	public Db getDb() {
-		if(db == null) throw new IllegalStateException("Should not be trying to get db unless the DbTestHelper was constructed using a Context");
-		return db;
+	public Db getAppDb() {
+		if(appDb == null) throw new IllegalStateException("Should not be trying to get db unless the DbTestHelper was constructed using a Context");
+		return appDb;
 	}
 
 //> TEST METHODS

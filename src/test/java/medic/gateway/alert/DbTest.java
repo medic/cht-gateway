@@ -31,7 +31,7 @@ public class DbTest {
 	@Before
 	public void setUp() throws Exception {
 		dbHelper = new DbTestHelper(RuntimeEnvironment.application);
-		db = dbHelper.getDb();
+		db = dbHelper.getAppDb();
 
 		db.setLogEntryLimit(50);
 	}
