@@ -287,14 +287,15 @@ public class DbTest {
 				cols("_id",    "message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
 				vals(statusId,    messageId,  WoMessage.Status.PENDING, null,             0,           true));
 
-		WoMessage.StatusUpdate newStatus = new WoMessage.StatusUpdate(statusId, messageId, WoMessage.Status.SENT, null, 123456);
+		// A corresponding StatusUpdate to send to api.
+		WoMessage.StatusUpdate newStatus = new WoMessage.StatusUpdate(statusId, messageId, WoMessage.Status.PENDING, null, 123456);
 
 		// when
 		db.setStatusForwarded(newStatus);
 
-		// Then
+		// Then : stored status is updated to set needs_forwarding to false.
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, false);
+				statusId, messageId, "PENDING", null, 0, false);
 	}
 
 	@Test
@@ -311,9 +312,10 @@ public class DbTest {
 		// when
 		db.updateStatus(aMessageWith(messageId, WoMessage.Status.PENDING), WoMessage.Status.SENT);
 
-		// then
+		// then : creates a new status, with the needs_forwarding flag set.
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, true);
+				ANY_NUMBER, messageId, "PENDING", null, 0, false,
+				ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, true /* needs_forwarding */);
 	}
 
 //> WoMessage.StatusUpdate TESTS
