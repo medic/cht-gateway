@@ -273,8 +273,10 @@ public class WebappPollerTest extends AndroidTestCase {
 				"aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "testing: one",
 				"aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "testing: two");
 		db.assertTable("wom_status",
-				ANY_NUMBER, "aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
-				ANY_NUMBER, "aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, false);
+				// needs_forwarding == true, because we're going to report the UNSENT status at next
+				// poll to confirm the message was saved.
+				ANY_NUMBER, "aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, true,
+				ANY_NUMBER, "aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, true);
 	}
 
 	@Test
@@ -315,7 +317,7 @@ public class WebappPollerTest extends AndroidTestCase {
 				"ok-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "ok: one",
 				"ok-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "ok: two");
 		db.assertTable("wom_status",
-				ANY_NUMBER, "ok-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
-				ANY_NUMBER, "ok-222", "UNSENT", NO_REASON, ANY_NUMBER, false);
+				ANY_NUMBER, "ok-111", "UNSENT", NO_REASON, ANY_NUMBER, true,
+				ANY_NUMBER, "ok-222", "UNSENT", NO_REASON, ANY_NUMBER, true);
 	}
 }
