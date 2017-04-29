@@ -8,7 +8,7 @@ import android.annotation.SuppressLint;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
-import static medic.gateway.alert.GatewayLog.*;
+import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.Settings.POLL_INTERVAL;
 
 @SuppressLint("ShortAlarm") // On Android 5.1+, poll interval will be forced up to 60s if below that
