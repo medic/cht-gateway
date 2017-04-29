@@ -2,14 +2,12 @@ package medic.gateway.alert;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static medic.gateway.alert.BuildConfig.DEBUG;
-import static medic.gateway.alert.BuildConfig.LOG_TAG;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 
@@ -54,7 +52,7 @@ public class SettingsStore {
 	}
 
 	public static SettingsStore in(Context ctx) {
-		if(DEBUG) Log.d(LOG_TAG, String.format("SettingStore :: loading for context: %s", ctx));
+		trace(SettingsStore.class, "loading for context: %s", ctx);
 
 		SharedPreferences prefs = ctx.getSharedPreferences(
 				SettingsStore.class.getName(),
@@ -77,7 +75,7 @@ class Settings {
 	public final boolean dummySendMode;
 
 	public Settings(String webappUrl, boolean pollingEnabled, boolean cdmaCompatMode, boolean dummySendMode) {
-		log("Settings() webappUrl=%s", redactUrl(webappUrl));
+		trace(this, "Settings() webappUrl=%s", redactUrl(webappUrl));
 		this.webappUrl = webappUrl;
 		this.pollingEnabled = pollingEnabled;
 		this.cdmaCompatMode = cdmaCompatMode;
@@ -108,10 +106,6 @@ class Settings {
 //> PRIVATE HELPERS
 	private boolean isSet(String val) {
 		return val != null && val.length() > 0;
-	}
-
-	private void log(String message, Object...extras) {
-		trace(this, message, extras);
 	}
 
 //> FACTORIES
