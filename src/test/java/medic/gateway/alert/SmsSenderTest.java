@@ -84,7 +84,9 @@ public class SmsSenderTest {
 	@Test
 	public void divideMessageForCdma_ascii_shouldLeaveSinglePartMessagesAlone() {
 		// given
-		String messageContent = "single message of 140 valid ascii chars";
+		String messageContent =
+				"single message of 140 valid ascii chars ------------------------------" +
+				"----------------------------------------------------------------------";
 
 		// when
 		ArrayList<String> actual = SmsSender.divideMessageForCdma(messageContent);
