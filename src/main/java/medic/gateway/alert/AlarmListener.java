@@ -14,7 +14,8 @@ import static medic.gateway.alert.Settings.POLL_INTERVAL;
 @SuppressLint("ShortAlarm") // On Android 5.1+, poll interval will be forced up to 60s if below that
 public class AlarmListener implements WakefulIntentService.AlarmListener {
 	public void scheduleAlarms(AlarmManager am, PendingIntent pendingIntent, Context ctx) {
-		if(Settings.in(ctx).pollingEnabled) {
+		Settings s = Settings.in(ctx);
+		if(s != null && s.pollingEnabled) {
 			logEvent(ctx, "AlarmManager.scheduleAlarms() :: polling enabled - setting alarms");
 
 			// On SDK >= 19, setRepeating will be inexact - the OS will try to fit alarms in with other
