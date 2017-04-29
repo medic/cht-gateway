@@ -51,7 +51,7 @@ public class SmsSender {
 		this.smsManager = SmsManager.getDefault();
 		this.r = new Random();
 
-		Settings settings = SettingsStore.in(ctx).get();
+		Settings settings = Settings.in(ctx);
 		this.cdmaCompatMode = settings == null ? false : settings.cdmaCompatMode;
 		this.dummySendMode = settings == null ? false : settings.dummySendMode;
 	}
