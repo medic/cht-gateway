@@ -53,6 +53,10 @@ Some CDMA networks have limited support for multipart SMS messages.  This can oc
 * multipart messages sent to CDMA phones never arrive; or
 * multipart messages sent to CDMA phones are truncated
 
+# Passwords
+
+When using HTTP Basic Auth with gateway, all characters in the password must be chosen from the [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) characterset, excluding `#`, `/`, `?`, `@`.
+
 # API
 
 This is the API specification for communications between `medic-gateway` and a web server.  Messages in both directions are `application/json`.
