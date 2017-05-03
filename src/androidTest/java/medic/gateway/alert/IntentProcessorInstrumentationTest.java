@@ -240,11 +240,39 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 			Field f = BroadcastReceiver.class.getDeclaredField("mPendingResult");
 			f.setAccessible(true);
 			f.set(intentProcessor, pr);
-		} catch(Exception ex) {
-			throw new RuntimeException(ex);
-		}
 
-		deliver(i);
+			deliver(i);
+
+			return;
+		} catch(Exception ex) { /* ignore */ }
+
+		try {
+			Constructor c = BroadcastReceiver.PendingResult.class.getDeclaredConstructor(int.class, String.class, android.os.Bundle.class, int.class, boolean.class, boolean.class, android.os.IBinder.class, int.class, int.class);
+			c.setAccessible(true);
+			BroadcastReceiver.PendingResult pr = (BroadcastReceiver.PendingResult) c.newInstance(resultCode, null, null, 0, false, false, null, 0, 0);
+
+			Field f = BroadcastReceiver.class.getDeclaredField("mPendingResult");
+			f.setAccessible(true);
+			f.set(intentProcessor, pr);
+
+			deliver(i);
+
+			return;
+		} catch(Exception ex) { /* ignore */ }
+
+		StringBuilder details = new StringBuilder();
+		for(Constructor c : BroadcastReceiver.PendingResult.class.getDeclaredConstructors()) {
+			details.append(c.getName());
+			details.append('(');
+			for(Class p : c.getParameterTypes()) {
+				details.append(p.getName());
+				details.append(',');
+			}
+			details.append("); ");
+		}
+		throw new RuntimeException("Looks like this version of Android isn't properly supported by this test :¬\\  " +
+				"Maybe one of these contructors will help: " + details);
+
 	}
 
 	private void deliver(Intent i) {
