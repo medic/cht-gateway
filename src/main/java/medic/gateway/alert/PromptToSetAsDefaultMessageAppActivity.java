@@ -38,7 +38,9 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 
 		setContentView(R.layout.set_as_default_messaging_app);
 
-		setText(this, R.id.txtDefaultMessageAppPrompt, R.string.txtDefaultMessageAppPrompt, getAppName(this));
+		String appName = getAppName(this);
+		setText(this, R.id.txtDefaultMessageAppWarning, R.string.txtDefaultMessageAppWarning, appName);
+		setText(this, R.id.txtDefaultMessageAppPrompt, R.string.txtDefaultMessageAppPrompt, appName);
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
