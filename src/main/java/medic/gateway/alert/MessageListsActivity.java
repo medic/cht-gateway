@@ -3,9 +3,14 @@ package medic.gateway.alert;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.AsyncTask;
@@ -15,6 +20,7 @@ import android.widget.TabHost;
 
 import static medic.gateway.alert.Capabilities.getCapabilities;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.getAppName;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
 import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startSettingsActivity;
@@ -22,6 +28,8 @@ import static medic.gateway.alert.Utils.toast;
 
 @SuppressWarnings("deprecation")
 public class MessageListsActivity extends TabActivity {
+	private static final long FIVE_MINUTES = 300000;
+
 	private static final Class[] TAB_CLASSES = {
 		GatewayEventLogActivity.class, WoListActivity.class, WtListActivity.class,
 	};
@@ -57,6 +65,14 @@ public class MessageListsActivity extends TabActivity {
 		}
 	};
 
+	private final BroadcastReceiver pollUpdateReceiver = new BroadcastReceiver() {
+		@Override public void onReceive(Context ctx, Intent i) {
+			if(LastPoll.isStatusUpdate(i)) {
+				updateForPollStatus();
+			}
+		}
+	};
+
 //> EVENT HANDLERS
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		log("Starting...");
@@ -73,6 +89,15 @@ public class MessageListsActivity extends TabActivity {
 			spec.setContent(new Intent(this, TAB_CLASSES[i]));
 			tabHost.addTab(spec);
 		}
+
+		updateForPollStatus();
+
+		LastPoll.register(this, pollUpdateReceiver);
+	}
+
+	@Override protected void onDestroy() {
+		super.onDestroy();
+		LastPoll.unregister(this, pollUpdateReceiver);
 	}
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -114,6 +139,54 @@ public class MessageListsActivity extends TabActivity {
 	private void openSettings() {
 		startSettingsActivity(this, getCapabilities());
 		finish();
+	}
+
+	private void updateForPollStatus() {
+		boolean pollingEnabled = Settings.in(this).pollingEnabled;
+		LastPoll last = LastPoll.getFrom(this);
+
+		char c;
+		Drawable icon;
+
+		if(pollingEnabled && last != null) {
+			if(last.wasSuccessful && last.timestamp + FIVE_MINUTES > System.currentTimeMillis()) {
+				icon = baseIcon();
+				c = '+';
+			} else {
+				icon = redIcon();
+				c = '!';
+			}
+		} else {
+			icon = grayscaleIcon();
+			c = '-';
+		}
+
+		this.getActionBar().setIcon(icon);
+		setTitle(c + " " + getAppName(this));
+	}
+
+	private Drawable baseIcon() {
+		return getResources().getDrawable(R.mipmap.icn_launcher).mutate();
+	}
+
+	private Drawable redIcon() {
+		Drawable icon = baseIcon();
+
+		icon.setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY);
+
+		return icon;
+	}
+
+	private Drawable grayscaleIcon() {
+		Drawable icon = baseIcon();
+
+		ColorMatrix matrix = new ColorMatrix();
+		matrix.setSaturation(0);
+		ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+
+		icon.setColorFilter(filter);
+
+		return icon;
 	}
 
 	private void log(String message, Object...extras) {

@@ -17,7 +17,7 @@ public class WakefulService extends WakefulIntentService {
 		super("WakefulService");
 	}
 
-	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
+	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity" })
 	public void doWakefulWork(Intent intent) {
 		boolean enableWifiAfterWork = false;
 		WifiConnectionManager wifiMan = null;
@@ -30,11 +30,11 @@ public class WakefulService extends WakefulIntentService {
 
 		try {
 			WebappPoller poller = new WebappPoller(this);
-			SimpleResponse resp = poller.pollWebapp();
+			SimpleResponse lastResponse = poller.pollWebapp();
 
 			// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
-			if(resp instanceof ExceptionResponse) {
-				ExceptionResponse exResponse = (ExceptionResponse) resp;
+			if(lastResponse instanceof ExceptionResponse) {
+				ExceptionResponse exResponse = (ExceptionResponse) lastResponse;
 				if(exResponse.ex instanceof SocketTimeoutException ||
 						exResponse.ex instanceof UnknownHostException ||
 						exResponse.ex instanceof ConnectException ||
@@ -44,12 +44,21 @@ public class WakefulService extends WakefulIntentService {
 						logEvent(this, "Disabling wifi and then retrying poll...");
 						enableWifiAfterWork = true;
 						wifiMan.disableWifi();
-						poller.pollWebapp();
+						lastResponse = poller.pollWebapp();
 					}
 				}
 			}
+
+			if(lastResponse instanceof ExceptionResponse) {
+				LastPoll.failed(this);
+			} else {
+				LastPoll.succeeded(this);
+			}
 		} catch(Exception ex) {
 			logException(this, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
+			LastPoll.failed(this);
+		} finally {
+			LastPoll.broadcast(this);
 		}
 
 		try {
