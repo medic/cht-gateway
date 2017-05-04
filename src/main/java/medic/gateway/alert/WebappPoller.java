@@ -1,6 +1,11 @@
 package medic.gateway.alert;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.net.MalformedURLException;
 import java.util.List;
@@ -36,6 +41,7 @@ public class WebappPoller {
 		webappUrl = Settings.in(ctx).webappUrl;
 	}
 
+//> PUBLIC API
 	public SimpleResponse pollWebapp() throws JSONException, MalformedURLException {
 		logEvent(ctx, "Polling webapp (forwarding %d messages & %d status updates)...",
 				request.wtMessageCount(), request.statusUpdateCount());
@@ -52,6 +58,7 @@ public class WebappPoller {
 		return response;
 	}
 
+//> PRIVATE HELPERS
 	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
 			try {
@@ -175,5 +182,71 @@ class GatewayRequest {
 		}
 
 		return json;
+	}
+}
+
+class LastPoll {
+	private static final String INTENT_UPDATED = "medic.gateway.WebappPoller.UPDATED";
+
+	private static final String PREF_LAST_TIMESTAMP = "last-timestamp";
+	private static final String PREF_LAST_WAS_SUCCESSFUL = "last-was-successful";
+
+//> INSTANCE
+	final long timestamp;
+	final boolean wasSuccessful;
+	LastPoll(long timestamp, boolean wasSuccessful) {
+		this.timestamp = timestamp;
+		this.wasSuccessful = wasSuccessful;
+	}
+
+//> PUBLIC UTILITIES
+	static void succeeded(Context ctx) {
+		logLast(ctx, true);
+	}
+
+	static void failed(Context ctx) {
+		logLast(ctx, false);
+	}
+
+	static LastPoll getFrom(Context ctx) {
+		SharedPreferences prefs = prefs(ctx);
+
+		if(!prefs.contains(PREF_LAST_TIMESTAMP) || !prefs.contains(PREF_LAST_WAS_SUCCESSFUL)) {
+			return null;
+		} else {
+			return new LastPoll(prefs.getLong(PREF_LAST_TIMESTAMP, 0),
+					prefs.getBoolean(PREF_LAST_WAS_SUCCESSFUL, true));
+		}
+	}
+
+	static boolean isStatusUpdate(Intent i) {
+		return INTENT_UPDATED.equals(i.getAction());
+	}
+
+	public static void register(Context ctx, BroadcastReceiver receiver) {
+		IntentFilter f = new IntentFilter();
+		f.addAction(INTENT_UPDATED);
+		LocalBroadcastManager.getInstance(ctx).registerReceiver(receiver, f);
+	}
+
+	public static void unregister(Context ctx, BroadcastReceiver receiver) {
+		LocalBroadcastManager.getInstance(ctx).unregisterReceiver(receiver);
+	}
+
+	public static void broadcast(Context ctx) {
+		Intent i = new Intent(INTENT_UPDATED);
+		LocalBroadcastManager.getInstance(ctx).sendBroadcast(i);
+	}
+
+//> STATIC HELPERS
+	private static SharedPreferences prefs(Context ctx) {
+		return ctx.getSharedPreferences(WebappPoller.class.getName(), Context.MODE_PRIVATE);
+	}
+
+	private static void logLast(Context ctx, boolean success) {
+		SharedPreferences.Editor e = prefs(ctx).edit();
+		e.putLong(PREF_LAST_TIMESTAMP, System.currentTimeMillis());
+		e.putBoolean(PREF_LAST_WAS_SUCCESSFUL, success);
+		e.apply();
 	}
 }
