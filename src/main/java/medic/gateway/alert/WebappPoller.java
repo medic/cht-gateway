@@ -52,14 +52,14 @@ public class WebappPoller {
 		if(response.isError()) {
 			handleError(response);
 		} else {
-			handleJsonResponse(request, ((JsonResponse) response).json);
+			handleOkResponse(request, ((JsonResponse) response).json);
 		}
 
 		return response;
 	}
 
 //> PRIVATE HELPERS
-	private void handleJsonResponse(GatewayRequest request, JSONObject response) throws JSONException {
+	private void handleOkResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
 			try {
 				db.updateStatusFrom(WtMessage.Status.WAITING, m);
@@ -88,7 +88,7 @@ public class WebappPoller {
 			try {
 				saveMessage(messages.getJSONObject(i));
 			} catch(Exception ex) {
-				logException(ex, "WebappPoller.handleJsonResponse()");
+				logException(ex, "WebappPoller.handleOkResponse()");
 			}
 		}
 	}
