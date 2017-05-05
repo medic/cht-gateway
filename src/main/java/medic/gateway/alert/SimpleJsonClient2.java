@@ -65,7 +65,7 @@ public class SimpleJsonClient2 {
 
 			return new JsonResponse(conn.getResponseCode(),
 					jsonResponseFrom("get", inputStream));
-		} catch(JSONException | IOException ex) {
+		} catch(IOException | JSONException ex) {
 			return exceptionResponseFor(conn, ex);
 		} finally {
 			closeSafely("get", inputStream);
