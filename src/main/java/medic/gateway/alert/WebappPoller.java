@@ -94,15 +94,17 @@ public class WebappPoller {
 	}
 
 	private void handleError(SimpleResponse response) throws JSONException {
-		String description = "unknown";
+		CharSequence description = "unknown";
 
 		if(response instanceof JsonResponse) {
 			JsonResponse jsonResponse = (JsonResponse) response;
 			if(jsonResponse.json.has("message")) description = jsonResponse.json.getString("message");
-		} else {
-			ExceptionResponse errorResponse = (ExceptionResponse) response;
-			description = errorResponse.ex.toString();
+		} else if(response instanceof ExceptionResponse) {
+			description = ((ExceptionResponse) response).ex.toString();
+		} else if(response instanceof TextResponse) {
+			description = ((TextResponse) response).text;
 		}
+
 
 		logEvent(ctx, "Received error from server: %s: %s", response.status, description);
 	}

@@ -4,6 +4,8 @@ import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.nio.charset.Charset;
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -52,23 +54,14 @@ public class SimpleJsonClient2 {
 	public SimpleResponse get(URL url) {
 		if(DEBUG) traceMethod("get", "url", redactUrl(url));
 		HttpURLConnection conn = null;
-		InputStream inputStream = null;
 		try {
 			conn = openConnection(url);
 			conn.setRequestProperty("Content-Type", "application/json");
 
-			if(conn.getResponseCode() < 400) {
-				inputStream = conn.getInputStream();
-			} else {
-				inputStream = conn.getErrorStream();
-			}
-
-			return new JsonResponse(conn.getResponseCode(),
-					jsonResponseFrom("get", inputStream));
+			return responseFrom("get", conn);
 		} catch(IOException | JSONException ex) {
 			return exceptionResponseFor(conn, ex);
 		} finally {
-			closeSafely("get", inputStream);
 			closeSafely("get", conn);
 		}
 	}
@@ -82,7 +75,6 @@ public class SimpleJsonClient2 {
 		if(DEBUG) traceMethod("post", "url", redactUrl(url));
 		HttpURLConnection conn = null;
 		OutputStream outputStream = null;
-		InputStream inputStream = null;
 		try {
 			conn = openConnection(url);
 			conn.setDoOutput(true);
@@ -95,19 +87,11 @@ public class SimpleJsonClient2 {
 			outputStream = conn.getOutputStream();
 			outputStream.write(content.toString().getBytes("UTF-8"));
 
-			if(conn.getResponseCode() < 400) {
-				inputStream = conn.getInputStream();
-			} else {
-				inputStream = conn.getErrorStream();
-			}
-
-			return new JsonResponse(conn.getResponseCode(),
-					jsonResponseFrom("post", inputStream));
+			return responseFrom("post", conn);
 		} catch(IOException | JSONException ex) {
 			return exceptionResponseFor(conn, ex);
 		} finally {
 			closeSafely("post", outputStream);
-			closeSafely("post", inputStream);
 			closeSafely("post", conn);
 		}
 	}
@@ -143,7 +127,33 @@ public class SimpleJsonClient2 {
 	}
 
 //> INSTANCE HELPERS
-	private JSONObject jsonResponseFrom(String method, InputStream in) throws IOException, JSONException {
+	@SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE") // for closeSafely()
+	private SimpleResponse responseFrom(String method, HttpURLConnection conn) throws IOException, JSONException {
+		int status = conn.getResponseCode();
+
+		InputStream inputStream = null;
+		try {
+			if(status < 400) {
+				inputStream = conn.getInputStream();
+				return new JsonResponse(status, readStream(method, inputStream));
+			} else {
+				inputStream = conn.getErrorStream();
+
+				if(inputStream == null) return new EmptyResponse(status);
+
+				CharSequence responseBody = readStream(method, inputStream);
+				try {
+					return new JsonResponse(status, responseBody);
+				} catch(JSONException ex) {
+					return new TextResponse(status, responseBody);
+				}
+			}
+		} finally {
+			closeSafely(method, inputStream);
+		}
+	}
+
+	private CharSequence readStream(String method, InputStream in) throws IOException {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(in, "UTF-8"), 8);
@@ -153,9 +163,10 @@ public class SimpleJsonClient2 {
 			while((line = reader.readLine()) != null) {
 				bob.append(line).append('\n');
 			}
-			String jsonString = bob.toString();
-			if(DEBUG) log(method, "Retrieved JSON: %s", jsonString);
-			return new JSONObject(jsonString);
+
+			if(DEBUG) log(method, "Retrieved text: %s", bob);
+
+			return bob;
 		} finally {
 			closeSafely(method, reader);
 		}
@@ -244,7 +255,22 @@ abstract class SimpleResponse {
 		this.status = status;
 	}
 
-	abstract boolean isError();
+	boolean isError() {
+		return this.status < 200 || this.status >= 300;
+	}
+}
+
+class EmptyResponse extends SimpleResponse {
+	EmptyResponse(int status) { super(status); }
+}
+
+class TextResponse extends SimpleResponse {
+	final CharSequence text;
+
+	TextResponse(int status, CharSequence text) {
+		super(status);
+		this.text = text;
+	}
 }
 
 class ExceptionResponse extends SimpleResponse {
@@ -255,7 +281,7 @@ class ExceptionResponse extends SimpleResponse {
 		this.ex = ex;
 	}
 
-	boolean isError() { return true; }
+	@Override boolean isError() { return true; }
 
 	public String toString() {
 		return new StringBuilder()
@@ -271,13 +297,9 @@ class ExceptionResponse extends SimpleResponse {
 class JsonResponse extends SimpleResponse {
 	final JSONObject json;
 
-	JsonResponse(int status, JSONObject json) {
+	JsonResponse(int status, CharSequence json) throws JSONException {
 		super(status);
-		this.json = json;
-	}
-
-	boolean isError() {
-		return this.status < 200 || this.status >= 300;
+		this.json = new JSONObject(json.toString());
 	}
 
 	public String toString() {
