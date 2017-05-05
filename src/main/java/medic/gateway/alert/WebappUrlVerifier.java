@@ -29,7 +29,7 @@ public class WebappUrlVerifier {
 		try {
 			SimpleResponse response = new SimpleJsonClient2().get(webappUrl);
 
-			if(response instanceof JsonResponse && response.status < 400)
+			if(response instanceof JsonResponse && !response.isError())
 				return handleJsonResponse(webappUrl, (JsonResponse) response);
 			else return handleFailResponse(webappUrl, response);
 		} catch(MalformedURLException ex) {
