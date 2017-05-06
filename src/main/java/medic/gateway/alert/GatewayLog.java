@@ -27,7 +27,7 @@ public final class GatewayLog {
 	}
 
 	public static void logException(Context ctx, Exception ex, String message, Object... extras) {
-		message = String.format(message, extras);
+		message = forException(ex, message, extras);
 
 		i(LOG_TAG, message, ex);
 
@@ -39,7 +39,7 @@ public final class GatewayLog {
 	}
 
 	public static void logException(Exception ex, String message, Object... extras) {
-		message = String.format(message, extras);
+		message = forException(ex, message, extras);
 
 		i(LOG_TAG, message, ex);
 	}
@@ -56,5 +56,11 @@ public final class GatewayLog {
 		} catch(SQLiteException ex) {
 			logException(ex, "Could not write log entry to DB.");
 		}
+	}
+
+	private static String forException(Exception ex, String message, Object... extras) {
+		return String.format("%s :: %s",
+				String.format(message, extras),
+				ex);
 	}
 }
