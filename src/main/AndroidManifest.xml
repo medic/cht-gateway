@@ -26,6 +26,10 @@
 	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
+	<!-- Required internally for sending multipart UCS2 messages - see:
+	       https://github.com/medic/medic-gateway/issues/103 -->
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
 	<application android:label="@string/app_name"
 			android:icon="@mipmap/icn_launcher"
 			android:allowBackup="false"
