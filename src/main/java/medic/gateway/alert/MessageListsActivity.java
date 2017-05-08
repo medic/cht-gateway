@@ -142,7 +142,8 @@ public class MessageListsActivity extends TabActivity {
 	}
 
 	private void updateForPollStatus() {
-		boolean pollingEnabled = Settings.in(this).pollingEnabled;
+		boolean pollingEnabled = SettingsStore.in(this).hasSettings() &&
+				Settings.in(this).pollingEnabled;
 		LastPoll last = LastPoll.getFrom(this);
 
 		char c;
