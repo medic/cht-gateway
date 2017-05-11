@@ -142,8 +142,8 @@ public class DbTestHelper {
 					Object expected = expectedValues[i * colCount + j];
 					String actual = c.getString(j);
 
-					String failMessage = String.format("Expected row: %s.  Unexpected value at (%s, %s):",
-							expectedRow, i, j);
+					String failMessage = String.format("Unexpected value at row %s column %s.  Expected row: %s.",
+							i, j, expectedRow);
 					if(expected == null) {
 						assertNull(failMessage, actual);
 					} else if(expected instanceof Pattern) {
