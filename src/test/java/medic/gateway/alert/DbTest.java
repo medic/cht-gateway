@@ -320,7 +320,7 @@ public class DbTest {
 
 //> WoMessage.StatusUpdate TESTS
 	@Test
-	public void wo_store_shouldCreateNewStatusUpdateTableEntry() {
+	public void woMessage_store_shouldCreateNewStatusUpdateTableEntry() {
 		// given
 		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
 		dbHelper.assertCount("wo_message", 0);
@@ -335,7 +335,7 @@ public class DbTest {
 	}
 
 	@Test
-	public void wo_updateStatus_shouldCreateNewStatusUpdateTableEntry() {
+	public void updateStatus_shouldCreateNewStatusUpdateTableEntry() {
 		// given
 		WoMessage m = aMessageWith(WoMessage.Status.UNSENT);
 		db.store(m);
