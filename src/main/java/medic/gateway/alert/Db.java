@@ -283,7 +283,7 @@ public final class Db extends SQLiteOpenHelper {
 			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
 
 			if(id != -1) {
-				storeStatusUpdate(m, m.status, null, m.lastAction, false);
+				storeStatusUpdate(m, m.status, null, m.lastAction, true);
 				return true;
 			} else {
 				return false;

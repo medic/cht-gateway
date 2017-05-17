@@ -288,7 +288,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, false);
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, true);
 	}
 
 	@Test
@@ -304,7 +304,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
-				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, false,
+				ANY_NUMBER, m.id, "UNSENT", null, ANY_NUMBER, true,
 				ANY_NUMBER, m.id, "PENDING", null, ANY_NUMBER, true);
 	}
 
