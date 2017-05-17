@@ -99,6 +99,40 @@ public class WebappPollerTest extends AndroidTestCase {
 	}
 
 	@Test
+	public void test_pollWebapp_shouldIncludeMultipleStatusUpdatesThatNeedForwardingForTheSameMessage()
+				throws Exception {
+		// given : one message...
+		String messageId = randomUuid();
+		db.insert("wo_message",
+						cols("_id",      "status",                   "last_action", "_to",         "content"),
+						vals(messageId,  WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT));
+		// ... with 3 successive statuses, one of which was already forwarded to api.
+		db.insert("wom_status",
+						cols("message_id", "status",                "timestamp", "needs_forwarding"),
+						vals(messageId,  WoMessage.Status.PENDING,  0,            false),
+						vals(messageId,  WoMessage.Status.SENT,     0,            true),
+						vals(messageId, WoMessage.Status.DELIVERED, 0,            true));
+		http.nextResponseJson("{}");
+
+		// when
+		new WebappPoller(getContext()).pollWebapp();
+
+		// then : the two non-forwarded status were forwarded.
+		JSONObject requestBody = http.assertPostRequestMade_withJsonResponse();
+
+		JSONArray updates = requestBody.getJSONArray("updates");
+		assertEquals(2, updates.length());
+
+		JSONObject update1 = (JSONObject) updates.get(0);
+		assertEquals(messageId, update1.getString("id"));
+		assertEquals("SENT", update1.getString("status"));
+
+		JSONObject update2 = (JSONObject) updates.get(0);
+		assertEquals(messageId, update2.getString("id"));
+		assertEquals("SENT", update2.getString("status"));
+	}
+
+	@Test
 	public void test_pollWebapp_shouldMarkForwardedStatusesAsSuchInDb() throws Exception {
 		// given
 		String messageId = randomUuid();
