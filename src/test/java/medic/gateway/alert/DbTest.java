@@ -283,18 +283,17 @@ public class DbTest {
 		dbHelper.insert("wo_message",
 						cols("_id",     "status",                 "failure_reason", "last_action", "_to",          "content"),
 						vals(messageId, WoMessage.Status.PENDING, null,             0,             A_PHONE_NUMBER, SOME_CONTENT));
+		WoMessage.StatusUpdate status = new WoMessage.StatusUpdate(statusId, messageId, WoMessage.Status.PENDING, null, 123456);
 		dbHelper.insert("wom_status",
-						cols("_id",    "message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
-						vals(statusId, messageId,    WoMessage.Status.PENDING, null,             0,           true));
-
-		WoMessage.StatusUpdate newStatus = new WoMessage.StatusUpdate(statusId, messageId, WoMessage.Status.SENT, null, 123456);
+						cols("_id",    "message_id",      "status",         "failure_reason",     "timestamp",      "needs_forwarding"),
+						vals(status.id, status.messageId, status.newStatus, status.failureReason, status.timestamp, true));
 
 		// when
-		db.setStatusForwarded(newStatus);
+		db.setStatusForwarded(status);
 
 		// Then
 		dbHelper.assertTable("wom_status",
-						ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, false);
+						ANY_NUMBER, messageId, "PENDING", null, ANY_NUMBER, false);
 	}
 
 	@Test
@@ -312,6 +311,7 @@ public class DbTest {
 
 		// then
 		dbHelper.assertTable("wom_status",
+						ANY_NUMBER, messageId, "PENDING", null, ANY_NUMBER, false,
 						ANY_NUMBER, messageId, "SENT", null, ANY_NUMBER, true);
 	}
 
