@@ -59,13 +59,16 @@ demo-server:
 	npm install && npm start
 
 
-.PHONY: avd stats travis
+.PHONY: avd changelog stats travis
 
 avd:
 	nohup android avd > /dev/null &
 
 stats:
 	./scripts/project_stats
+
+changelog:
+	./scripts/changelog
 
 travis: stats
 	${GRADLEW} --stacktrace check test assemble
