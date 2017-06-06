@@ -213,7 +213,7 @@ To build locally and install to an attached android device:
 To run tests and static analysis tools locally:
 
 	make test
-	
+
 To run tests without static analysis (faster!):
 
 	./gradlew test
