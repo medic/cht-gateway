@@ -214,10 +214,6 @@ To run tests and static analysis tools locally:
 
 	make test
 
-To run tests without static analysis (faster!):
-
-	./gradlew test
-
 ## `demo-server`
 
 There is a demonstration implementation of a server included for `medic-gateway` to communicate with.  You can add messages to this server, and query it to see the interactions that it has with `medic-gateway`.
