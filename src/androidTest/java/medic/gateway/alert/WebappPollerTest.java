@@ -244,6 +244,26 @@ public class WebappPollerTest extends AndroidTestCase {
 	}
 
 	@Test
+	public void test_pollWebapp_shouldStripSpecialCharactersInPhoneNumbersBeforeSavingToDb() throws Exception {
+		// given
+		db.assertEmpty("wo_message");
+		db.assertEmpty("wom_status");
+		http.nextResponseJson("{ \"messages\": [ " +
+					"{ \"id\": \"abc-123\", \"to\": \"+1-2 3\", \"content\": \"testing: abc\" }" +
+				"] }");
+
+		// when
+		new WebappPoller(getContext()).pollWebapp();
+
+		// then
+		http.assertSinglePostRequestMade();
+		db.assertTable("wo_message",
+				"abc-123", "UNSENT", NO_REASON, ANY_NUMBER, "+123", "testing: abc");
+		db.assertTable("wom_status",
+				ANY_NUMBER, "abc-123", "UNSENT", NO_REASON, ANY_NUMBER, false);
+	}
+
+	@Test
 	public void test_pollWebapp_poorlyFormedWoMessagesShouldNotAffectWellFormed() throws Exception {
 		// given
 		db.assertEmpty("wo_message");

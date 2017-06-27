@@ -18,6 +18,7 @@ import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.Utils.normalisePhoneNumber;
 import static medic.gateway.alert.Utils.json;
 
 public class WebappPoller {
@@ -113,7 +114,7 @@ public class WebappPoller {
 		logEvent(ctx, "Saving WO message: %s", json);
 		WoMessage m = new WoMessage(
 				json.getString("id"),
-				json.getString("to"),
+				normalisePhoneNumber(json.getString("to")),
 				json.getString("content"));
 		boolean success = db.store(m);
 		if(!success) logEvent(ctx, "Failed to save WO message: %s", json);

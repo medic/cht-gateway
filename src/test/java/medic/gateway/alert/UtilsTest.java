@@ -112,6 +112,31 @@ public class UtilsTest {
 	}
 
 	@Test
+	public void normalisePhoneNumber_shouldStripCertainCharacters() {
+		// given
+		String[] testMappings = {
+			"1234567890", "1234567890",
+			"123 456 7890", "1234567890",
+			"123-456 7890", "1234567890",
+			"123-456-7890", "1234567890",
+
+			"+1234567890", "+1234567890",
+			"+123 456 7890", "+1234567890",
+			"+123-456 7890", "+1234567890",
+			"+123-456-7890", "+1234567890",
+		};
+
+		for(int i=0; i<testMappings.length; i+=2) {
+			// when
+			String original = testMappings[i];
+			String expected = testMappings[i+1];
+
+			// expect
+			assertEquals(expected, Utils.normalisePhoneNumber(original));
+		}
+	}
+
+	@Test
 	public void startSettingsActivity_kitkatPlus_defaultSmsApp_shouldNotPromptForDefaultSmsAppChange() {
 		// given
 		Capabilities cap = isDefaultSmsApp();

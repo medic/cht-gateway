@@ -45,6 +45,10 @@ public final class Utils {
 		return ctx.getResources().getString(R.string.app_name);
 	}
 
+	public static String normalisePhoneNumber(String phoneNumber) {
+		return phoneNumber.replaceAll("[-\\s]", "");
+	}
+
 	public static String randomUuid() {
 		return randomUUID().toString();
 	}
