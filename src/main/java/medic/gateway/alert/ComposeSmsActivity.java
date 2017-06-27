@@ -27,7 +27,7 @@ public class ComposeSmsActivity extends Activity {
 
 //> CUSTOM EVENT HANDLERS
 	public void send(View view) {
-		String[] recipients = SmsComposerUtils.getRecipients(text(R.id.txtComposer_recipients));
+		String[] recipients = getRecipients();
 
 		if(recipients.length == 0) {
 			showError(R.id.txtComposer_recipients, R.string.errComposer_noRecipients);
@@ -58,6 +58,13 @@ public class ComposeSmsActivity extends Activity {
 		return recipient.replaceAll(" ", "");
 	}
 
+	private String[] getRecipients() {
+		String userInput = text(R.id.txtComposer_recipients);
+		return userInput.replaceAll("[-\\s]", "")
+				.replaceAll("[,;:]+", ",")
+				.split(",");
+	}
+
 	private String text(int componentId) {
 		EditText field = (EditText) findViewById(componentId);
 		return field.getText().toString();
@@ -71,17 +78,5 @@ public class ComposeSmsActivity extends Activity {
 	private void showError(int componentId, int stringId) {
 		TextView field = (TextView) findViewById(componentId);
 		field.setError(getString(stringId));
-	}
-}
-
-final class SmsComposerUtils {
-	private static final String[] NO_RECIPIENTS = new String[0];
-
-	private SmsComposerUtils() {}
-
-	public static String[] getRecipients(String userInput) {
-		String normalised = userInput.replaceAll("[\\s,;:]+", ",");
-		if(normalised.length() == 0) return NO_RECIPIENTS;
-		else return normalised.split(",");
 	}
 }
