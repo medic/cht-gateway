@@ -74,10 +74,10 @@ public final class InstrumentationTestUtils {
 
 	@SuppressWarnings({"PMD.NPathComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.StdCyclomaticComplexity"})
 	private static boolean areJsonValuesEqual(Object a, Object b) throws JSONException {
-		if(a instanceof Boolean    && b instanceof Boolean)    return ((Boolean) a) == ((Boolean) b);
-		if(a instanceof Double     && b instanceof Double)     return ((Double)  a) == ((Double)  b);
-		if(a instanceof Integer    && b instanceof Integer)    return ((Integer) a) == ((Integer) b);
-		if(a instanceof Long       && b instanceof Long)       return ((Long)    a) == ((Long)    b);
+		if(a instanceof Boolean    && b instanceof Boolean)    return ((boolean) a) == ((boolean) b);
+		if(a instanceof Double     && b instanceof Double)     return ((double)  a) == ((double)  b);
+		if(a instanceof Integer    && b instanceof Integer)    return ((int)     a) == ((int)     b);
+		if(a instanceof Long       && b instanceof Long)       return ((long)    a) == ((long)    b);
 		if(a instanceof String     && b instanceof String)     return ((String) a).equals(b);
 		if(a instanceof JSONObject && b instanceof JSONObject) return areEqual((JSONObject) a, (JSONObject) b);
 		if(a instanceof JSONArray  && b instanceof JSONArray) {
