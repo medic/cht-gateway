@@ -259,6 +259,7 @@ public class SettingsDialogActivityTest {
 		assertVisible(id.txtWebappPassword);
 
 		assertVisible(id.cbxEnablePolling);
+		assertVisible(id.cbxEnableCdmaCompatMode);
 		assertVisible(id.btnSaveSettings);
 
 		assertDoesNotExist(id.txtWebappUrl);
