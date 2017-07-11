@@ -81,7 +81,7 @@ public class PromptForPermissionsActivity extends Activity implements ActivityCo
 			if(canShowPromptFor(this, permissionsRequestType)) { // NOPMD
 				// Don't do anything - the user can re-read the on-screen advice.
 			} else {
-				// The user has checked the "don't ask me again"/"never allow" box TODO which one, so we have to step things up.
+				// The user has checked the "don't ask me again"/"never allow" box (TODO which one?), so we have to step things up.
 				startActivity(demandPermissions(this));
 				finish();
 			}
