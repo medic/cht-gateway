@@ -28,7 +28,7 @@ public class PromptForPermissionsActivity extends Activity implements ActivityCo
 	private static final String X_PERMISSIONS_TYPE = "permissionsType";
 
 	private static final Object[][] PERMISSIONS_REQUESTS = {
-		/* sms */ { R.string.txtPermissionsPrompt_sms, new String[] { permission.SEND_SMS, permission.RECEIVE_SMS } },
+		/* sms */ { R.string.txtPermissionsPrompt_sms, new String[] { permission.SEND_SMS, permission.RECEIVE_SMS, permission.READ_PHONE_STATE } },
 		/* file access */ { R.string.txtPermissionsPrompt_fileAccess, new String[] { permission.WRITE_EXTERNAL_STORAGE } },
 	};
 
