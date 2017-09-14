@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 @SuppressFBWarnings("MS_MUTABLE_ARRAY")
 public final class TestUtils {
 	public static final String A_PHONE_NUMBER = "+447890123123";
+	public static final String ANOTHER_PHONE_NUMBER = "+447890000000";
 	public static final Pattern ANY_PHONE_NUMBER = Pattern.compile("\\+\\d{7,12}");
 	public static final String SOME_CONTENT = "Hello.";
 	public static final Pattern ANY_CONTENT = Pattern.compile(".*");
@@ -87,5 +88,9 @@ public final class TestUtils {
 
 	public static long daysAgo(long numberOfDaysAgo) {
 		return now() - (numberOfDaysAgo * 1000 * 60 * 60 * 24);
+	}
+
+	public static int randomInt(int limit) {
+		return new Random().nextInt(limit);
 	}
 }

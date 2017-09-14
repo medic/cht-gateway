@@ -111,8 +111,8 @@ public class IntentProcessorTest {
 		// then
 		db.assertTable("wt_message",
 				ANY_ID, "WAITING", ANY_NUMBER, "+447890123456", "Good for you. Slap on the back etc.", ANY_NUMBER, ANY_NUMBER,
-				ANY_ID, "WAITING", ANY_NUMBER, "+447890999999", "Good for you. Slap on the back etc.", ANY_NUMBER, ANY_NUMBER,
-				ANY_ID, "WAITING", ANY_NUMBER, "+447890999999", "Here is a very very very very very very very very very very very very very very very very very very long message which actually spans two other messages apart from the original one!", ANY_NUMBER, ANY_NUMBER);
+				ANY_ID, "WAITING", ANY_NUMBER, "+447890999999", "Here is a very very very very very very very very very very very very very very very very very very long message which actually spans two other messages apart from the original one!", ANY_NUMBER, ANY_NUMBER,
+				ANY_ID, "WAITING", ANY_NUMBER, "+447890999999", "Good for you. Slap on the back etc.", ANY_NUMBER, ANY_NUMBER);
 	}
 
 //> HELPERS

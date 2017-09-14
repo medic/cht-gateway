@@ -50,13 +50,14 @@ class WtMessage {
 	public final long smsSent;
 	public final long smsReceived;
 
+	// TODO smsSent in practice actually appears to be the time that the SMS was received at the gateway
 	public WtMessage(String from, String content, long smsSent) {
 		this.id = randomUuid();
 		setStatus(Status.WAITING);
 		this.from = from;
 		this.content = content;
 		this.smsSent = smsSent;
-		this.smsReceived = lastAction;
+		this.smsReceived = lastAction; // TODO this appears to be a no-op
 	}
 
 	public WtMessage(String id, Status status, long lastAction, String from, String content, long smsSent, long smsReceived) {

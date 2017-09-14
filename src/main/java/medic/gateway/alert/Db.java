@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.telephony.SmsMessage;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +22,7 @@ import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.BuildConfig.FORCE_SEED;
 import static medic.gateway.alert.BuildConfig.LOAD_SEED_DATA;
 import static medic.gateway.alert.GatewayLog.logEvent;
+import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.GatewayLog.warnException;
 import static medic.gateway.alert.Utils.args;
@@ -28,7 +31,7 @@ import static medic.gateway.alert.DebugUtils.randomSmsContent;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
-	private static final int SCHEMA_VERSION = 5;
+	private static final int SCHEMA_VERSION = 6;
 
 	private static final String ALL = null, NO_GROUP = null;
 	private static final String[] NO_ARGS = {};
@@ -49,6 +52,15 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WTM_clmCONTENT = "content";
 	private static final String WTM_clmSMS_SENT = "sms_sent";
 	private static final String WTM_clmSMS_RECEIVED = "sms_received";
+
+	private static final String tblWT_MESSAGE_PART = "wt_message_part";
+	private static final String WMP_clmFROM = "_from";
+	private static final String WMP_clmCONTENT = "content";
+	private static final String WMP_clmSENT = "sent";
+	private static final String WMP_clmRECEIVED = "received";
+	private static final String WMP_clmMP_REF = "mp_reference";
+	private static final String WMP_clmMP_PART = "mp_part_number";
+	private static final String WMP_clmMP_TOTAL_PARTS = "mp_total_parts";
 
 	private static final String tblWT_STATUS = "wtm_status";
 	private static final String WTS_clmID = "_id";
@@ -145,6 +157,7 @@ public final class Db extends SQLiteOpenHelper {
 
 		migrate_createTable_WoMessageStatusUpdate(db, true);
 		migrate_createTable_WtMessageStatusUpdate(db, true);
+		migrate_createTable_WtMessagePart(db, true);
 	}
 
 	public void onUpgrade(SQLiteDatabase db,
@@ -162,6 +175,9 @@ public final class Db extends SQLiteOpenHelper {
 		}
 		if(oldVersion < 5) {
 			migrate_create_WTM_clmSMS_SENT__clmSMS_RECEIVED(db);
+		}
+		if(oldVersion < 6) {
+			migrate_createTable_WtMessagePart(db, false);
 		}
 	}
 
@@ -225,6 +241,22 @@ public final class Db extends SQLiteOpenHelper {
 
 		// These values were not stored for old messages, so we can't
 		// set a meaningful value for these columns for old messages.
+	}
+
+	static void migrate_createTable_WtMessagePart(SQLiteDatabase db, boolean isCleanDb) {
+		trace(db, "onUpgrade() :: migrate_createTable_WtMessagePart()");
+		db.execSQL(String.format("CREATE TABLE %s (" +
+					"%s TEXT NOT NULL, " +
+					"%s TEXT NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
+					"%s INTEGER NOT NULL, " +
+					"PRIMARY KEY (%s, %s, %s, %s))",
+				tblWT_MESSAGE_PART,
+				WMP_clmFROM, WMP_clmCONTENT, WMP_clmSENT, WMP_clmRECEIVED, WMP_clmMP_REF, WMP_clmMP_PART, WMP_clmMP_TOTAL_PARTS,
+				WMP_clmFROM, WMP_clmMP_REF, WMP_clmMP_PART, WMP_clmMP_TOTAL_PARTS));
 	}
 
 //> ACCESSORS
@@ -520,20 +552,57 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 //> WtMessage HANDLERS
-	boolean store(MultipartSms sms) {
-		WtMessage m = new WtMessage(
-				sms.getOriginatingAddress(),
-				sms.getMessageBody(),
-				sms.getTimestampMillis());
-		return store(m);
-	}
-
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE") // for #117
 	boolean store(SmsMessage sms) {
-		WtMessage m = new WtMessage(
-				sms.getOriginatingAddress(),
-				sms.getMessageBody(),
-				sms.getTimestampMillis());
-		return store(m);
+		SmsUdh multi = SmsUdh.from(sms);
+
+		if(multi == null || multi.totalParts == 1) {
+			WtMessage m = new WtMessage(
+					sms.getOriginatingAddress(),
+					sms.getMessageBody(),
+					sms.getTimestampMillis());
+			return store(m);
+		} else {
+			try {
+				long id = db.insertOrThrow(tblWT_MESSAGE_PART, null, getContentValues(sms, multi));
+
+				if(id == -1) return false;
+			} catch(SQLiteConstraintException ex) {
+				logException(ex, "Failed to save multipart fragment - it likely already exists in the database.");
+				return false;
+			}
+
+			Cursor c = null;
+			db.beginTransaction();
+
+			try {
+				c = db.query(tblWT_MESSAGE_PART,
+						cols(WMP_clmCONTENT),
+						eq(WMP_clmFROM, WMP_clmMP_REF),
+						args(sms.getOriginatingAddress(), multi.multipartRef),
+						NO_GROUP, NO_GROUP,
+						SortDirection.ASC.apply(WMP_clmMP_PART));
+				if(c.getCount() == multi.totalParts) {
+					StringBuilder bob = new StringBuilder();
+					while(c.moveToNext()) {
+						bob.append(c.getString(0));
+					}
+					boolean success = store(new WtMessage(sms.getOriginatingAddress(), bob.toString(), multi.sentTimestamp));
+					if(success) {
+						rawUpdateOrDelete("DELETE FROM %s WHERE %s=? AND %s=?",
+								cols(tblWT_MESSAGE_PART, WMP_clmFROM, WMP_clmMP_REF),
+								args(sms.getOriginatingAddress(), multi.multipartRef));
+						db.setTransactionSuccessful();
+					} else {
+						return false;
+					}
+				}
+				return true;
+			} finally {
+				db.endTransaction();
+				if(c != null) c.close();
+			}
+		}
 	}
 
 	boolean store(WtMessage m) {
@@ -620,6 +689,20 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WTM_clmCONTENT, m.content);
 		v.put(WTM_clmSMS_SENT, m.smsSent);
 		v.put(WTM_clmSMS_RECEIVED, m.smsReceived);
+		return v;
+	}
+
+	private ContentValues getContentValues(SmsMessage sms, SmsUdh multi) {
+		ContentValues v = new ContentValues();
+
+		v.put(WMP_clmFROM, sms.getOriginatingAddress());
+		v.put(WMP_clmCONTENT, sms.getMessageBody());
+		v.put(WMP_clmSENT, multi.sentTimestamp);
+		v.put(WMP_clmRECEIVED, sms.getTimestampMillis());
+		v.put(WMP_clmMP_REF, multi.multipartRef);
+		v.put(WMP_clmMP_PART, multi.partNumber);
+		v.put(WMP_clmMP_TOTAL_PARTS, multi.totalParts);
+
 		return v;
 	}
 

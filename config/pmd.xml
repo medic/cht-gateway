@@ -90,6 +90,7 @@ Severity: HARD
 		<exclude name="AbstractNaming"/>
 		<exclude name="AvoidFieldNameMatchingMethodName"/>
 		<exclude name="LongVariable"/>
+		<exclude name="MisleadingVariableName"/>
 		<exclude name="ShortClassName"/>
 		<exclude name="ShortVariable"/>
 		<exclude name="VariableNamingConventions"/>

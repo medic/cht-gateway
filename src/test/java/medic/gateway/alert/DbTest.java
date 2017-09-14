@@ -5,6 +5,9 @@ import android.database.*;
 import android.database.sqlite.*;
 import android.telephony.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -22,7 +25,7 @@ import static medic.gateway.alert.test.TestUtils.*;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants=BuildConfig.class)
-@SuppressWarnings({"PMD.GodClass", "PMD.JUnitTestsShouldIncludeAssert", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.JUnitTestsShouldIncludeAssert", "PMD.SignatureDeclareThrowsException", "PMD.TooManyMethods"})
 public class DbTest {
 	private Db db;
 
@@ -181,6 +184,203 @@ public class DbTest {
 		assertTrue(successReported);
 		dbHelper.assertTable("wt_message",
 				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
+	}
+
+//> Multipart SmsMessage TESTS
+	@Test
+	public void store_multipart_shouldStoreFirstPart() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 1, 3);
+
+		// when
+		boolean successReported = db.store(m);
+
+		// then
+		assertTrue(successReported);
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertTable("wt_message_part",
+				A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 1, 3);
+	}
+
+	@Test
+	public void store_multipart_shouldStoreSecondPart_alone() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 2, 3);
+
+		// when
+		boolean successReported = db.store(m);
+
+		// then
+		assertTrue(successReported);
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertTable("wt_message_part",
+				A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 2, 3);
+	}
+
+	@Test
+	public void store_multipart_shouldStoreThirdPart_alone() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 3, 3);
+
+		// when
+		boolean successReported = db.store(m);
+
+		// then
+		assertTrue(successReported);
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertTable("wt_message_part",
+				A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 3, 3);
+	}
+
+	@Test
+	public void store_multipart_shouldStoreSecondPart() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m1 = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 1, 3);
+		SmsMessage m2 = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 2, 3);
+
+		// when
+		boolean successReported1 = db.store(m1);
+		boolean successReported2 = db.store(m2);
+
+		// then
+		assertTrue(successReported1);
+		assertTrue(successReported2);
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertTable("wt_message_part",
+				A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 1, 3,
+				A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 2, 3);
+	}
+
+	@Test
+	public void store_multipart_shouldStoreThirdPart() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m1 = aMultipartSmsWith(A_PHONE_NUMBER, "one ", randomReference, 1, 3);
+		SmsMessage m2 = aMultipartSmsWith(A_PHONE_NUMBER, "two ", randomReference, 2, 3);
+		SmsMessage m3 = aMultipartSmsWith(A_PHONE_NUMBER, "...3", randomReference, 3, 3);
+
+		// when
+		boolean successReported1 = db.store(m1);
+		boolean successReported2 = db.store(m2);
+		boolean successReported3 = db.store(m3);
+
+		// then
+		assertTrue(successReported1);
+		assertTrue(successReported2);
+		assertTrue(successReported3);
+		dbHelper.assertTable("wt_message",
+				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, "one two ...3", ANY_NUMBER, ANY_NUMBER);
+		dbHelper.assertEmpty("wt_message_part");
+	}
+
+	@Test
+	public void store_multipart_shouldProcessPartsInAnyOrder() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m1 = aMultipartSmsWith(A_PHONE_NUMBER, "one ", randomReference, 1, 3);
+		SmsMessage m2 = aMultipartSmsWith(A_PHONE_NUMBER, "two ", randomReference, 2, 3);
+		SmsMessage m3 = aMultipartSmsWith(A_PHONE_NUMBER, "...3", randomReference, 3, 3);
+
+		// when
+		boolean successReported1 = db.store(m2);
+		boolean successReported2 = db.store(m3);
+		boolean successReported3 = db.store(m1);
+
+		// then
+		assertTrue(successReported1);
+		assertTrue(successReported2);
+		assertTrue(successReported3);
+		dbHelper.assertTable("wt_message",
+				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, "one two ...3", ANY_NUMBER, ANY_NUMBER);
+		dbHelper.assertEmpty("wt_message_part");
+	}
+
+	@Test
+	public void store_multipart_shouldNotStoreSamePartMultipleTimes() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m_a = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 1, 3);
+		SmsMessage m_b = aMultipartSmsWith(A_PHONE_NUMBER, SOME_CONTENT, randomReference, 1, 3);
+
+		// when
+		boolean successReported_a = db.store(m_a);
+		boolean successReported_b = db.store(m_b);
+
+		// then
+		assertTrue(successReported_a);
+		assertFalse(successReported_b);
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertTable("wt_message_part",
+				A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 1, 3);
+	}
+
+	@Test
+	public void store_multipart_shouldNotStitchUnrelatedMessages() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m_a = aMultipartSmsWith(A_PHONE_NUMBER,       SOME_CONTENT, randomReference, 1, 2);
+		SmsMessage m_b = aMultipartSmsWith(ANOTHER_PHONE_NUMBER, SOME_CONTENT, randomReference, 2, 2);
+
+		// when
+		boolean successReported_a = db.store(m_a);
+		boolean successReported_b = db.store(m_b);
+
+		// then
+		assertTrue(successReported_a);
+		assertTrue(successReported_b);
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertTable("wt_message_part",
+				A_PHONE_NUMBER,       SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 1, 2,
+				ANOTHER_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference, 2, 2);
+	}
+
+	@Test
+	public void store_multipart_shouldNotDeleteUnrelatedParts() throws Exception {
+		// given
+		dbHelper.assertEmpty("wt_message");
+		dbHelper.assertEmpty("wt_message_part");
+		int randomReference = randomInt(256);
+		SmsMessage m_a1 = aMultipartSmsWith(A_PHONE_NUMBER,       "one ",       randomReference,   1, 2);
+		SmsMessage m_a2 = aMultipartSmsWith(A_PHONE_NUMBER,       "two",        randomReference,   2, 2);
+		SmsMessage m_b  = aMultipartSmsWith(ANOTHER_PHONE_NUMBER, SOME_CONTENT, randomReference,   2, 2);
+		SmsMessage m_c  = aMultipartSmsWith(A_PHONE_NUMBER,       SOME_CONTENT, randomReference+1, 2, 2);
+
+		// when
+		boolean successReported_a1 = db.store(m_a1);
+		boolean successReported_b  = db.store(m_b);
+		boolean successReported_c  = db.store(m_c);
+		boolean successReported_a2 = db.store(m_a2);
+
+		// then
+		assertTrue(successReported_a1);
+		assertTrue(successReported_a2);
+		assertTrue(successReported_b);
+		assertTrue(successReported_c);
+		dbHelper.assertTable("wt_message",
+				ANY_ID, "WAITING", ANY_NUMBER, A_PHONE_NUMBER, "one two", ANY_NUMBER, ANY_NUMBER);
+		dbHelper.assertTable("wt_message_part",
+				ANOTHER_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference,   2, 2,
+				A_PHONE_NUMBER,       SOME_CONTENT, ANY_NUMBER, ANY_NUMBER, randomReference+1, 2, 2);
 	}
 
 //> WoMessage TESTS
@@ -739,6 +939,37 @@ public class DbTest {
 		SmsMessage m = mock(SmsMessage.class);
 		when(m.getMessageBody()).thenReturn(content);
 		when(m.getOriginatingAddress()).thenReturn(from);
+		when(m.getPdu()).thenReturn(null);
+		return m;
+	}
+
+	private static SmsMessage aMultipartSmsWith(String from, String content, int referenceNumber, int partNumber, int totalParts) throws IOException {
+		SmsMessage m = mock(SmsMessage.class);
+		when(m.getMessageBody()).thenReturn(content);
+		when(m.getOriginatingAddress()).thenReturn(from);
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		UDH: {
+			DataOutputStream pdu = new DataOutputStream(baos);
+
+			pdu.write(0);               // empty SMSC number
+			pdu.write(1 << 6);          // byte0, including UDH-present flag
+			pdu.write(0); pdu.write(0); // an empty FROM number, but min length is 1
+			pdu.write(0); pdu.write(0); // PID and DCS (both ignored in our SmsUdh)
+			pdu.write(0); pdu.write(0); // \
+			pdu.write(0); pdu.write(0); // |- timestamp (ignored)
+			pdu.write(0); pdu.write(0); // |
+			pdu.write(0);               // /
+			pdu.write(0);               // UD Length byte (ignored in our SmsUdh
+			pdu.write(5);               // number of bytes following this one...
+			pdu.write(0);               // element type id: 8-bit concat info
+			pdu.write(5);               // element content length (including this and the previous byte)
+			pdu.write(referenceNumber);
+			pdu.write(totalParts);
+			pdu.write(partNumber);
+		}
+		when(m.getPdu()).thenReturn(baos.toByteArray());
+
 		return m;
 	}
 
