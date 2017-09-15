@@ -45,6 +45,16 @@ public final class Utils {
 		return ctx.getResources().getString(R.string.app_name);
 	}
 
+	public static String getAppVersion(Context ctx) {
+		try {
+			return ctx.getPackageManager()
+					.getPackageInfo(ctx.getPackageName(), 0)
+					.versionName;
+		} catch(Exception ex) {
+			return "?";
+		}
+	}
+
 	public static String normalisePhoneNumber(String phoneNumber) {
 		return phoneNumber.replaceAll("[-\\s]", "");
 	}

@@ -21,6 +21,7 @@ import android.widget.TabHost;
 import static medic.gateway.alert.Capabilities.getCapabilities;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.getAppName;
+import static medic.gateway.alert.Utils.getAppVersion;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
 import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startSettingsActivity;
@@ -163,7 +164,7 @@ public class MessageListsActivity extends TabActivity {
 		}
 
 		this.getActionBar().setIcon(icon);
-		setTitle(c + " " + getAppName(this));
+		setTitle(String.format("%s %s v%s", c, getAppName(this), getAppVersion(this)));
 	}
 
 	private Drawable baseIcon() {
