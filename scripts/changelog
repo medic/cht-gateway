@@ -3,8 +3,16 @@ versions() {
 	git tag | grep '^v'
 }
 
-current="$(versions | tail -n1)"
-previous="$(versions | tail -n2 | head -n1)"
+if [[ $# > 0 ]]; then
+	current="$1"
+else
+	current="$(versions | tail -n1)"
+fi
+if [[ $# > 1 ]]; then
+	previous="$2"
+else
+	previous="$(versions | tail -n2 | head -n1)"
+fi
 
 echo "Changelog $previous -> $current"
 echo "=========================="
