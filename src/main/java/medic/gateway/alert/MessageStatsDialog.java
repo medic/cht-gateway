@@ -2,7 +2,6 @@ package medic.gateway.alert;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
 import java.util.LinkedList;
@@ -10,13 +9,12 @@ import java.util.LinkedList;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.Utils.NO_CLICK_LISTENER;
 import static medic.gateway.alert.Utils.showAlert;
-import static medic.gateway.alert.Utils.showSpinner;
 
 final class MessageStatsDialog {
 	private MessageStatsDialog() {}
 
-	public static void show(final Activity a) {
-		final ProgressDialog spinner = showSpinner(a);
+	static Thinking show(final Activity a) {
+		final Thinking thinking = Thinking.show(a);
 		AsyncTask.execute(new Runnable() {
 			private final String string(int stringId, Object...args) {
 				return a.getString(stringId, args);
@@ -48,9 +46,10 @@ final class MessageStatsDialog {
 				} catch(Exception ex) {
 					logException(a, ex, "Failed to load message stats dialog.");
 				} finally {
-					spinner.dismiss();
+					thinking.dismiss();
 				}
 			}
 		});
+		return thinking;
 	}
 }

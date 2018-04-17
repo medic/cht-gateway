@@ -1,7 +1,6 @@
 package medic.gateway.alert;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.showAlert;
-import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.NO_CLICK_LISTENER;
 import static medic.gateway.alert.WoMessage.Status.UNSENT;
 import static medic.gateway.alert.WoMessage.Status.FAILED;
@@ -27,7 +25,9 @@ import static medic.gateway.alert.WoMessage.Status.FAILED;
 public class WoListActivity extends FragmentActivity {
 	private Db db;
 	private Set<String> checkedMessageIds;
+	private Thinking thinking;
 
+//> LIFECYCLE
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message_list_wo);
@@ -47,6 +47,11 @@ public class WoListActivity extends FragmentActivity {
 		refreshList();
 	}
 
+	@Override public void onDestroy() {
+		super.onDestroy();
+		if(thinking != null) thinking.dismiss();
+	}
+
 //> API FOR WoListFragment
 	boolean isChecked(WoMessage m) {
 		return checkedMessageIds.contains(m.id);
@@ -60,7 +65,7 @@ public class WoListActivity extends FragmentActivity {
 	}
 
 	void showMessageDetailDialog(final WoMessage m) {
-		final ProgressDialog spinner = showSpinner(this);
+		thinking = Thinking.show(this);
 		AsyncTask.execute(new Runnable() {
 			public void run() {
 				try {
@@ -100,7 +105,7 @@ public class WoListActivity extends FragmentActivity {
 				} catch(Exception ex) {
 					logException(WoListActivity.this, ex, "Failed to load WO message details.");
 				} finally {
-					spinner.dismiss();
+					thinking.dismiss();
 				}
 			}
 		});

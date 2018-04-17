@@ -1,7 +1,6 @@
 package medic.gateway.alert;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,7 +22,6 @@ import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.getAppName;
 import static medic.gateway.alert.Utils.getAppVersion;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
-import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startSettingsActivity;
 import static medic.gateway.alert.Utils.toast;
 
@@ -35,10 +33,12 @@ public class MessageListsActivity extends TabActivity {
 		GatewayEventLogActivity.class, WoListActivity.class, WtListActivity.class,
 	};
 
+	private Thinking thinking;
+
 //> CLICK LISTENERS
 	private final DialogInterface.OnClickListener deleteOldDataHandler = new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int which) {
-			final ProgressDialog spinner = showSpinner(MessageListsActivity.this, R.string.txtDeleteOldData_inProgress);
+			thinking = Thinking.show(MessageListsActivity.this, R.string.txtDeleteOldData_inProgress);
 
 			new AsyncTask<String, Void, Integer>() {
 				private final Context ctx = MessageListsActivity.this;
@@ -53,7 +53,7 @@ public class MessageListsActivity extends TabActivity {
 				protected void onPostExecute(Integer deleteCount) {
 					String message = getResources().getQuantityString(R.plurals.txtOldDataDeleteCount, deleteCount);
 					toast(ctx, message, deleteCount);
-					spinner.dismiss();
+					thinking.dismiss();
 					MessageListsActivity.this.recreate();
 				}
 			}.execute();
@@ -99,6 +99,7 @@ public class MessageListsActivity extends TabActivity {
 	@Override protected void onDestroy() {
 		super.onDestroy();
 		LastPoll.unregister(this, pollUpdateReceiver);
+		if(thinking != null) thinking.dismiss();
 	}
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,7 +110,7 @@ public class MessageListsActivity extends TabActivity {
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.mnuMessageStats:
-				MessageStatsDialog.show(this);
+				thinking = MessageStatsDialog.show(this);
 				return true;
 			case R.id.mnuCompose:
 				Intent composer;
