@@ -29,8 +29,8 @@ public class ExternalLogProcessorActivity extends Activity {
 	}
 
 	@Override public void onDestroy() {
-		super.onDestroy();
 		if(thinking != null) thinking.dismiss();
+		super.onDestroy();
 	}
 
 //> PRIVATE HELPERS

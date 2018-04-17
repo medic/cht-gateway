@@ -97,9 +97,9 @@ public class MessageListsActivity extends TabActivity {
 	}
 
 	@Override protected void onDestroy() {
-		super.onDestroy();
 		LastPoll.unregister(this, pollUpdateReceiver);
 		if(thinking != null) thinking.dismiss();
+		super.onDestroy();
 	}
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {

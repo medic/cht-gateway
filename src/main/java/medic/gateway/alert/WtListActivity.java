@@ -50,8 +50,8 @@ public class WtListActivity extends FragmentActivity {
 	}
 
 	@Override public void onDestroy() {
-		super.onDestroy();
 		if(thinking != null) thinking.dismiss();
+		super.onDestroy();
 	}
 
 //> API FOR WtListFragment

@@ -10,7 +10,7 @@ import android.content.Context;
  * 1. they are dismissed when the parent {@code Context} is destroyed, and
  * 2. they are not dismissed when they are not being displayed
  */
-class Thinking {
+final class Thinking {
 	private final ProgressDialog dialog;
 
 	private Thinking(ProgressDialog dialog) {
