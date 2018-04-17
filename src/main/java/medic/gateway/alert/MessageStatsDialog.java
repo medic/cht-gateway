@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.Utils.NO_CLICK_LISTENER;
+import static medic.gateway.alert.Utils.showAlert;
 import static medic.gateway.alert.Utils.showSpinner;
 
 final class MessageStatsDialog {
@@ -43,9 +44,7 @@ final class MessageStatsDialog {
 
 					dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
 
-					a.runOnUiThread(new Runnable() {
-						public void run() { dialog.create().show(); }
-					});
+					showAlert(a, dialog);
 				} catch(Exception ex) {
 					logException(a, ex, "Failed to load message stats dialog.");
 				} finally {

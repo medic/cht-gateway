@@ -18,6 +18,7 @@ import java.util.Set;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.absoluteTimestamp;
+import static medic.gateway.alert.Utils.showAlert;
 import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.NO_CLICK_LISTENER;
 import static medic.gateway.alert.WoMessage.Status.UNSENT;
@@ -95,9 +96,7 @@ public class WoListActivity extends FragmentActivity {
 
 					dialog.setItems(content.toArray(new String[content.size()]), NO_CLICK_LISTENER);
 
-					runOnUiThread(new Runnable() {
-						public void run() { dialog.create().show(); }
-					});
+					showAlert(WoListActivity.this, dialog);
 				} catch(Exception ex) {
 					logException(WoListActivity.this, ex, "Failed to load WO message details.");
 				} finally {

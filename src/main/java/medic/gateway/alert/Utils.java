@@ -1,6 +1,7 @@
 package medic.gateway.alert;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -73,6 +74,15 @@ public final class Utils {
 
 	public static ProgressDialog showSpinner(Context ctx) {
 		return showSpinner(ctx, null);
+	}
+
+	public static void showAlert(final Activity parent, final AlertDialog.Builder dialog) {
+		parent.runOnUiThread(new Runnable() {
+			public void run() {
+				if(parent.isFinishing()) return;
+				dialog.create().show();
+			}
+		});
 	}
 
 	public static ProgressDialog showSpinner(Context ctx, int messageId) {
