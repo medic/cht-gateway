@@ -1,7 +1,6 @@
 package medic.gateway.alert;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,14 +21,15 @@ import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.absoluteTimestamp;
 import static medic.gateway.alert.Utils.showAlert;
-import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.NO_CLICK_LISTENER;
 import static medic.gateway.alert.WtMessage.Status.WAITING;
 
 public class WtListActivity extends FragmentActivity {
 	private Db db;
 	private Set<String> checkedMessageIds;
+	private Thinking thinking;
 
+//> LIFECYCLE
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message_list_wt);
@@ -49,6 +49,11 @@ public class WtListActivity extends FragmentActivity {
 		refreshList();
 	}
 
+	@Override public void onDestroy() {
+		if(thinking != null) thinking.dismiss();
+		super.onDestroy();
+	}
+
 //> API FOR WtListFragment
 	boolean isChecked(WtMessage m) {
 		return checkedMessageIds.contains(m.id);
@@ -62,7 +67,7 @@ public class WtListActivity extends FragmentActivity {
 	}
 
 	void showMessageDetailDialog(final WtMessage m, final int position) {
-		final ProgressDialog spinner = showSpinner(this);
+		thinking = Thinking.show(this);
 		AsyncTask.execute(new Runnable() {
 			public void run() {
 				try {
@@ -98,7 +103,7 @@ public class WtListActivity extends FragmentActivity {
 				} catch(Exception ex) {
 					logException(WtListActivity.this, ex, "Failed to load WT message details.");
 				} finally {
-					spinner.dismiss();
+					thinking.dismiss();
 				}
 			}
 		});

@@ -1,16 +1,17 @@
 package medic.gateway.alert;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import static medic.gateway.alert.GatewayLog.trace;
-import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startSettingsOrMainActivity;
 
 public class ExternalLogProcessorActivity extends Activity {
+	private Thinking thinking;
+
+//> LIFECYCLE
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		trace(this, "Starting...");
@@ -27,13 +28,19 @@ public class ExternalLogProcessorActivity extends Activity {
 		finish();
 	}
 
+	@Override public void onDestroy() {
+		if(thinking != null) thinking.dismiss();
+		super.onDestroy();
+	}
+
+//> PRIVATE HELPERS
 	private void processExternalLog() {
-		final ProgressDialog spinner = showSpinner(this, R.string.txtProcessingExternalLog);
+		thinking = Thinking.show(this, R.string.txtProcessingExternalLog);
 		AsyncTask.execute(new Runnable() {
 			public void run() {
 				Context ctx = ExternalLogProcessorActivity.this;
 				ExternalLog.getInstance(ctx).process(ctx);
-				spinner.dismiss();
+				thinking.dismiss();
 				startSettingsOrMainActivity(ctx);
 			}
 		});

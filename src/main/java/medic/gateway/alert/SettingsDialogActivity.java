@@ -1,7 +1,6 @@
 package medic.gateway.alert;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,7 +23,6 @@ import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.SimpleJsonClient2.basicAuth_isValidPassword;
 import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
 import static medic.gateway.alert.Utils.includeVersionNameInActivityTitle;
-import static medic.gateway.alert.Utils.showSpinner;
 import static medic.gateway.alert.Utils.startMainActivity;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
@@ -33,6 +31,7 @@ public class SettingsDialogActivity extends Activity {
 	private static final Pattern MEDIC_URL_PARSER = Pattern.compile("https://gateway:([^:]+)@(.+)\\.([^.]+)\\.medicmobile.org/api/sms");
 
 	private boolean hasPreviousSettings;
+	private Thinking thinking;
 
 //> EVENT HANDLERS
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +167,7 @@ public class SettingsDialogActivity extends Activity {
 		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
 		final boolean dummySendMode = isDummySendModeChecked();
 
-		final ProgressDialog spinner = showSpinner(this,
+		thinking = Thinking.show(this,
 				String.format(getString(R.string.txtValidatingWebappUrl),
 						redactUrl(webappUrl)));
 
@@ -189,7 +188,7 @@ public class SettingsDialogActivity extends Activity {
 					submitButton().setEnabled(true);
 					cancelButton().setEnabled(true);
 				}
-				spinner.dismiss();
+				thinking.dismiss();
 			}
 		}.execute();
 	}
@@ -199,7 +198,7 @@ public class SettingsDialogActivity extends Activity {
 		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
 		final boolean dummySendMode = isDummySendModeChecked();
 
-		final ProgressDialog spinner = showSpinner(this,
+		thinking = Thinking.show(this,
 				getString(R.string.txtSavingSettings));
 
 		AsyncTask.execute(new Runnable() {
@@ -215,7 +214,7 @@ public class SettingsDialogActivity extends Activity {
 						}
 					});
 				}
-				spinner.dismiss();
+				thinking.dismiss();
 			}
 		});
 	}
