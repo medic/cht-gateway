@@ -1,17 +1,17 @@
 #!/bin/bash -eu
 versions() {
-	git tag | grep '^v'
+	git tag | grep '^v' | sort --field-separator=. --key=1,1nr --key=2,2nr --key=3,3nr
 }
 
 if [[ $# > 0 ]]; then
 	current="$1"
 else
-	current="$(versions | tail -n1)"
+	current="$(versions | head -n1)"
 fi
 if [[ $# > 1 ]]; then
 	previous="$2"
 else
-	previous="$(versions | tail -n2 | head -n1)"
+	previous="$(versions | head -n2 | tail -n1)"
 fi
 
 echo "Changelog $previous -> $current"
