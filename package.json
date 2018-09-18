@@ -8,7 +8,7 @@
     "start": "node demo-server/index.js"
   },
   "author": "Alex Anderson",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": "5.10.x"
   },
