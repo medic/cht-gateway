@@ -24,9 +24,10 @@ gradle.projectsEvaluated {
 }
 
 repositories {
-	mavenCentral()
-	maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
 	maven { url "${System.env.ANDROID_HOME}/extras/android/m2repository/" }
+	mavenCentral()
+	jcenter()
+	maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
 	google()
 }
 
