@@ -1,6 +1,5 @@
 package medic.gateway.alert;
 
-import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
@@ -35,13 +34,6 @@ import static medic.gateway.alert.BuildConfig.LOG_TAG;
  */
 @SuppressWarnings("PMD.GodClass")
 public class SimpleJsonClient2 {
-	static {
-		// HTTP connection reuse which was buggy pre-froyo
-		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
-			System.setProperty("http.keepAlive", "false");
-		}
-	}
-
 	private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
 
