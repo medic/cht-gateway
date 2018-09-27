@@ -3,23 +3,15 @@ buildscript {
 		mavenCentral()
 		maven { url "https://jitpack.io" }
 		jcenter()
+		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.1.0'
+		classpath 'com.android.tools.build:gradle:3.2.0'
 		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e'
-		classpath 'com.trickyandroid:jacoco-everywhere:0.2.1'
-	}
-	configurations.all {
-		resolutionStrategy {
-			// use old jacoco so Robolectric test coverage is included in reports
-			// track https://github.com/paveldudka/JacocoEverywhere/issues/14 for a less hacky solution
-			force 'org.jacoco:org.jacoco.core:0.7.2.201409121644'
-		}
 	}
 }
 apply plugin: 'com.android.application'
 apply plugin: 'com.noveogroup.android.check'
-apply plugin: 'jacoco-everywhere'
 
 // enable verbose lint warnings
 gradle.projectsEvaluated {
@@ -35,6 +27,7 @@ repositories {
 	mavenCentral()
 	maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
 	maven { url "${System.env.ANDROID_HOME}/extras/android/m2repository/" }
+	google()
 }
 
 dependencies {
@@ -78,32 +71,9 @@ def getVersionName = {
 	System.env.VERSION_TO_BUILD ?: 'SNAPSHOT'
 }
 
-connectedCheck.doLast {
-	// Add CLI report for Jacoco coverage
-	def slurper = new XmlSlurper()
-	slurper.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false) 
-	slurper.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
-	['generic', 'medic'].each { flavour ->
-		def report = slurper.parse("./build/reports/coverage/${flavour}/debug/report.xml")
-
-		println "------ Code Coverage (flavour: $flavour)) ------"
-		report.package.each { p ->
-			println "--> ${p.@name.toString().replaceAll('/', '.')}"
-			p.counter.each { c ->
-				def covered = c.@covered.toString() as int
-				def missed = c.@missed.toString() as int
-				def percent = ((100 * covered) / (covered + missed))
-				println String.format('    %-16s %.1f ', c.@type, percent) + '%'
-			}
-			println "----------------------------------"
-		}
-	}
-}
-
 android {
 	compileSdkVersion 23
-	buildToolsVersion '23.0.3'
+	buildToolsVersion '28.0.2'
 
 	packagingOptions {
 		exclude 'META-INF/LICENSE'
@@ -185,6 +155,7 @@ android {
 		}
 	}
 
+	flavorDimensions 'brand'
 	productFlavors {
 		generic {
 			applicationId = 'medic.gateway.alert.generic'
