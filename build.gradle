@@ -73,7 +73,7 @@ def getVersionName = {
 }
 
 android {
-	compileSdkVersion 23
+	compileSdkVersion 26
 	buildToolsVersion '28.0.2'
 
 	packagingOptions {
