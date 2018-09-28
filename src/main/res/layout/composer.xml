@@ -6,6 +6,8 @@
 		android:paddingRight="16dp"
 		android:orientation="vertical">
 	<EditText android:id="@+id/txtComposer_recipients"
+			android:inputType="textNoSuggestions"
+			android:autofillHints=""
 			android:hint="@string/txtComposer_recipients"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -17,6 +19,8 @@
 			android:layout_weight="1"
 			>
 		<EditText android:id="@+id/txtComposer_content"
+				android:inputType="text"
+				android:autofillHints=""
 				android:hint="@string/txtComposer_content"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
