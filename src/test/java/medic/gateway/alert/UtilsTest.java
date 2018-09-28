@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 import static org.robolectric.Shadows.*;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants=BuildConfig.class)
+@Config(sdk=26)
 @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity",
 		"PMD.NPathComplexity",
 		"PMD.StdCyclomaticComplexity"})
@@ -27,13 +27,15 @@ public class UtilsTest {
 	private static final long HALF_DAY = 12 * HOUR;
 	private static final long DAY = 2 * HALF_DAY;
 
-	private Application ctx;
+	private MessageListsActivity messageListsActivity;
 	private ShadowApplication shadowApplication;
 
 	@Before
 	public void setUp() {
-		ctx = RuntimeEnvironment.application;
+		Application ctx = RuntimeEnvironment.application;
 		shadowApplication = shadowOf(ctx);
+
+		messageListsActivity = Robolectric.buildActivity(MessageListsActivity.class).create().get();
 	}
 
 	/**
@@ -105,7 +107,7 @@ public class UtilsTest {
 		Capabilities cap = preKitkat();
 
 		// when
-		Utils.startSettingsActivity(ctx, cap);
+		Utils.startSettingsActivity(messageListsActivity, cap);
 
 		// then
 		assertActivityLaunched(shadowApplication, SettingsDialogActivity.class);
@@ -142,7 +144,7 @@ public class UtilsTest {
 		Capabilities cap = isDefaultSmsApp();
 
 		// when
-		Utils.startSettingsActivity(ctx, cap);
+		Utils.startSettingsActivity(messageListsActivity, cap);
 
 		// then
 		assertActivityLaunched(shadowApplication, SettingsDialogActivity.class);
@@ -154,7 +156,7 @@ public class UtilsTest {
 		Capabilities cap = isNotDefaultSmsApp();
 
 		// when
-		Utils.startSettingsActivity(ctx, cap);
+		Utils.startSettingsActivity(messageListsActivity, cap);
 
 		// then
 		assertActivityLaunched(shadowApplication, PromptToSetAsDefaultMessageAppActivity.class);

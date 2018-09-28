@@ -24,7 +24,7 @@ import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants=BuildConfig.class)
+@Config(sdk=26)
 @SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.JUnitTestsShouldIncludeAssert", "PMD.SignatureDeclareThrowsException", "PMD.TooManyMethods"})
 public class DbTest {
 	private Db db;

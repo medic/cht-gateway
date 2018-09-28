@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.robolectric.Shadows.*;
 
-@Config(constants=BuildConfig.class)
 public class SimpleJsonClient2Test {
 	private static final String NO_CHANGE = null;
 

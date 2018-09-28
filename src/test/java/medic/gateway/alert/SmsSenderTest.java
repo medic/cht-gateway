@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static org.robolectric.Shadows.*;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants=BuildConfig.class)
+@Config(sdk=26)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert",
 		"PMD.UnnecessaryFullyQualifiedName",
 		"PMD.SignatureDeclareThrowsException"})

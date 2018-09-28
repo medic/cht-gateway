@@ -11,6 +11,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(sdk=26)
 public class SmsUdhTest {
 	@Test
 	public void from_shouldDecodePdu_1() {

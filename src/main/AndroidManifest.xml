@@ -8,10 +8,7 @@
 		package="medic.gateway.alert"
 		>
 	<uses-sdk android:minSdkVersion="16"
-			tools:ignore="OldTargetApi"
-			android:targetSdkVersion="26"/>
-			<!-- TODO update the targetSdkVersion and remove the lint warning
-			   suppression above once Robolectric supports values greater than 23 -->
+			android:targetSdkVersion="28"/>
 
 	<!-- communication permissions -->
 	<uses-permission android:name="android.permission.INTERNET"/>

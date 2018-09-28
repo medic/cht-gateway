@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.robolectric.Shadows.*;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants=BuildConfig.class)
+@Config(sdk=26)
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 public class IntentProcessorTest {
 	private IntentProcessor intentProcessor;
