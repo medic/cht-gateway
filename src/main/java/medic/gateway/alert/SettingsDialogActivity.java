@@ -163,34 +163,11 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 	private void verifyAndSave() {
-		final String webappUrl = getWebappUrlFromFields();
-		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
-		final boolean dummySendMode = isDummySendModeChecked();
-
 		thinking = Thinking.show(this,
 				String.format(getString(R.string.txtValidatingWebappUrl),
-						redactUrl(webappUrl)));
+						redactUrl(getWebappUrlFromFields())));
 
-		new AsyncTask<Void, Void, WebappUrlVerififcation>() {
-			protected WebappUrlVerififcation doInBackground(Void..._) {
-				return new WebappUrlVerifier(SettingsDialogActivity.this).verify(webappUrl);
-			}
-			protected void onPostExecute(WebappUrlVerififcation result) {
-				boolean savedOk = false;
-
-				if(result.isOk)
-					savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode, dummySendMode));
-				else
-					showError(IS_MEDIC_FLAVOUR ? R.id.txtWebappInstanceName : R.id.txtWebappUrl, result.failure);
-
-				if(savedOk) startApp();
-				else {
-					submitButton().setEnabled(true);
-					cancelButton().setEnabled(true);
-				}
-				thinking.dismiss();
-			}
-		}.execute();
+		new SaveTask(this).execute();
 	}
 
 	private void saveWithoutVerification() {
@@ -247,6 +224,25 @@ public class SettingsDialogActivity extends Activity {
 			});
 			return false;
 		}
+	}
+
+	private void handleSaveResult(WebappUrlVerififcation result) {
+		boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
+		boolean dummySendMode = isDummySendModeChecked();
+
+		boolean savedOk = false;
+
+		if(result.isOk)
+			savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode, dummySendMode));
+		else
+			showError(IS_MEDIC_FLAVOUR ? R.id.txtWebappInstanceName : R.id.txtWebappUrl, result.failure);
+
+		if(savedOk) startApp();
+		else {
+			submitButton().setEnabled(true);
+			cancelButton().setEnabled(true);
+		}
+		thinking.dismiss();
 	}
 
 	private void startApp() {
@@ -321,5 +317,28 @@ public class SettingsDialogActivity extends Activity {
 
 	private void log(String message, Object... extras) {
 		trace(this, message, extras);
+	}
+
+
+	private static class SaveTask extends ActivityTask<SettingsDialogActivity, Void, Void, WebappUrlVerififcation> {
+		SaveTask(SettingsDialogActivity ctx) {
+			super(ctx);
+		}
+
+		protected WebappUrlVerififcation doInBackground(Void..._) {
+			SettingsDialogActivity a = getCtx();
+
+			if(a == null) throw new IllegalStateException("SaveTask.doInBackground() :: no parent context available.");
+
+			String webappUrl = a.getWebappUrlFromFields();
+			return new WebappUrlVerifier(a).verify(webappUrl);
+		}
+		protected void onPostExecute(WebappUrlVerififcation result) {
+			SettingsDialogActivity a = getCtx();
+
+			if(a == null) throw new IllegalStateException("SaveTask.doInBackground() :: no parent context available.");
+
+			a.handleSaveResult(result);
+		}
 	}
 }

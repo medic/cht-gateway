@@ -95,6 +95,7 @@ Severity: HARD
 		<exclude name="ShortVariable"/>
 		<exclude name="VariableNamingConventions"/>
 		<exclude name="MethodNamingConventions"/>
+		<exclude name="GenericsNaming"/>
 	</rule>
 
 	<rule ref="rulesets/java/optimizations.xml">

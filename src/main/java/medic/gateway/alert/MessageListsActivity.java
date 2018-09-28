@@ -12,12 +12,12 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 
 import static medic.gateway.alert.Capabilities.getCapabilities;
+import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.getAppName;
 import static medic.gateway.alert.Utils.getAppVersion;
@@ -40,23 +40,7 @@ public class MessageListsActivity extends TabActivity {
 		public void onClick(DialogInterface dialog, int which) {
 			thinking = Thinking.show(MessageListsActivity.this, R.string.txtDeleteOldData_inProgress);
 
-			new AsyncTask<String, Void, Integer>() {
-				private final Context ctx = MessageListsActivity.this;
-
-				protected Integer doInBackground(String..._) {
-					try {
-						return Db.getInstance(ctx).deleteOldData();
-					} catch(RuntimeException ex) {
-						return -1;
-					}
-				}
-				protected void onPostExecute(Integer deleteCount) {
-					String message = getResources().getQuantityString(R.plurals.txtOldDataDeleteCount, deleteCount);
-					toast(ctx, message, deleteCount);
-					thinking.dismiss();
-					MessageListsActivity.this.recreate();
-				}
-			}.execute();
+			new DeleteTask(MessageListsActivity.this).execute();
 		}
 	};
 
@@ -194,5 +178,34 @@ public class MessageListsActivity extends TabActivity {
 
 	private void log(String message, Object...extras) {
 		trace(this, message, extras);
+	}
+
+	private static class DeleteTask extends ActivityTask<MessageListsActivity, String, Void, Integer> {
+		DeleteTask(MessageListsActivity a) {
+			super(a);
+		}
+
+		protected Integer doInBackground(String..._) {
+			try {
+				MessageListsActivity ctx = getCtx();
+
+				if(ctx == null) throw new IllegalStateException("Couldn't get parent Activity");
+
+				return Db.getInstance(ctx).deleteOldData();
+			} catch(RuntimeException ex) {
+				logException(ex, "Something went wrong deleting old data.");
+				return -1;
+			}
+		}
+		protected void onPostExecute(Integer deleteCount) {
+			MessageListsActivity ctx = getCtx();
+
+			if(ctx == null) throw new IllegalStateException("Couldn't get parent Activity");
+
+			String message = ctx.getResources().getQuantityString(R.plurals.txtOldDataDeleteCount, deleteCount);
+			toast(ctx, message, deleteCount);
+			ctx.thinking.dismiss();
+			ctx.recreate();
+		}
 	}
 }
