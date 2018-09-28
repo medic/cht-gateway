@@ -3,7 +3,7 @@ package medic.gateway.alert.test;
 import android.annotation.*;
 import android.app.*;
 import android.content.*;
-import android.util.*;
+import android.util.Base64;
 import android.view.*;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -11,7 +11,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import medic.gateway.alert.*;
 
 import java.io.*;
-import java.util.*;
+import java.util.Random;
+import java.util.List;
 import java.util.regex.*;
 
 import static org.junit.Assert.*;
@@ -49,6 +50,8 @@ public final class TestUtils {
 	public static final byte[] A_VALID_DELIVERED_REPORT = {
 		(byte) 0x07, (byte) 0x91, (byte) 0x52, (byte) 0x74, (byte) 0x22, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x06, (byte) 0x07, (byte) 0x0A, (byte) 0x81, (byte) 0x70, (byte) 0x20, (byte) 0x95, (byte) 0x77, (byte) 0x11, (byte) 0x11, (byte) 0x21, (byte) 0x12, (byte) 0x11, (byte) 0x33, (byte) 0x91, (byte) 0xE1, (byte) 0x11, (byte) 0x21, (byte) 0x12, (byte) 0x11, (byte) 0x33, (byte) 0x91, (byte) 0x21, (byte) 0x00,
 	};
+
+	private static final Random RANDOM = new Random();
 
 	private TestUtils() {}
 
@@ -91,6 +94,6 @@ public final class TestUtils {
 	}
 
 	public static int randomInt(int limit) {
-		return new Random().nextInt(limit);
+		return RANDOM.nextInt(limit);
 	}
 }
