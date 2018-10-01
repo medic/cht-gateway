@@ -165,7 +165,7 @@ public class UtilsTest {
 //> PRIVATE HELPERS
 	private Capabilities preKitkat() {
 		Capabilities app = mock(Capabilities.class);
-		when(app.isDefaultSmsProvider(RuntimeEnvironment.application)).thenThrow(new IllegalStateException());
+		when(app.isDefaultSmsProvider(any(Context.class))).thenThrow(new IllegalStateException());
 		when(app.canBeDefaultSmsProvider()).thenReturn(false);
 		return app;
 	}
@@ -173,7 +173,7 @@ public class UtilsTest {
 	private Capabilities isNotDefaultSmsApp() {
 		Capabilities app = mock(Capabilities.class);
 		when(app.canBeDefaultSmsProvider()).thenReturn(true);
-		when(app.isDefaultSmsProvider(RuntimeEnvironment.application))
+		when(app.isDefaultSmsProvider(any(Context.class)))
 				.thenReturn(false);
 		return app;
 	}
@@ -181,7 +181,7 @@ public class UtilsTest {
 	private Capabilities isDefaultSmsApp() {
 		Capabilities app = mock(Capabilities.class);
 		when(app.canBeDefaultSmsProvider()).thenReturn(true);
-		when(app.isDefaultSmsProvider(RuntimeEnvironment.application))
+		when(app.isDefaultSmsProvider(any(Context.class)))
 				.thenReturn(true);
 		return app;
 	}
