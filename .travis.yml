@@ -28,6 +28,7 @@ cache:
     - $HOME/.gradle/wrapper/
 before_script:
   - export VERSION_TO_BUILD="$TRAVIS_TAG"
+  - yes | sdkmanager 'platforms;android-28'
 script: make travis
 deploy:
   provider: releases
