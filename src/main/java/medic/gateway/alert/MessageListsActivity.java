@@ -16,7 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 
-import medic.android.ActivityTask;
+import medic.android.ActivityBackgroundTask;
 
 import static medic.gateway.alert.Capabilities.getCapabilities;
 import static medic.gateway.alert.GatewayLog.logException;
@@ -182,7 +182,7 @@ public class MessageListsActivity extends TabActivity {
 		trace(this, message, extras);
 	}
 
-	private static class DeleteTask extends ActivityTask<MessageListsActivity, String, Void, Integer> {
+	private static class DeleteTask extends ActivityBackgroundTask<MessageListsActivity, String, Void, Integer> {
 		DeleteTask(MessageListsActivity a) {
 			super(a);
 		}

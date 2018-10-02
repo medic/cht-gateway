@@ -15,7 +15,7 @@ import android.widget.TextView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import medic.android.ActivityTask;
+import medic.android.ActivityBackgroundTask;
 
 import static medic.gateway.alert.BuildConfig.IS_DUMMY_SEND_AVAILABLE;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
@@ -322,7 +322,7 @@ public class SettingsDialogActivity extends Activity {
 	}
 
 
-	private static class SaveTask extends ActivityTask<SettingsDialogActivity, Void, Void, WebappUrlVerififcation> {
+	private static class SaveTask extends ActivityBackgroundTask<SettingsDialogActivity, Void, Void, WebappUrlVerififcation> {
 		SaveTask(SettingsDialogActivity ctx) {
 			super(ctx);
 		}
