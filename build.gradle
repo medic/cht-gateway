@@ -42,9 +42,9 @@ dependencies {
 	androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.2.0'
 	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-	compile 'com.android.support:support-v4:23.0.1'
-	compile 'com.commonsware.cwac:wakeful:1.1.0'
-	compile 'com.google.code.findbugs:annotations:3.0.1', {
+	implementation 'com.android.support:support-v4:23.0.1'
+	implementation 'com.commonsware.cwac:wakeful:1.1.0'
+	implementation 'com.google.code.findbugs:annotations:3.0.1', {
 		// Need to exclude these, or build is broken by:
 		//   com.android.dex.DexException: Multiple dex files define Ljavax/annotation/CheckForNull
 		exclude module: 'jsr305'
