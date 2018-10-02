@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 
+import medic.android.ActivityTask;
+
 import static medic.gateway.alert.Capabilities.getCapabilities;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
@@ -187,10 +189,7 @@ public class MessageListsActivity extends TabActivity {
 
 		protected Integer doInBackground(String..._) {
 			try {
-				MessageListsActivity ctx = getCtx();
-
-				if(ctx == null) throw new IllegalStateException("Couldn't get parent Activity");
-
+				MessageListsActivity ctx = getRequiredCtx("DeleteTask.doInBackground()");
 				return Db.getInstance(ctx).deleteOldData();
 			} catch(RuntimeException ex) {
 				logException(ex, "Something went wrong deleting old data.");
@@ -198,10 +197,7 @@ public class MessageListsActivity extends TabActivity {
 			}
 		}
 		protected void onPostExecute(Integer deleteCount) {
-			MessageListsActivity ctx = getCtx();
-
-			if(ctx == null) throw new IllegalStateException("Couldn't get parent Activity");
-
+			MessageListsActivity ctx = getRequiredCtx("MessageListsActivity.onPostExecute()");
 			String message = ctx.getResources().getQuantityString(R.plurals.txtOldDataDeleteCount, deleteCount);
 			toast(ctx, message, deleteCount);
 			ctx.thinking.dismiss();

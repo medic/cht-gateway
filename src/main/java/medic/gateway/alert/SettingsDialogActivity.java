@@ -15,6 +15,8 @@ import android.widget.TextView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import medic.android.ActivityTask;
+
 import static medic.gateway.alert.BuildConfig.IS_DUMMY_SEND_AVAILABLE;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.GatewayLog.logEvent;
@@ -326,10 +328,7 @@ public class SettingsDialogActivity extends Activity {
 		}
 
 		protected WebappUrlVerififcation doInBackground(Void..._) {
-			SettingsDialogActivity a = getCtx();
-
-			if(a == null) throw new IllegalStateException("SaveTask.doInBackground() :: no parent context available.");
-
+			SettingsDialogActivity a = getRequiredCtx("SaveTask.doInBackground()");
 			String webappUrl = a.getWebappUrlFromFields();
 			return new WebappUrlVerifier(a).verify(webappUrl);
 		}
