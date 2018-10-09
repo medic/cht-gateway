@@ -90,7 +90,7 @@ N.B. messages are cosidered duplicate by `medic-gateway` if they have identical 
 
 ## Messages
 
-THe entire API should be implemented by a webapp at a single endpoint, e.g. https://exmaple.com/medic-gateway-api-endpoint
+The entire API should be implemented by a webapp at a single endpoint, e.g. https://exmaple.com/medic-gateway-api-endpoint
 
 ### GET
 
