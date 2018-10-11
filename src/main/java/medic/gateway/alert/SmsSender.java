@@ -7,7 +7,6 @@ import android.telephony.SmsManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static android.telephony.PhoneNumberUtils.isGlobalPhoneNumber;
 import static medic.gateway.alert.GatewayLog.logEvent;
@@ -22,13 +21,13 @@ import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
 @SuppressWarnings("PMD.LooseCoupling")
 public class SmsSender {
+	private static final int UNUSED_REQUEST_CODE = 0;
 	private static final int MAX_WO_MESSAGES = 10;
 	private static final String DEFAULT_SMSC = null;
 
 	private final Context ctx;
 	private final Db db;
 	private final SmsManager smsManager;
-	private final Random r;
 
 	/**
 	 * Some CDMA networks do not support multipart SMS properly.  On these
@@ -49,7 +48,6 @@ public class SmsSender {
 		this.ctx = ctx;
 		this.db = Db.getInstance(ctx);
 		this.smsManager = SmsManager.getDefault();
-		this.r = new Random();
 
 		Settings settings = Settings.in(ctx);
 		this.cdmaCompatMode = settings == null ? false : settings.cdmaCompatMode;
@@ -131,14 +129,7 @@ public class SmsSender {
 		intent.putExtra("partIndex", partIndex);
 		intent.putExtra("totalParts", totalParts);
 
-		// Use a random number for the PendingIntent's requestCode - we
-		// will never want to cancel these intents, and we do not want
-		// collisions.  There is a small chance of collisions if two
-		// SMS are in-flight at the same time and are given the same id.
-		// TODO use an algorithm that's less likely to generate colliding values
-		int requestCode = r.nextInt();
-
-		return PendingIntent.getBroadcast(ctx, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
+		return PendingIntent.getBroadcast(ctx, UNUSED_REQUEST_CODE, intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 
 	/**
