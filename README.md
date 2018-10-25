@@ -290,3 +290,11 @@ To support being the default messaging app, `medic-gateway` listens for `SMS_DEL
 ## Runtime Permissions
 
 Since Android 6.0 (marshmallow), permissions for sending and receiving SMS must be requested both in `AndroidManifest.xml` and also at runtime.  Read more at https://developer.android.com/intl/ru/about/versions/marshmallow/android-6.0-changes.html#behavior-runtime-permissions
+
+## Copyright
+
+Copyright 2013-2018 Medic Mobile, Inc. <hello@medicmobile.org>
+
+## License
+
+The software is provided under AGPL-3.0. Contributions to this project are accepted under the same license.
