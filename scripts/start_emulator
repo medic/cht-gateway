@@ -11,7 +11,7 @@ echo "[start_emulator] Creating ABI..."
 echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a --sdcard 200M
 
 echo "[start_emulator] Starting emulator..."
-emulator -avd test -no-audio -no-window &
+QEMU_AUDIO_DRV=none emulator -avd test -no-window &
 
 echo "[start_emulator] Waiting for emulator..."
 android-wait-for-emulator
