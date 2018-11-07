@@ -72,6 +72,5 @@ changelog:
 
 travis: stats
 	${GRADLEW} --stacktrace check test assemble
-# FIXME emulator is currently broken on Travis
-#	./scripts/start_emulator
-#	${GRADLEW} connectedCheck
+	./scripts/start_emulator
+	${GRADLEW} connectedCheck

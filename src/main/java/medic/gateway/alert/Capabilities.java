@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -22,6 +23,7 @@ public class Capabilities {
 	 * device.  This feature is only available on Android 4.4 (kitkat®) or
 	 * later.
 	 */
+	@SuppressLint("ObsoleteSdkInt") // lint seems to think checking for > KITKAT is unnecessary: "Error: Unnecessary; SDK_INT is never < 16", but I think KITKAT is version 19 or 20
 	public boolean canBeDefaultSmsProvider() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 	}

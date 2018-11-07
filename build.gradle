@@ -6,8 +6,12 @@ buildscript {
 		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.2.0'
-		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e'
+		classpath 'com.android.tools.build:gradle:3.2.0', {
+			exclude module: 'xmlpull'
+		}
+		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e', {
+			exclude module: 'xmlpull'
+		}
 		classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
 	}
 }
@@ -33,16 +37,25 @@ repositories {
 	google()
 }
 
+def excludeKxml2 = {
+	// This transitive dependency is excluded from some direct dependencies to prevent
+	// "Program type already present: org.xmlpull.v1.XmlSerializer" when running
+	// `gradle clean transformDexArchiveWithExternalLibsDexMergerForGenericDebugAndroidTest`
+	// This class is also included in the android core libs by default, so this should
+	// be safe to exclude from androidTestImplementation and implementation configurations.
+	exclude module: 'kxml2'
+}
+
 dependencies {
-	testImplementation 'junit:junit:4.12'
 	testImplementation 'com.google.android:android-test:4.1.1.4'
 	testImplementation 'org.robolectric:robolectric:3.8'
 	testImplementation 'com.squareup.okhttp3:mockwebserver:3.2.0'
 	testImplementation 'org.mockito:mockito-core:1.10.19'
 
-	androidTestImplementation 'junit:junit:4.12'
+	androidTestImplementation 'com.google.android:android-test:4.1.1.4'
 	androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.2.0'
-	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2', excludeKxml2
+	androidTestImplementation 'com.android.support.test:rules:1.0.2', excludeKxml2
 
 	implementation 'com.android.support:support-core-ui:28.0.0'
 	implementation 'com.android.support:support-fragment:28.0.0'
@@ -86,6 +99,8 @@ android {
 	}
 
 	defaultConfig {
+		minSdkVersion 16
+
 		versionCode getVersionCode()
 		versionName getVersionName()
 		archivesBaseName = "${project.name}-${versionName}"
