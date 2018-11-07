@@ -2,7 +2,9 @@ language: android
 sudo: required
 android:
   components:
-    # some travis/android magic from https://github.com/travis-ci/travis-ci/issues/5036
+    # some travis/android magic from
+    # * https://github.com/travis-ci/travis-ci/issues/5036
+    # * https://stackoverflow.com/questions/28751111/invalid-abi-armeabi-v7a-for-the-selected-target-with-google-apis
     - tools
     - platform-tools
 
@@ -17,7 +19,7 @@ android:
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-26
+    - sys-img-armeabi-v7a-addon-google_apis-google-26
 env:
 - GRADLE_OPTS="-XX:MaxPermSize=512m"
 before_cache:
