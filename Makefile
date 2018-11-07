@@ -71,6 +71,6 @@ changelog:
 	./scripts/changelog
 
 travis: stats
-	${GRADLEW} --stacktrace check test assemble
+	#${GRADLEW} --stacktrace check test assemble
 	./scripts/start_emulator
 	${GRADLEW} connectedCheck
