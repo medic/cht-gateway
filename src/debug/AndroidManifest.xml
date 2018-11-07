@@ -4,6 +4,10 @@
   https://stackoverflow.com/questions/34074955/android-exact-alarm-is-always-3-minutes-off/34085645 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="medic.gateway.alert">
+	<uses-sdk android:minSdkVersion="16"
+			android:targetSdkVersion="28"
+			tools:overrideLibrary="android.support.test.espresso"/>
+
 	<!-- extra permissions used by instrumentation tests -->
 	<uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
