@@ -2,7 +2,7 @@
 # start the emulator
 
 echo "[start_emulator] Creating ABI..."
-echo no | android create avd --force -n test -t android-26 --abi google_apis/armeabi-v7a --sdcard 200M
+echo no | android create avd --force -n test -t android-26 --abi armeabi-v7a --sdcard 200M
 
 echo "[start_emulator] Starting emulator..."
 emulator -avd test -no-audio -no-window &
