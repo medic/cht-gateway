@@ -1,6 +1,9 @@
 #!/bin/bash -eu
 # start the emulator
 
+echo "[start_emulator] Listing available ABIs..."
+android list sdk --extended --no-ui --all
+
 echo "[start_emulator] Creating ABI..."
 echo no | android create avd --force -n test -t android-26 --abi armeabi-v7a --sdcard 200M
 
