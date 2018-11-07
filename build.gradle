@@ -75,6 +75,7 @@ def getVersionName = {
 }
 
 android {
+	minSdkVersion 16
 	compileSdkVersion 28
 	buildToolsVersion '28.0.2'
 
