@@ -1,23 +1,23 @@
 language: android
-sudo: required
 android:
   components:
-    # some travis/android magic from https://github.com/travis-ci/travis-ci/issues/5036
+    # some travis/android magic from https://docs.travis-ci.com/user/languages/android/
     - tools
     - platform-tools
+    - tools
 
     # The BuildTools version used by your project
     - build-tools-28.0.2
 
     # The SDK version used to compile your project
-    - android-26
+    - android-22
 
     # Additional components
     - extra-android-m2repository
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-26
+    - sys-img-armeabi-v7a-android-22
 env:
 - GRADLE_OPTS="-XX:MaxPermSize=512m"
 before_cache:

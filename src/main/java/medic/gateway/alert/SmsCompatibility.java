@@ -42,6 +42,7 @@ final class SmsCompatibility {
 	/**
 	 * @see https://developer.android.com/reference/android/telephony/SmsMessage.html#createFromPdu%28byte[],%20java.lang.String%29
 	 */
+	@SuppressLint("ObsoleteSdkInt") // lint seems to think checking for > M is unnecessary: "Error: Unnecessary; SDK_INT is never < 16", but I think M is version 23
 	public static SmsMessage createFromPdu(Intent intent) {
 		byte[] pdu = intent.getByteArrayExtra("pdu");
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
