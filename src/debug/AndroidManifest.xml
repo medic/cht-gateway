@@ -3,6 +3,7 @@
   https://code.google.com/p/android/issues/detail?id=82001
   https://stackoverflow.com/questions/34074955/android-exact-alarm-is-always-3-minutes-off/34085645 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:tools="http://schemas.android.com/tools"
 		package="medic.gateway.alert">
 	<uses-sdk android:minSdkVersion="16"
 			android:targetSdkVersion="28"
