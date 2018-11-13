@@ -8,9 +8,6 @@
 		package="medic.gateway.alert"
 		tools:overrideLibrary="android.support.test.espresso"
 		>
-	<uses-sdk android:minSdkVersion="16"
-			android:targetSdkVersion="28"
-			tools:overrideLibrary="android.support.test.espresso"/>
 
 	<!-- communication permissions -->
 	<uses-permission android:name="android.permission.INTERNET"/>
