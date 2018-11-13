@@ -36,7 +36,6 @@
 			android:supportsRtl="false"
 			tools:ignore="GoogleAppIndexingWarning">
 		<activity android:name="StartupActivity"
-				android:screenOrientation="portrait"
 				android:configChanges="orientation|screenSize"
 				android:theme="@android:style/Theme.NoDisplay"
 				>
