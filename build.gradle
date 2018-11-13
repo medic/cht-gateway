@@ -84,6 +84,8 @@ android {
 	}
 
 	defaultConfig {
+		minSdkVersion 16
+
 		versionCode getVersionCode()
 		versionName getVersionName()
 		archivesBaseName = "${project.name}-${versionName}"
