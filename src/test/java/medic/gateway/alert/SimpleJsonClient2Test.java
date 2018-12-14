@@ -76,17 +76,6 @@ public class SimpleJsonClient2Test {
 	}
 
 	@Test public void isValidBasicAuthPassword_invalidOptions() {
-		final String[] passwords = {
-			"/ is bad", "the / is bad", "should fail for /",
-			"# is bad", "the # is bad", "should fail for #",
-			"? is bad", "the ? is bad", "should fail for ?",
-			"@ is bad", "the @ is bad", "should fail for @",
-		};
-
-		for(String p : passwords)
-			assertFalse("Wrongly accepted password: " + p,
-					SimpleJsonClient2.basicAuth_isValidPassword(p));
-
 		for(char c : SIMPLE_NON_ISO_8859_1_CHARS.toCharArray()) {
 			String p = "bad char: " + c;
 			assertFalse("Wrongly accepted password: " + p,
@@ -168,6 +157,29 @@ public class SimpleJsonClient2Test {
 			if(expected == null) expected = initial;
 
 			assertEquals(expected, SimpleJsonClient2.redactUrl(initial));
+		}
+	}
+
+	@Test public void uriEncodeAuth_shouldEncodeSuppliedPasswords() {
+		final String[][] testCases = {
+			{ null, null },
+			{ "http://example.com/path", "http://example.com/path" },
+			{ "https://example.com/path", "https://example.com/path" },
+			{ "https://admin:pass@:?%&/#@example.com/path", "https://admin:pass%40%3A%3F%25%26%2F%23@example.com/path" },
+		};
+
+		for(String[] testCase : testCases) {
+
+			// given
+			String unencoded = testCase[0];
+			String expected = testCase[1];
+
+			// when
+			String actual = SimpleJsonClient2.uriEncodeAuth(unencoded);
+
+			// then
+			assertEquals(String.format("Expected URL %s to be converted to %s but actually got %s", unencoded, expected, actual),
+					expected, actual);
 		}
 	}
 }

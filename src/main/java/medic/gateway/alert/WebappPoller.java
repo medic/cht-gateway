@@ -18,6 +18,7 @@ import static medic.gateway.alert.BuildConfig.DEBUG;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.GatewayLog.trace;
+import static medic.gateway.alert.SimpleJsonClient2.uriEncodeAuth;
 import static medic.gateway.alert.Utils.normalisePhoneNumber;
 import static medic.gateway.alert.Utils.json;
 
@@ -47,7 +48,8 @@ public class WebappPoller {
 		logEvent(ctx, "Polling webapp (forwarding %d messages & %d status updates)...",
 				request.wtMessageCount(), request.statusUpdateCount());
 
-		SimpleResponse response = new SimpleJsonClient2().post(webappUrl, request.getJson());
+		SimpleResponse response = new SimpleJsonClient2().post(
+				uriEncodeAuth(webappUrl), request.getJson());
 		if(DEBUG) log(response.toString());
 
 		if(response.isError()) {
