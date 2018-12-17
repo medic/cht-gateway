@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
@@ -124,7 +125,7 @@ public class SimpleJsonClient2 {
 		if(!m.matches()) return url;
 
 		return String.format("%s://%s:%s@%s",
-				m.group(1), m.group(2), urlEncode(m.group(3)), m.group(4));
+				m.group(1), m.group(2), Uri.encode(m.group(3)), m.group(4));
 	}
 
 //> INSTANCE HELPERS
@@ -226,18 +227,6 @@ public class SimpleJsonClient2 {
 	@SuppressWarnings("PMD.PreserveStackTrace")
 	private static String encodeCredentials(String normal) {
 		return Base64.encodeToString(normal.getBytes(ISO_8859_1), Base64.NO_WRAP);
-	}
-
-	private static String urlEncode(String s) {
-		return s
-				.replace("%", "%25")
-				.replace("?", "%3F")
-				.replace("&", "%26")
-				.replace("@", "%40")
-				.replace(":", "%3A")
-				.replace("/", "%2F")
-				.replace("#", "%23")
-				;
 	}
 
 	private static void traceMethod(String methodName, Object...args) {
