@@ -8,10 +8,12 @@ buildscript {
 	dependencies {
 		classpath 'com.android.tools.build:gradle:3.2.0'
 		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e'
+		classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
 	}
 }
 apply plugin: 'com.android.application'
 apply plugin: 'com.noveogroup.android.check'
+apply plugin: 'de.mobilej.unmock'
 
 // enable verbose lint warnings
 gradle.projectsEvaluated {
@@ -174,4 +176,8 @@ android {
 			buildConfigField "boolean", "IS_MEDIC_FLAVOUR", "true"
 		}
 	}
+}
+
+unMock {
+	keep 'android.net.Uri'
 }
