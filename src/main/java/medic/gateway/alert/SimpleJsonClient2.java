@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
@@ -35,7 +36,7 @@ import static medic.gateway.alert.BuildConfig.LOG_TAG;
 @SuppressWarnings("PMD.GodClass")
 public class SimpleJsonClient2 {
 	private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
-	private static final Pattern AUTH_URL = Pattern.compile("(.+)://(.*):(.*)@(.*)");
+	private static final Pattern AUTH_URL = Pattern.compile("(.+)://([^:]*):(.*)@(.*)");
 
 //> PUBLIC METHODS
 	public SimpleResponse get(String url) throws MalformedURLException {
@@ -103,19 +104,28 @@ public class SimpleJsonClient2 {
 	}
 
 	public static boolean basicAuth_isValidUsername(String username) {
-		return basicAuth_isValidPassword(username) &&
-				username.indexOf(':') == -1;
-	}
-
-	public static boolean basicAuth_isValidPassword(String password) {
-		for(int i=password.length()-1; i>=0; --i) {
-			switch(password.charAt(i)) {
-				case '#': case '/': case '?': case '@':
+		for(int i=username.length()-1; i>=0; --i) {
+			switch(username.charAt(i)) {
+				case '#': case '/': case '?': case '@': case ':':
 					return false;
 			}
 		}
+		return basicAuth_isValidPassword(username);
+	}
+
+	public static boolean basicAuth_isValidPassword(String password) {
 		String reEncoded = new String(password.getBytes(ISO_8859_1), ISO_8859_1);
 		return password.equals(reEncoded);
+	}
+
+	public static String uriEncodeAuth(String url) {
+		if(url == null) return null;
+
+		Matcher m = AUTH_URL.matcher(url);
+		if(!m.matches()) return url;
+
+		return String.format("%s://%s:%s@%s",
+				m.group(1), m.group(2), Uri.encode(m.group(3)), m.group(4));
 	}
 
 //> INSTANCE HELPERS
@@ -231,11 +241,13 @@ public class SimpleJsonClient2 {
 	}
 
 	private static void log(String methodName, String message, Object... extras) {
-		Log.d(LOG_TAG, "SimpleJsonClient2." + methodName + "() :: " + String.format(message, extras));
+		if(extras.length > 0) message = String.format(message, extras);
+		Log.d(LOG_TAG, "SimpleJsonClient2." + methodName + "() :: " + message);
 	}
 
 	private static void log(Exception ex, String message, Object... extras) {
-		Log.i(LOG_TAG, String.format(message, extras), ex);
+		if(extras.length > 0) message = String.format(message, extras);
+		Log.i(LOG_TAG, message, ex);
 	}
 }
 

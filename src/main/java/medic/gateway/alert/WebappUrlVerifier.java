@@ -13,6 +13,7 @@ import static medic.gateway.alert.R.string.errWebappUrl_badSsl;
 import static medic.gateway.alert.R.string.errWebappUrl_serverNotFound;
 import static medic.gateway.alert.R.string.errWebappUrl_unauthorised;
 import static medic.gateway.alert.SimpleJsonClient2.redactUrl;
+import static medic.gateway.alert.SimpleJsonClient2.uriEncodeAuth;
 
 public class WebappUrlVerifier {
 	private final Context ctx;
@@ -27,7 +28,7 @@ public class WebappUrlVerifier {
 		}
 
 		try {
-			SimpleResponse response = new SimpleJsonClient2().get(webappUrl);
+			SimpleResponse response = new SimpleJsonClient2().get(uriEncodeAuth(webappUrl));
 
 			if(response instanceof JsonResponse && !response.isError())
 				return handleJsonResponse(webappUrl, (JsonResponse) response);
