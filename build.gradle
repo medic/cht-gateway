@@ -36,9 +36,6 @@ repositories {
 }
 
 dependencies {
-	testImplementation('junit:junit:4.12') {
-		exclude module: 'xmlpull'
-	}
 	testImplementation('com.google.android:android-test:4.1.1.4') {
 		exclude module: 'xmlpull'
 	}
@@ -52,9 +49,6 @@ dependencies {
 		exclude module: 'xmlpull'
 	}
 
-//	androidTestImplementation('junit:junit:4.12') {
-//		exclude module: 'xmlpull'
-//	}
 	androidTestImplementation('com.google.android:android-test:4.1.1.4') {
 		exclude module: 'xmlpull'
 		exclude module: 'kxml2'
