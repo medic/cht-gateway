@@ -6,9 +6,7 @@
 		xmlns:tools="http://schemas.android.com/tools"
 		android:installLocation="internalOnly"
 		package="medic.gateway.alert"
-		tools:overrideLibrary="android.support.test.espresso"
 		>
-
 	<!-- communication permissions -->
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.RECEIVE_SMS"/>
