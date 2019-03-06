@@ -91,7 +91,7 @@ def getVersionName = {
 
 android {
 	compileSdkVersion 28
-	buildToolsVersion '28.0.2'
+	buildToolsVersion '28.0.3'
 
 	packagingOptions {
 		exclude 'META-INF/LICENSE'
@@ -100,6 +100,7 @@ android {
 
 	defaultConfig {
 		minSdkVersion 16
+		targetSdkVersion 26
 
 		versionCode getVersionCode()
 		versionName getVersionName()
