@@ -21,13 +21,13 @@ before_install:
 before_script:
   - yes | sdkmanager 'platforms;android-28'
 stages:
-#- name: test
+- name: test
 - name: deploy
-  # if: tag IS present
+  if: tag IS present
 jobs:
   include:
-#  - stage: test
-#    script: make travis
+  - stage: test
+    script: make travis
   - stage: deploy
     script: fastlane deploy
 before_cache:
@@ -47,6 +47,7 @@ deploy:
   file_glob: true
   file: ./build/outputs/apk/**/release/*.apk
   on:
-    # tags: true
+    tags: true
     repo: medic/medic-gateway
-    branch: 145-travis
+    all_branches: true
+    # branch: master
