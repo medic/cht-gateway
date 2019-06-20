@@ -18,6 +18,9 @@ before_install:
 - tar -xf ./secrets.tar.gz
 - gem update --system
 - gem install fastlane --no-document --quiet
+before_script:
+  - export VERSION_TO_BUILD="$TRAVIS_TAG"
+  - yes | sdkmanager 'platforms;android-28'
 stages:
 - name: test
 - name: deploy
