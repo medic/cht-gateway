@@ -1,49 +1,49 @@
 language: android
+dist: trusty
 android:
   components:
-    # some travis/android magic from https://docs.travis-ci.com/user/languages/android/
-    - tools
-    - platform-tools
-    - tools
-
-    # The BuildTools version used by your project
-    - build-tools-28.0.2
-
-    # The SDK version used to compile your project
-    - android-22
-
-    # Additional components
-    - extra-android-m2repository
+  - tools
+  - platform-tools
+  - build-tools-28.0.2
+  - android-22
+  - extra-android-m2repository
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
+  - sys-img-armeabi-v7a-android-22
 env:
 - GRADLE_OPTS="-XX:MaxPermSize=512m"
+before_install:
+- openssl aes-256-cbc -K $encrypted_937040266844_key -iv $encrypted_937040266844_iv -in medic-official.keystore.enc -out medic-official.keystore -d
+before_script:
+- yes | sdkmanager 'platforms;android-28'
+stages:
+- name: test
+- name: build
+  if: tag IS present
+jobs:
+  include:
+  - stage: test
+    script: make travis
+  - stage: build
+    script: ./gradlew assembleRelease
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-before_script:
-  - export VERSION_TO_BUILD="$TRAVIS_TAG"
-  - yes | sdkmanager 'platforms;android-28'
-script: make travis
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.android/build-cache"
 deploy:
   provider: releases
-  api_key: $GITHUB_OAUTH_TOKEN
-  file:
-    - build/outputs/apk/medic/release/medic-gateway-${VERSION_TO_BUILD}-medic-release.apk
-    - build/outputs/apk/generic/release/medic-gateway-${VERSION_TO_BUILD}-generic-release.apk
   skip_cleanup: true
+  overwrite: true
+  api_key:
+    secure: GqA3eJzbhjusl2iNa0sLIG6VIYCJuZW9XXpRgRLMhnt1T009zTgtsFG9WHEhAHJNomCeaIeXdEcsOHlGuJc3j2uBiLEpm02n04fslgHcS8BndMCjVuO3txdFBijA5Bbcrx7n0CUDKYIjcyF5wpk98UFLBcTBspFEenuMLfWN2WDLLNYmmYx1QwcRojH8SfoDjEaOM3UEMhlm7pRNCxrVW6l5g0hmQpe504zEX6WGZx1+InDyT7s49+NuN1HqWvPVN0mO8FArPWAoiN+w0WsFh6EpRDzCD42ceyJMXlJJq0rpkhM0eIr077XaVFGraWaWLYr4DbScx3LHj2B1aH50eP5+0sTIbWFhbAwBb1WPvnk0bAG2SREhFqPZ1PMIB/+i+iYVhRiYsG+y/wTy/E6L0Ur6/4K5BD+nXc1vqd05HhbxbrrQMxn5YmCoLvYWhcjQWu5hFVAMk49sSgaIYwtNX7vFPzqLByxkRtHH6Ugbi3aVLuarXzJPLMd6xPa6k73S7eUJLF0yQtSm6rB6l+2jW83YE23tmeIqgjJbS5BOz5xA9van2ik1VFsq6SZgIggaaAXOXGGa3FqwEqp8Or0cR0UqH+ZKaopRvFjMKKFHf7Vuf3lSuKyrtVFD29RqlMYYWAD6yBHdmX+qG1WXw3ImARskMynVBPYZqpYFpvaCT3I=
+  file_glob: true
+  file: ./build/outputs/apk/**/release/*.apk
   on:
     tags: true
-notifications:
-  slack:
-    rooms:
-      - medic:SdzCLsD56UOr5U8ujzOCMDJd#development
-    template:
-      - "[gateway] <%{build_url}|%{author}'s build> %{result}. Commit: %{commit_message} (<%{compare_url}|compare>)"
-    on_success: change
-    on_failure: always
+    repo: medic/medic-gateway
+    branch: master
