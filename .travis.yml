@@ -1,44 +1,47 @@
 language: android
+dist: trusty
 android:
   components:
-    # some travis/android magic from https://docs.travis-ci.com/user/languages/android/
-    - tools
-    - platform-tools
-    - tools
-
-    # The BuildTools version used by your project
-    - build-tools-28.0.2
-
-    # The SDK version used to compile your project
-    - android-22
-
-    # Additional components
-    - extra-android-m2repository
+  - tools
+  - platform-tools
+  - build-tools-28.0.2
+  - android-22
+  - extra-android-m2repository
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
+  - sys-img-armeabi-v7a-android-22
 env:
 - GRADLE_OPTS="-XX:MaxPermSize=512m"
 before_install:
 - openssl aes-256-cbc -K $encrypted_937040266844_key -iv $encrypted_937040266844_iv -in secrets.tar.gz.enc -out ./secrets.tar.gz -d
 - tar -xf ./secrets.tar.gz
+- gem update --system
+- gem install fastlane --no-document --quiet
+stages:
+- name: test
+- name: deploy
+  # if: tag IS present
+jobs:
+  include:
+  - stage: test
+    script: make travis
+  - stage: deploy
+    script: fastlane deploy
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-before_script:
-  - export VERSION_TO_BUILD="$TRAVIS_TAG"
-  - yes | sdkmanager 'platforms;android-28'
-script: make travis
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
+  - $HOME/.android/build-cache
 deploy:
   provider: releases
-  api_key: $GITHUB_OAUTH_TOKEN
-  file:
-    - build/outputs/apk/medic/release/medic-gateway-${VERSION_TO_BUILD}-medic-release.apk
-    - build/outputs/apk/generic/release/medic-gateway-${VERSION_TO_BUILD}-generic-release.apk
-  skip_cleanup: true
+  api_key:
+    secure: Ac5mL8ZANrw6QJr1tlvuYb8O4TZWXykYQpUkav7HhBA1tlfkZVCQgEPUvlldKr9PFOMoMIu2eDAhkxbA1BJ00FVPChsE4ruxKw4EwBFo6y9qX27w+kAvWLjnupcuI+iPQLYDzg3Rz6kAyOsww6qF8UZUagBAQVsepLpdchGRNmOQR54yDFDurO8pIRPuQ4o/zrhCcRVq2K+7v8TDpF+OSciHFN3kSJKQGf5RY2lWbnUSOOGzvMpCdXyvUnajC5kTFBQC6pbhNOJVB2jxx4Qk5ygBcGpRauMGHav18TX21w4osOJlGkrS12UWJqddHryzBi2TuDFP42A0e6aaO8Ya7oTHTqCO+NuTw+DvYMqWyCAA8NXsPNYxyq/U27davE0x7VNm3vW8oG0NmC5W9P8UqKdbqLGjI9yn/U2R1BdIi00X9byFTVD2AZJMkRvclqtJGSz9t3W1THltTTZStnTle0o5Q/z6kuoJ2E5xus6AVzwf+5dblCieHinDdu0r6NrjIID1uPADyqsRYYleiFJXFfTSGwJpaRffYU0l1xToO1xTmCMadQ+4wcEXy9sIkOIOfSgOMAWVClTaOEVeIXjN608vtBc3Pi059zKCFv1FVsO+fgAL25uP+AkxyQDo3Z921MSSx2xaXazQt83g8G/Dj5tkP602RzGYPQljurYwPU8=
+  file: ./build/outputs/apk/**/release/*.apk
   on:
-    tags: true
+    # tags: true
+    repo: medic/medic-gateway
+    branch: 145-travis
