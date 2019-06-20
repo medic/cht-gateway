@@ -14,22 +14,19 @@ android:
 env:
 - GRADLE_OPTS="-XX:MaxPermSize=512m"
 before_install:
-- openssl aes-256-cbc -K $encrypted_937040266844_key -iv $encrypted_937040266844_iv -in secrets.tar.gz.enc -out ./secrets.tar.gz -d
-- tar -xf ./secrets.tar.gz
-- gem update --system
-- gem install fastlane --no-document --quiet
+- openssl aes-256-cbc -K $encrypted_937040266844_key -iv $encrypted_937040266844_iv -in medic-official.keystore.enc -out medic-official.keystore -d
 before_script:
 - yes | sdkmanager 'platforms;android-28'
 stages:
 - name: test
-- name: deploy
+- name: build
   if: tag IS present
 jobs:
   include:
   - stage: test
     script: make travis
-  - stage: deploy
-    script: fastlane deploy
+  - stage: build
+    script: ./gradlew assembleRelease
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
