@@ -41,8 +41,11 @@ cache:
   - $HOME/.android/build-cache
 deploy:
   provider: releases
+  skip_cleanup: true
+  overwrite: true
   api_key:
     secure: Ac5mL8ZANrw6QJr1tlvuYb8O4TZWXykYQpUkav7HhBA1tlfkZVCQgEPUvlldKr9PFOMoMIu2eDAhkxbA1BJ00FVPChsE4ruxKw4EwBFo6y9qX27w+kAvWLjnupcuI+iPQLYDzg3Rz6kAyOsww6qF8UZUagBAQVsepLpdchGRNmOQR54yDFDurO8pIRPuQ4o/zrhCcRVq2K+7v8TDpF+OSciHFN3kSJKQGf5RY2lWbnUSOOGzvMpCdXyvUnajC5kTFBQC6pbhNOJVB2jxx4Qk5ygBcGpRauMGHav18TX21w4osOJlGkrS12UWJqddHryzBi2TuDFP42A0e6aaO8Ya7oTHTqCO+NuTw+DvYMqWyCAA8NXsPNYxyq/U27davE0x7VNm3vW8oG0NmC5W9P8UqKdbqLGjI9yn/U2R1BdIi00X9byFTVD2AZJMkRvclqtJGSz9t3W1THltTTZStnTle0o5Q/z6kuoJ2E5xus6AVzwf+5dblCieHinDdu0r6NrjIID1uPADyqsRYYleiFJXFfTSGwJpaRffYU0l1xToO1xTmCMadQ+4wcEXy9sIkOIOfSgOMAWVClTaOEVeIXjN608vtBc3Pi059zKCFv1FVsO+fgAL25uP+AkxyQDo3Z921MSSx2xaXazQt83g8G/Dj5tkP602RzGYPQljurYwPU8=
+  file_glob: true
   file: ./build/outputs/apk/**/release/*.apk
   on:
     # tags: true
