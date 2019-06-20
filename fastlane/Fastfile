@@ -9,6 +9,8 @@ platform :android do
   lane :deploy do
     version = ENV['TRAVIS_TAG'].empty? ? 'SNAPSHOT' : ENV['TRAVIS_TAG']
 
+    gradle(task: "assembleMedicRelease")
+
     # Note that only the `medic` flavor is actually on the app store
     supply(
       package_name: "medic.gateway.alert",
