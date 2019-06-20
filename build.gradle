@@ -113,7 +113,7 @@ android {
 		testInstrumentationRunner 'medic.gateway.alert.test.WakingJUnitRunner'
 	}
 
-	applicationVariants.all {
+	applicationVariants.all { variant ->
 		buildConfigField "String", "LOG_TAG", '"MedicGateway"'
 		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
 
@@ -122,6 +122,13 @@ android {
 		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")";
 
 		buildConfigField "boolean", "IS_DUMMY_SEND_AVAILABLE", "Boolean.parseBoolean(\"${System.env.ENABLE_DUMMY_SEND_OPTION}\")";
+
+    // Every APK requires a unique version code. 
+    // So when compiling multiple APKS for the different ABIs, use the first digit
+    variant.outputs.each { output ->
+      def versionAugmentation = (output.getFilter(OutputFile.ABI) == 'arm64-v8a') ? 1 : 0;
+      output.versionCodeOverride = variant.versionCode * 10 + versionAugmentation
+    }
 	}
 
 	sourceSets {
