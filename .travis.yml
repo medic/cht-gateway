@@ -19,7 +19,7 @@ before_install:
 - gem update --system
 - gem install fastlane --no-document --quiet
 before_script:
-  - yes | sdkmanager 'platforms;android-28'
+- yes | sdkmanager 'platforms;android-28'
 stages:
 - name: test
 - name: deploy
@@ -35,19 +35,19 @@ before_cache:
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-  - $HOME/.gradle/caches/
-  - $HOME/.gradle/wrapper/
-  - $HOME/.android/build-cache
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.android/build-cache"
 deploy:
   provider: releases
   skip_cleanup: true
   overwrite: true
   api_key:
-    secure: Ac5mL8ZANrw6QJr1tlvuYb8O4TZWXykYQpUkav7HhBA1tlfkZVCQgEPUvlldKr9PFOMoMIu2eDAhkxbA1BJ00FVPChsE4ruxKw4EwBFo6y9qX27w+kAvWLjnupcuI+iPQLYDzg3Rz6kAyOsww6qF8UZUagBAQVsepLpdchGRNmOQR54yDFDurO8pIRPuQ4o/zrhCcRVq2K+7v8TDpF+OSciHFN3kSJKQGf5RY2lWbnUSOOGzvMpCdXyvUnajC5kTFBQC6pbhNOJVB2jxx4Qk5ygBcGpRauMGHav18TX21w4osOJlGkrS12UWJqddHryzBi2TuDFP42A0e6aaO8Ya7oTHTqCO+NuTw+DvYMqWyCAA8NXsPNYxyq/U27davE0x7VNm3vW8oG0NmC5W9P8UqKdbqLGjI9yn/U2R1BdIi00X9byFTVD2AZJMkRvclqtJGSz9t3W1THltTTZStnTle0o5Q/z6kuoJ2E5xus6AVzwf+5dblCieHinDdu0r6NrjIID1uPADyqsRYYleiFJXFfTSGwJpaRffYU0l1xToO1xTmCMadQ+4wcEXy9sIkOIOfSgOMAWVClTaOEVeIXjN608vtBc3Pi059zKCFv1FVsO+fgAL25uP+AkxyQDo3Z921MSSx2xaXazQt83g8G/Dj5tkP602RzGYPQljurYwPU8=
+    secure: GqA3eJzbhjusl2iNa0sLIG6VIYCJuZW9XXpRgRLMhnt1T009zTgtsFG9WHEhAHJNomCeaIeXdEcsOHlGuJc3j2uBiLEpm02n04fslgHcS8BndMCjVuO3txdFBijA5Bbcrx7n0CUDKYIjcyF5wpk98UFLBcTBspFEenuMLfWN2WDLLNYmmYx1QwcRojH8SfoDjEaOM3UEMhlm7pRNCxrVW6l5g0hmQpe504zEX6WGZx1+InDyT7s49+NuN1HqWvPVN0mO8FArPWAoiN+w0WsFh6EpRDzCD42ceyJMXlJJq0rpkhM0eIr077XaVFGraWaWLYr4DbScx3LHj2B1aH50eP5+0sTIbWFhbAwBb1WPvnk0bAG2SREhFqPZ1PMIB/+i+iYVhRiYsG+y/wTy/E6L0Ur6/4K5BD+nXc1vqd05HhbxbrrQMxn5YmCoLvYWhcjQWu5hFVAMk49sSgaIYwtNX7vFPzqLByxkRtHH6Ugbi3aVLuarXzJPLMd6xPa6k73S7eUJLF0yQtSm6rB6l+2jW83YE23tmeIqgjJbS5BOz5xA9van2ik1VFsq6SZgIggaaAXOXGGa3FqwEqp8Or0cR0UqH+ZKaopRvFjMKKFHf7Vuf3lSuKyrtVFD29RqlMYYWAD6yBHdmX+qG1WXw3ImARskMynVBPYZqpYFpvaCT3I=
   file_glob: true
   file: ./build/outputs/apk/**/release/*.apk
   on:
-    tags: true
+    # tags: true
     repo: medic/medic-gateway
     all_branches: true
     # branch: master
