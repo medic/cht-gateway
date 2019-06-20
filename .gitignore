@@ -3,3 +3,11 @@
 /build/
 /*.log
 /node_modules/
+/.idea/
+
+secrets.tar.gz
+medic-official.keystore
+playstore-secret.json
+
+fastlane/*
+!fastlane/Fastfile

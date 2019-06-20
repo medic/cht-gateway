@@ -1,0 +1,33 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+
+default_platform(:android)
+
+platform :android do
+  desc "Build and deploy on Google Play"
+  lane :deploy do
+    version = ENV['TRAVIS_TAG'].empty? ? 'SNAPSHOT' : ENV['TRAVIS_TAG']
+
+    gradle(task: "assembleMedicRelease")
+
+    # Note that only the `medic` flavor is actually on the app store
+    supply(
+      package_name: "medic.gateway.alert",
+      track: "alpha",
+      json_key: "playstore-secret.json",
+      apk_paths: [
+        "build/outputs/apk/medic/release/medic-gateway-#{version}-medic-armeabi-v7a-release.apk",
+        "build/outputs/apk/medic/release/medic-gateway-#{version}-medic-arm64-v8a-release.apk",
+      ],
+
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      validate_only: false,
+
+      timeout: 3600,
+    )
+  end
+end
