@@ -16,10 +16,7 @@ platform :android do
       package_name: "medic.gateway.alert",
       track: "alpha",
       json_key: "playstore-secret.json",
-      apk_paths: [
-        "build/outputs/apk/medic/release/medic-gateway-#{version}-medic-armeabi-v7a-release.apk",
-        "build/outputs/apk/medic/release/medic-gateway-#{version}-medic-arm64-v8a-release.apk",
-      ],
+      apk: "build/outputs/apk/medic/release/medic-gateway-#{version}-release.apk",
 
       skip_upload_aab: true,
       skip_upload_metadata: true,

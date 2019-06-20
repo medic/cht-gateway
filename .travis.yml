@@ -49,4 +49,5 @@ deploy:
   on:
     tags: true
     repo: medic/medic-gateway
-    branch: master
+    # branch: master
+    all_branches: true
