@@ -61,6 +61,18 @@ public class WebappPoller {
 		return response;
 	}
 
+	public boolean pollWebappMessagesAvailable(){
+		int count = request.wtMessageCount();
+		if (count >= 10)
+		{
+			return true;
+		}
+		if (count < 10)
+		{
+			return false;
+		}
+	}
+
 //> PRIVATE HELPERS
 	private void handleOkResponse(GatewayRequest request, JSONObject response) throws JSONException {
 		for(WtMessage m : request.messages) {
@@ -241,6 +253,18 @@ class LastPoll {
 	public static void broadcast(Context ctx) {
 		Intent i = new Intent(INTENT_UPDATED);
 		LocalBroadcastManager.getInstance(ctx).sendBroadcast(i);
+	}
+
+	public static boolean messagesAvailable(Context ctx){
+		//if (count >= 10)
+		//{
+		//	return true;
+		//}
+		//if (count < 10)
+		//{
+		//	return false;
+		//}
+		return true;
 	}
 
 //> STATIC HELPERS
