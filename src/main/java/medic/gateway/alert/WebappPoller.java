@@ -63,14 +63,7 @@ public class WebappPoller {
 
 	public boolean pollWebappMessagesAvailable(){
 		int count = request.wtMessageCount();
-		if (count >= 10)
-		{
-			return true;
-		}
-		if (count < 10)
-		{
-			return false;
-		}
+		return  (count >= 10);
 	}
 
 //> PRIVATE HELPERS
