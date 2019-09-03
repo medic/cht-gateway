@@ -51,7 +51,7 @@ public class WakefulService extends WakefulIntentService {
 								}
 							}
 						}
-	
+
 						if (lastResponse == null || lastResponse.isError()) {
 							LastPoll.failed(this);
 						} else {
