@@ -21,6 +21,7 @@ import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.SimpleJsonClient2.uriEncodeAuth;
 import static medic.gateway.alert.Utils.normalisePhoneNumber;
 import static medic.gateway.alert.Utils.json;
+import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
 public class WebappPoller {
 	private static final int MAX_WT_MESSAGES = 10;
@@ -61,9 +62,14 @@ public class WebappPoller {
 		return response;
 	}
 
-	public boolean pollWebappMessagesAvailable(){
-		int count = request.wtMessageCount();
-		return  count >= 10;
+	boolean pollWebappMessagesAvailable(){
+		List<WoMessage> smsForSending = db.getWoMessages(10, UNSENT);
+		logEvent(ctx, "In server for sending: %s: ", smsForSending.size());
+		return messagesAvailable(smsForSending.size());
+	}
+
+	boolean messagesAvailable(int count){
+		return count >= 10;
 	}
 
 //> PRIVATE HELPERS
@@ -246,18 +252,6 @@ class LastPoll {
 	public static void broadcast(Context ctx) {
 		Intent i = new Intent(INTENT_UPDATED);
 		LocalBroadcastManager.getInstance(ctx).sendBroadcast(i);
-	}
-
-	public static boolean messagesAvailable(Context ctx){
-		//if (count >= 10)
-		//{
-		//	return true;
-		//}
-		//if (count < 10)
-		//{
-		//	return false;
-		//}
-		return true;
 	}
 
 //> STATIC HELPERS

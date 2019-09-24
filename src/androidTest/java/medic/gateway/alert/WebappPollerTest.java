@@ -304,4 +304,16 @@ public class WebappPollerTest extends AndroidTestCase {
 				ANY_NUMBER, "ok-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
 				ANY_NUMBER, "ok-222", "UNSENT", NO_REASON, ANY_NUMBER, false);
 	}
+
+	@Test
+	public void test_pollWebapp_pollWebappMessagesAvailable() {
+		//given
+		Integer messagesCount = 10;
+
+		//when
+		WebappPoller wap = new WebappPoller(getContext());
+
+		//then
+		assertTrue(wap.messagesAvailable(messagesCount));
+	}
 }

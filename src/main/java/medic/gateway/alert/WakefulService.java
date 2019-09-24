@@ -28,55 +28,60 @@ public class WakefulService extends WakefulIntentService {
 			logException(this, ex, "Exception caught trying to clean up event log: %s", ex.getMessage());
 		}
 
-		try{
+		try {
 			WebappPoller poller = new WebappPoller(this);
 			SimpleResponse lastResponse = poller.pollWebapp();
 			boolean messagesAvailable = poller.pollWebappMessagesAvailable();
 
-			for(int i = 0;i <= 6; i++){
-				if(messagesAvailable){
-						// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
-						if(lastResponse instanceof ExceptionResponse) {
-							ExceptionResponse exResponse = (ExceptionResponse) lastResponse;
-							if(exResponse.ex instanceof SocketTimeoutException ||
+			do {
+				try {
+					// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
+					if (lastResponse instanceof ExceptionResponse) {
+						ExceptionResponse exResponse = (ExceptionResponse) lastResponse;
+						if (exResponse.ex instanceof SocketTimeoutException ||
 								exResponse.ex instanceof UnknownHostException ||
 								exResponse.ex instanceof ConnectException ||
 								exResponse.ex instanceof NoRouteToHostException) {
-								wifiMan = new WifiConnectionManager(this);
-								if(wifiMan.isWifiActive()) {
-									logEvent(this, "Disabling wifi and then retrying poll...");
-									enableWifiAfterWork = true;
-									wifiMan.disableWifi();
-									lastResponse = poller.pollWebapp();
-								}
+							wifiMan = new WifiConnectionManager(this);
+							if (wifiMan.isWifiActive()) {
+								logEvent(this, "Disabling wifi and then retrying poll...");
+								enableWifiAfterWork = true;
+								wifiMan.disableWifi();
+								lastResponse = poller.pollWebapp();
 							}
 						}
+					}
 
-						if (lastResponse == null || lastResponse.isError()) {
-							LastPoll.failed(this);
-						} else {
-							LastPoll.succeeded(this);
-						}
+					if (lastResponse == null || lastResponse.isError()) {
+						LastPoll.failed(this);
+					} else {
+						LastPoll.succeeded(this);
+					}
+
+				} catch (Exception ex) {
+					logException(this, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
+					LastPoll.failed(this);
+				} finally {
+					LastPoll.broadcast(this);
 				}
+
+				try {
+					new SmsSender(this).sendUnsentSmses();
+				} catch (Exception ex) {
+					logException(this, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
+				}
+
+				if (enableWifiAfterWork) try {
+					wifiMan.enableWifi();
+				} catch (Exception ex) {
+					logException(this, ex, "Exception caught trying to check wifi status: %s", ex.getMessage());
+				}
+				messagesAvailable = poller.pollWebappMessagesAvailable();
 			}
-
-		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
-			LastPoll.failed(this);
-		} finally {
-			LastPoll.broadcast(this);
+			while (messagesAvailable);
 		}
-
-		try {
-			new SmsSender(this).sendUnsentSmses();
-		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
-		}
-
-		if(enableWifiAfterWork) try {
-			wifiMan.enableWifi();
-		} catch(Exception ex) {
-			logException(this, ex, "Exception caught trying to check wifi status: %s", ex.getMessage());
+		catch (Exception ex){
+			logException(this,ex,"Exception caught while looping messages batch: %s", ex.getMessage());
 		}
 	}
 }
