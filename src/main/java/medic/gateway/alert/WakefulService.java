@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.content.Context;
 import android.content.Intent;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
@@ -13,9 +14,33 @@ import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 
 public class WakefulService extends WakefulIntentService {
+	private final Context ctx;
+	private final Db db;
+
 	public WakefulService() {
 		super("WakefulService");
+		this.ctx = this;
+		db = Db.getInstance(ctx);
 	}
+
+	public WakefulService(Context ctx) {
+		super("WakefulService");
+		this.ctx = ctx;
+		db = Db.getInstance(ctx);
+	}
+
+	protected Db getInstanceOfDb(){
+		return Db.getInstance(this);
+	}
+
+	protected Context getInstanceOfCtx(){
+		return this.ctx;
+	}
+
+	protected WebappPoller getWebappPoller(){
+		return new WebappPoller(getInstanceOfCtx());
+	}
+
 
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.NPathComplexity" })
 	public void doWakefulWork(Intent intent) {
@@ -23,15 +48,16 @@ public class WakefulService extends WakefulIntentService {
 		WifiConnectionManager wifiMan = null;
 
 		try {
-			Db.getInstance(this).cleanLogs();
+			//db.getInstance(ctx).cleanLogs();
+			getInstanceOfDb().cleanLogs();
 		} catch(Exception ex) {
 			logException(this, ex, "Exception caught trying to clean up event log: %s", ex.getMessage());
 		}
 
 		try {
-			WebappPoller poller = new WebappPoller(this);
-			SimpleResponse lastResponse = poller.pollWebapp();
-			boolean messagesAvailable = poller.pollWebappMessagesAvailable();
+			//WebappPoller poller = new WebappPoller(this);
+			SimpleResponse lastResponse = getWebappPoller().pollWebapp();
+			boolean messagesAvailable = getWebappPoller().pollWebappMessagesAvailable();
 
 			do {
 				try {
@@ -47,7 +73,7 @@ public class WakefulService extends WakefulIntentService {
 								logEvent(this, "Disabling wifi and then retrying poll...");
 								enableWifiAfterWork = true;
 								wifiMan.disableWifi();
-								lastResponse = poller.pollWebapp();
+								lastResponse = getWebappPoller().pollWebapp();
 							}
 						}
 					}
@@ -76,7 +102,7 @@ public class WakefulService extends WakefulIntentService {
 				} catch (Exception ex) {
 					logException(this, ex, "Exception caught trying to check wifi status: %s", ex.getMessage());
 				}
-				messagesAvailable = poller.pollWebappMessagesAvailable();
+				messagesAvailable = getWebappPoller().pollWebappMessagesAvailable();
 			}
 			while (messagesAvailable);
 		}

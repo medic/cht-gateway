@@ -18,7 +18,23 @@ import static medic.gateway.alert.test.TestUtils.A_PHONE_NUMBER;
 import static medic.gateway.alert.test.TestUtils.SOME_CONTENT;
 import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
+@SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WakefulServiceTest extends AndroidTestCase {
+	static class WakefulServiceMocked extends WakefulService{
+
+		WakefulServiceMocked(){
+			super();
+		}
+
+		protected Db getInstanceOfDb(){
+			return Db.getInstance(this);
+		}
+
+		protected WebappPoller getWebappPoller(){
+			return new WebappPoller(getInstanceOfCtx());
+		}
+	}
+
 	private DbTestHelper db;
 	private HttpTestHelper http;
 	@Before
@@ -60,14 +76,17 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		// when
 		Intent i = new Intent(getContext(), WakefulIntentService.class);
-		WakefulService wfs = new WakefulService();
+		//WakefulService wfs = new WakefulServiceMocked();
+		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
+		//new WebappPoller(getContext()).pollWebapp();
 
 		//then
-		db.assertEmpty("wo_message");
+		//db.assertEmpty("wo_message");
+		db.assertCount("wo_message",10);
 	}
 	@Test
-	public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() {
+	public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() throws Exception{
 		// given
 		db.insert("wo_message",
 				cols("_id", "status",  "last_action", "_to",   "content"),
@@ -87,10 +106,12 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		// when
 		Intent i = new Intent(getContext(), WakefulIntentService.class);
-		WakefulService wfs = new WakefulService();
+		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
-
+		//new WebappPoller(getContext()).pollWebapp();
 		//then
-		db.assertCount("wo_message",2);
+		db.assertCount("wo_message",12);
 	}
 }
+
+
