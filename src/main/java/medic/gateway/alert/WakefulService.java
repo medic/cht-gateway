@@ -15,21 +15,17 @@ import static medic.gateway.alert.GatewayLog.logException;
 
 public class WakefulService extends WakefulIntentService {
 	private final Context ctx;
-	private final Db db;
-
 	public WakefulService() {
 		super("WakefulService");
 		this.ctx = this;
-		db = Db.getInstance(ctx);
 	}
 
 	public WakefulService(Context ctx) {
 		super("WakefulService");
 		this.ctx = ctx;
-		db = Db.getInstance(ctx);
 	}
 
-	protected Db getInstanceOfDb(){
+	protected Db getDbInstance(){
 		return Db.getInstance(this);
 	}
 
@@ -48,7 +44,7 @@ public class WakefulService extends WakefulIntentService {
 		WifiConnectionManager wifiMan = null;
 
 		try {
-			getInstanceOfDb().cleanLogs();
+			getDbInstance().cleanLogs();
 		} catch(Exception ex) {
 			logException(this, ex, "Exception caught trying to clean up event log: %s", ex.getMessage());
 		}
