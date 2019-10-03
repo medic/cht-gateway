@@ -48,14 +48,12 @@ public class WakefulService extends WakefulIntentService {
 		WifiConnectionManager wifiMan = null;
 
 		try {
-			//db.getInstance(ctx).cleanLogs();
 			getInstanceOfDb().cleanLogs();
 		} catch(Exception ex) {
 			logException(this, ex, "Exception caught trying to clean up event log: %s", ex.getMessage());
 		}
 
 		try {
-			//WebappPoller poller = new WebappPoller(this);
 			SimpleResponse lastResponse = getWebappPoller().pollWebapp();
 			boolean messagesAvailable = getWebappPoller().pollWebappMessagesAvailable();
 

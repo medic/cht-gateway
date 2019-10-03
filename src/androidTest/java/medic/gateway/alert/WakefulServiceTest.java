@@ -23,14 +23,17 @@ public class WakefulServiceTest extends AndroidTestCase {
 	static class WakefulServiceMocked extends WakefulService{
 
 		WakefulServiceMocked(){
+
 			super();
 		}
 
 		protected Db getInstanceOfDb(){
+
 			return Db.getInstance(this);
 		}
 
 		protected WebappPoller getWebappPoller(){
+
 			return new WebappPoller(getInstanceOfCtx());
 		}
 	}
@@ -79,11 +82,10 @@ public class WakefulServiceTest extends AndroidTestCase {
 		//WakefulService wfs = new WakefulServiceMocked();
 		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
-		//new WebappPoller(getContext()).pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		//then
-		//db.assertEmpty("wo_message");
-		db.assertCount("wo_message",10);
+		db.assertEmpty("wo_message");
 	}
 	@Test
 	public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() throws Exception{
@@ -108,9 +110,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 		Intent i = new Intent(getContext(), WakefulIntentService.class);
 		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
-		//new WebappPoller(getContext()).pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 		//then
-		db.assertCount("wo_message",12);
+		db.assertCount("wo_message",2);
 	}
 }
 
