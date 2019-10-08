@@ -27,14 +27,14 @@ public class WakefulServiceTest extends AndroidTestCase {
 			super();
 		}
 
-		protected Db getInstanceOfDb(){
+		protected Db getDbInstance(){
 
 			return Db.getInstance(this);
 		}
 
 		protected WebappPoller getWebappPoller(){
 
-			return new WebappPoller(getInstanceOfCtx());
+			return new WebappPoller(getCtxInstance());
 		}
 	}
 
@@ -111,6 +111,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
 		new WebappPoller(getContext()).pollWebapp();
+
 		//then
 		db.assertCount("wo_message",2);
 	}

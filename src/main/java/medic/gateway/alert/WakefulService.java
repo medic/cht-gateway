@@ -29,12 +29,12 @@ public class WakefulService extends WakefulIntentService {
 		return Db.getInstance(this);
 	}
 
-	protected Context getInstanceOfCtx(){
+	protected Context getCtxInstance(){
 		return this.ctx;
 	}
 
 	protected WebappPoller getWebappPoller(){
-		return new WebappPoller(getInstanceOfCtx());
+		return new WebappPoller(getCtxInstance());
 	}
 
 
