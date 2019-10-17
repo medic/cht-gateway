@@ -11,12 +11,13 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 import medic.gateway.alert.test.DbTestHelper;
 import medic.gateway.alert.test.HttpTestHelper;
 
+import static medic.gateway.alert.WoMessage.Status.UNSENT;
 import static medic.gateway.alert.test.DbTestHelper.cols;
 import static medic.gateway.alert.test.DbTestHelper.randomUuid;
 import static medic.gateway.alert.test.DbTestHelper.vals;
 import static medic.gateway.alert.test.TestUtils.A_PHONE_NUMBER;
 import static medic.gateway.alert.test.TestUtils.SOME_CONTENT;
-import static medic.gateway.alert.WoMessage.Status.UNSENT;
+import static medic.gateway.alert.WtMessage.Status.WAITING;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WakefulServiceTest extends AndroidTestCase {
@@ -44,10 +45,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		db = new DbTestHelper(getContext());
-
+		db = new DbTestHelper(MedicGetwayApplication.getMedicApplicationContext());
 		http = new HttpTestHelper();
-		http.configureAppSettings(getContext());
+		http.configureAppSettings(MedicGetwayApplication.getMedicApplicationContext());
 	}
 
 	@After
@@ -78,16 +78,16 @@ public class WakefulServiceTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		Intent i = new Intent(getContext(), WakefulIntentService.class);
+		Intent i = new Intent(MedicGetwayApplication.getMedicApplicationContext(), WakefulIntentService.class);
 		//WakefulService wfs = new WakefulServiceMocked();
-		WakefulService wfs = new WakefulService(getContext());
+		WakefulService wfs = new WakefulService(MedicGetwayApplication.getMedicApplicationContext());
 		wfs.doWakefulWork(i);
-		new WebappPoller(getContext()).pollWebapp();
+		new WebappPoller(MedicGetwayApplication.getMedicApplicationContext()).pollWebapp();
 
 		//then
 		db.assertEmpty("wo_message");
 	}
-	@Test
+
 	public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() throws Exception{
 		// given
 		db.insert("wo_message",
@@ -108,9 +108,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		// when
 		Intent i = new Intent(getContext(), WakefulIntentService.class);
-		WakefulService wfs = new WakefulService(getContext());
+		WakefulService wfs = new WakefulService(MedicGetwayApplication.getMedicApplicationContext());
 		wfs.doWakefulWork(i);
-		new WebappPoller(getContext()).pollWebapp();
+		SimpleResponse response = new WebappPoller(MedicGetwayApplication.getMedicApplicationContext()).pollWebapp();
 
 		//then
 		db.assertCount("wo_message",2);

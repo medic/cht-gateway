@@ -40,8 +40,8 @@ public class WebappPoller {
 		request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
 				db.getWoMessageStatusUpdates(MAX_WOM_STATUS_UPDATES));
-
-		webappUrl = Settings.in(ctx).webappUrl;
+		
+		webappUrl =Settings.in(ctx).webappUrl;
 	}
 
 //> PUBLIC API
@@ -260,7 +260,7 @@ class LastPoll {
 	}
 
 	private static void logLast(Context ctx, boolean success) {
-		SharedPreferences.Editor e = prefs(ctx).edit();
+		SharedPreferences.Editor e = prefs(MedicGetwayApplication.getMedicApplicationContext()).edit();
 		e.putLong(PREF_LAST_TIMESTAMP, System.currentTimeMillis());
 		e.putBoolean(PREF_LAST_WAS_SUCCESSFUL, success);
 		e.apply();

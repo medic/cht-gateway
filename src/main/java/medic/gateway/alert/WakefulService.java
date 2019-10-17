@@ -26,7 +26,7 @@ public class WakefulService extends WakefulIntentService {
 	}
 
 	protected Db getDbInstance(){
-		return Db.getInstance(this);
+		return Db.getInstance(MedicGetwayApplication.getMedicApplicationContext());
 	}
 
 	protected Context getCtxInstance(){
@@ -51,7 +51,8 @@ public class WakefulService extends WakefulIntentService {
 
 		try {
 			SimpleResponse lastResponse = getWebappPoller().pollWebapp();
-			boolean messagesAvailable = getWebappPoller().pollWebappMessagesAvailable();
+			getWebappPoller().pollWebappMessagesAvailable();
+			boolean messagesAvailable;
 
 			do {
 				try {
@@ -73,9 +74,9 @@ public class WakefulService extends WakefulIntentService {
 					}
 
 					if (lastResponse == null || lastResponse.isError()) {
-						LastPoll.failed(this);
+						LastPoll.failed(MedicGetwayApplication.getMedicApplicationContext());
 					} else {
-						LastPoll.succeeded(this);
+						LastPoll.succeeded(MedicGetwayApplication.getMedicApplicationContext());
 					}
 
 				} catch (Exception ex) {
@@ -86,7 +87,7 @@ public class WakefulService extends WakefulIntentService {
 				}
 
 				try {
-					new SmsSender(this).sendUnsentSmses();
+					new SmsSender(MedicGetwayApplication.getMedicApplicationContext()).sendUnsentSmses();
 				} catch (Exception ex) {
 					logException(this, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
 				}

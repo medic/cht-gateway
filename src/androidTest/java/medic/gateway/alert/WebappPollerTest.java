@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.support.test.InstrumentationRegistry;
 import android.test.*;
 
 import medic.gateway.alert.test.*;
@@ -9,6 +10,7 @@ import okhttp3.mockwebserver.*;
 import org.json.*;
 import org.junit.*;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static org.junit.Assert.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
@@ -24,7 +26,7 @@ public class WebappPollerTest extends AndroidTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		db = new DbTestHelper(getContext());
+		db = new DbTestHelper(getInstrumentation().getTargetContext().getApplicationContext());
 
 		http = new HttpTestHelper();
 		http.configureAppSettings(getContext());
