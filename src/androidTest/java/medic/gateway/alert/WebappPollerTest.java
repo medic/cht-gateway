@@ -1,6 +1,5 @@
 package medic.gateway.alert;
 
-import android.support.test.InstrumentationRegistry;
 import android.test.*;
 
 import medic.gateway.alert.test.*;

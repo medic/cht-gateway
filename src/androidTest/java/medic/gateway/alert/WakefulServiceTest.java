@@ -17,7 +17,6 @@ import static medic.gateway.alert.test.DbTestHelper.randomUuid;
 import static medic.gateway.alert.test.DbTestHelper.vals;
 import static medic.gateway.alert.test.TestUtils.A_PHONE_NUMBER;
 import static medic.gateway.alert.test.TestUtils.SOME_CONTENT;
-import static medic.gateway.alert.WtMessage.Status.WAITING;
 
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class WakefulServiceTest extends AndroidTestCase {
@@ -45,9 +44,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		db = new DbTestHelper(MedicGetwayApplication.getMedicApplicationContext());
+		db = new DbTestHelper(getContext());
 		http = new HttpTestHelper();
-		http.configureAppSettings(MedicGetwayApplication.getMedicApplicationContext());
+		http.configureAppSettings(getContext());
 	}
 
 	@After
@@ -78,11 +77,11 @@ public class WakefulServiceTest extends AndroidTestCase {
 		http.nextResponseJson("{}");
 
 		// when
-		Intent i = new Intent(MedicGetwayApplication.getMedicApplicationContext(), WakefulIntentService.class);
+		Intent i = new Intent(getContext(), WakefulIntentService.class);
 		//WakefulService wfs = new WakefulServiceMocked();
-		WakefulService wfs = new WakefulService(MedicGetwayApplication.getMedicApplicationContext());
+		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
-		new WebappPoller(MedicGetwayApplication.getMedicApplicationContext()).pollWebapp();
+		new WebappPoller(getContext()).pollWebapp();
 
 		//then
 		db.assertEmpty("wo_message");
@@ -108,9 +107,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		// when
 		Intent i = new Intent(getContext(), WakefulIntentService.class);
-		WakefulService wfs = new WakefulService(MedicGetwayApplication.getMedicApplicationContext());
+		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
-		SimpleResponse response = new WebappPoller(MedicGetwayApplication.getMedicApplicationContext()).pollWebapp();
+		SimpleResponse response = new WebappPoller(getContext()).pollWebapp();
 
 		//then
 		db.assertCount("wo_message",2);
