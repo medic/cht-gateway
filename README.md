@@ -1,5 +1,5 @@
 `medic-gateway`
-===============
+==============
 
 <a href="https://travis-ci.org/medic/medic-gateway"><img src="https://travis-ci.org/medic/medic-gateway.svg?branch=master"/></a>
 
