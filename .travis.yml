@@ -12,8 +12,6 @@ android:
   - sys-img-armeabi-v7a-android-22
 env:
 - GRADLE_OPTS="-XX:MaxPermSize=512m"
-before_install:
-- openssl aes-256-cbc -K $encrypted_937040266844_key -iv $encrypted_937040266844_iv -in medic-official.keystore.enc -out medic-official.keystore -d
 before_script:
 - yes | sdkmanager 'platforms;android-28'
 stages:
