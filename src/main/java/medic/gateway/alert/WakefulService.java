@@ -28,6 +28,10 @@ public class WakefulService extends WakefulIntentService {
 		this.ctx = ctx;
 	}
 
+	protected WebappPoller getWebappPoller() {
+		return new WebappPoller(this);
+	}
+
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.NPathComplexity" })
 	public void doWakefulWork(Intent intent) {
 		boolean enableWifiAfterWork = false;
