@@ -6,7 +6,7 @@ buildscript {
 		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.2.0', {
+		classpath 'com.android.tools.build:gradle:3.5.2', {
 			exclude module: 'xmlpull'
 		}
 		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e', {
@@ -16,7 +16,6 @@ buildscript {
 	}
 }
 apply plugin: 'com.android.application'
-apply plugin: 'com.noveogroup.android.check'
 apply plugin: 'de.mobilej.unmock'
 
 // enable verbose lint warnings
@@ -150,17 +149,14 @@ android {
 		}
 	}
 
-	check {
-		abortOnError true
-	}
-
 	lintOptions {
 		lintConfig = new File('config/lint.xml')
 
 		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
 		disable 'GradleDependency' // TODO update to latest support-v4 lib and re-enable this rule
 
-		warningsAsErrors true
+		abortOnError false
+		warningsAsErrors false
 
 		xmlReport false
 
