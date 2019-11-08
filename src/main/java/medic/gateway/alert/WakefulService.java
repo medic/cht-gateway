@@ -28,8 +28,10 @@ public class WakefulService extends WakefulIntentService {
 		this.ctx = ctx;
 	}
 
-	protected WebappPoller getWebappPoller() {
-		return new WebappPoller(this);
+	WakefulService(Context ctx) {
+		super("WakefulService");
+
+		this.ctx = ctx;
 	}
 
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.NPathComplexity" })
