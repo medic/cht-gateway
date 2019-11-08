@@ -46,11 +46,13 @@ public class WakefulService extends WakefulIntentService {
 		}
 
 		try {
+			System.out.println("doWakefulWork try");
 			WebappPoller poller;
 			do {
 
 				poller = new WebappPoller(ctx);
 				SimpleResponse lastResponse = poller.pollWebapp();
+				System.out.println("doWakefulWork post poll");
 
 				// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
 				if(lastResponse instanceof ExceptionResponse) {
@@ -85,6 +87,7 @@ public class WakefulService extends WakefulIntentService {
 			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
 			LastPoll.failed(ctx);
 		} finally {
+			System.out.println("doWakefulWork try finally");
 			LastPoll.broadcast(ctx);
 		}
 
