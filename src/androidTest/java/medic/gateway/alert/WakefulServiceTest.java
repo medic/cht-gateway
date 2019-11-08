@@ -43,7 +43,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_doWakefulWork_unsentMessagesShouldSendLessThanBatchMessages() throws Exception {
+	public void test_doWakefulWork_unsentMessagesShouldSendMessages() throws Exception {
 		// given
 		db.insert("wt_message",
 				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
@@ -61,32 +61,35 @@ public class WakefulServiceTest extends AndroidTestCase {
 		db.assertEmpty("wo_message");
 	}
 
-	// @Test
-	// public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() throws Exception{
-	// 	// given
-	// 	db.insert("wo_message",
-	// 			cols("_id", "status",  "last_action", "_to",   "content"),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT));
-	// 	http.nextResponseJson("{}");
+	@Test
+	public void test_doWakefulWork_unsentMessagesShouldSendMultipleBatches() throws Exception {
+		// given
+		db.insert("wt_message",
+				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+		http.nextResponseJson("{}");
 
-	// 	// when
-	// 	Intent i = new Intent(getContext(), WakefulIntentService.class);
-	// 	WakefulService wfs = new WakefulService(getContext());
-	// 	wfs.doWakefulWork(i);
-	// 	SimpleResponse response = new WebappPoller(getContext()).pollWebapp();
+		// when
+		Intent i = new Intent(getContext(), WakefulIntentService.class);
+		WakefulService wfs = new WakefulService(getContext());
+		wfs.doWakefulWork(i);
 
-	// 	//then
-	// 	db.assertCount("wo_message",1);
-	// }
+		//then
+		db.assertEmpty("wo_message");
+	}
 }
