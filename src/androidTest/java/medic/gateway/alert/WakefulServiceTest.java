@@ -41,6 +41,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 		http.assertNoMoreRequests();
 
 	}
+
 	@Test
 	public void test_doWakefulWork_unsentMessagesShouldBeEmptyIfOnlyTenMessagesAvailable() throws Exception {
 		// given
@@ -63,38 +64,38 @@ public class WakefulServiceTest extends AndroidTestCase {
 		//WakefulService wfs = new WakefulServiceMocked();
 		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
-		new WebappPoller(getContext()).pollWebapp();
+		// new WebappPoller(getContext()).pollWebapp();
 
 		//then
 		db.assertEmpty("wo_message");
 	}
 
-	@Test
-	public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() throws Exception{
-		// given
-		db.insert("wo_message",
-				cols("_id", "status",  "last_action", "_to",   "content"),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
-				vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT));
-		http.nextResponseJson("{}");
+	// @Test
+	// public void test_doWakefulWork_unsentMessagesCountShouldBeEqualToTwoIfUnsentMessagesAreTwelve() throws Exception{
+	// 	// given
+	// 	db.insert("wo_message",
+	// 			cols("_id", "status",  "last_action", "_to",   "content"),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT),
+	// 			vals(randomUuid(),  UNSENT,     0,     A_PHONE_NUMBER, SOME_CONTENT));
+	// 	http.nextResponseJson("{}");
 
-		// when
-		Intent i = new Intent(getContext(), WakefulIntentService.class);
-		WakefulService wfs = new WakefulService(getContext());
-		wfs.doWakefulWork(i);
-		SimpleResponse response = new WebappPoller(getContext()).pollWebapp();
+	// 	// when
+	// 	Intent i = new Intent(getContext(), WakefulIntentService.class);
+	// 	WakefulService wfs = new WakefulService(getContext());
+	// 	wfs.doWakefulWork(i);
+	// 	SimpleResponse response = new WebappPoller(getContext()).pollWebapp();
 
-		//then
-		db.assertCount("wo_message",1);
-	}
+	// 	//then
+	// 	db.assertCount("wo_message",1);
+	// }
 }
