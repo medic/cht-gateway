@@ -161,6 +161,7 @@ android {
 		disable 'GradleDependency' // TODO update to latest support-v4 lib and re-enable this rule
 
 		warningsAsErrors true
+		abortOnError false
 
 		xmlReport false
 

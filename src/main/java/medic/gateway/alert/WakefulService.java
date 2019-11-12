@@ -40,14 +40,11 @@ public class WakefulService extends WakefulIntentService {
 		}
 
 		try {
-			System.out.println("doWakefulWork try");
 			WebappPoller poller;
 			do {
-				System.out.println("doWakefulWork do loop start");
 
 				poller = new WebappPoller(ctx);
 				SimpleResponse lastResponse = poller.pollWebapp();
-				System.out.println("doWakefulWork post poll");
 
 				// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
 				if(lastResponse instanceof ExceptionResponse) {
@@ -77,13 +74,11 @@ public class WakefulService extends WakefulIntentService {
 				 * more to send to us. To enable that feature correctly we should have webapp pass us this
 				 * value back, because otherwise we'd have to hardcode webapp's batch size in Gateway
 				 */
-				System.out.println("doWakefulWork just before do-while loop");
 			} while (poller.moreMessagesToSend());
 		} catch(Exception ex) {
 			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
 			LastPoll.failed(ctx);
 		} finally {
-			System.out.println("doWakefulWork try finally");
 			LastPoll.broadcast(ctx);
 		}
 

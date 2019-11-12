@@ -11,7 +11,6 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 import medic.gateway.alert.test.DbTestHelper;
 import medic.gateway.alert.test.HttpTestHelper;
 
-import static medic.gateway.alert.WoMessage.Status.UNSENT;
 import static medic.gateway.alert.test.DbTestHelper.cols;
 import static medic.gateway.alert.test.DbTestHelper.randomUuid;
 import static medic.gateway.alert.test.DbTestHelper.vals;
