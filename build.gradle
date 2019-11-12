@@ -16,6 +16,7 @@ buildscript {
 	}
 }
 apply plugin: 'com.android.application'
+apply plugin: 'com.noveogroup.android.check'
 apply plugin: 'de.mobilej.unmock'
 
 // enable verbose lint warnings
@@ -147,6 +148,10 @@ android {
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'config/proguard.pro'
 			signingConfig signingConfigs.release
 		}
+	}
+
+	check {
+		abortOnError true
 	}
 
 	lintOptions {
