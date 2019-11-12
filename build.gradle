@@ -16,6 +16,7 @@ buildscript {
 	}
 }
 apply plugin: 'com.android.application'
+apply plugin: 'com.noveogroup.android.check'
 apply plugin: 'de.mobilej.unmock'
 
 // enable verbose lint warnings
@@ -149,14 +150,17 @@ android {
 		}
 	}
 
+	check {
+		abortOnError true
+	}
+
 	lintOptions {
 		lintConfig = new File('config/lint.xml')
 
 		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
 		disable 'GradleDependency' // TODO update to latest support-v4 lib and re-enable this rule
 
-		abortOnError false
-		warningsAsErrors false
+		warningsAsErrors true
 
 		xmlReport false
 

@@ -72,12 +72,12 @@ public class WakefulService extends WakefulIntentService {
 					LastPoll.succeeded(ctx);
 				}
 
-			/**
-			 * NB: this is only testing that *we* have more to send to webapp, and not that webapp has
-			 * more to send to us. To enable that feature correctly we should have webapp pass us this
-			 * value back, because otherwise we'd have to hardcode webapp's batch size in Gateway
-			 */
-			System.out.println("doWakefulWork just before do-while loop");
+				/**
+				 * NB: this is only testing that *we* have more to send to webapp, and not that webapp has
+				 * more to send to us. To enable that feature correctly we should have webapp pass us this
+				 * value back, because otherwise we'd have to hardcode webapp's batch size in Gateway
+				 */
+				System.out.println("doWakefulWork just before do-while loop");
 			} while (poller.moreMessagesToSend());
 		} catch(Exception ex) {
 			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
