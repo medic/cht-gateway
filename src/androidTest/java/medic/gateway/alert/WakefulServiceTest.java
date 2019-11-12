@@ -12,8 +12,8 @@ import medic.gateway.alert.test.DbTestHelper;
 import medic.gateway.alert.test.HttpTestHelper;
 
 import static medic.gateway.alert.test.DbTestHelper.cols;
-import static medic.gateway.alert.test.DbTestHelper.randomUuid;
 import static medic.gateway.alert.test.DbTestHelper.vals;
+import static medic.gateway.alert.test.TestUtils.ANY_NUMBER;
 import static medic.gateway.alert.test.TestUtils.A_PHONE_NUMBER;
 import static medic.gateway.alert.test.TestUtils.SOME_CONTENT;
 
@@ -46,9 +46,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 		// given
 		db.insert("wt_message",
 				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
-				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals(randomUuid(), WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+				vals("message-0001", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-0002", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-0003", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
 		http.nextResponseJson("{}");
 
 		// when
@@ -57,7 +57,10 @@ public class WakefulServiceTest extends AndroidTestCase {
 		wfs.doWakefulWork(i);
 
 		//then
-		db.assertEmpty("wt_message");
+		db.assertTable("wt_message",
+				"message-0001", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-0002", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-0003", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
 	}
 
 	// @Test
