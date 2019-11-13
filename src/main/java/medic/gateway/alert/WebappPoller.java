@@ -62,8 +62,8 @@ public class WebappPoller {
 	}
 
 	public Boolean moreMessagesToSend() {
-		// Complication: we could change db calls to get MAX+1, and use that
-		// to determine if there are *truly* more
+		// REVIEWER: we could change db calls to get MAX+1, and use that
+		// to determine if there are *truly* more... thoughts?
 		return request.wtMessageCount() == MAX_WT_MESSAGES ||
 					request.statusUpdateCount() == MAX_WOM_STATUS_UPDATES;
 	}

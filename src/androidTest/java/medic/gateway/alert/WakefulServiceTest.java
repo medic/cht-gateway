@@ -36,9 +36,6 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		http.tearDown();
 		db.tearDown();
-
-		// http.assertNoMoreRequests();
-
 	}
 
 	@Test
