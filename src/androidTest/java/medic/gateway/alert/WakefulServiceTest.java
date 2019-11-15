@@ -10,6 +10,7 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 import medic.gateway.alert.test.DbTestHelper;
 import medic.gateway.alert.test.HttpTestHelper;
+import okhttp3.mockwebserver.RecordedRequest;
 
 import static medic.gateway.alert.test.DbTestHelper.cols;
 import static medic.gateway.alert.test.DbTestHelper.vals;
