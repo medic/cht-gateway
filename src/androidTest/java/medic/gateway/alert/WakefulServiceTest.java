@@ -36,6 +36,8 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		http.tearDown();
 		db.tearDown();
+
+		http.assertNoMoreRequests();
 	}
 
 	@Test
@@ -58,6 +60,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 				"message-0001", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
 				"message-0002", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
 				"message-0003", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
+
+		RecordedRequest request = http.server.takeRequest();
+		assertEquals("{}", request.getBody().readUtf8());
 	}
 
 	@Test
@@ -107,5 +112,11 @@ public class WakefulServiceTest extends AndroidTestCase {
 				"message-1014", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
 				"message-1015", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
 				"message-1016", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
+
+		RecordedRequest firstRequest = http.server.takeRequest();
+		assertEquals("{}", firstRequest.getBody().readUtf8());
+
+		RecordedRequest secondRequest = http.server.takeRequest();
+		assertEquals("{}", secondRequest.getBody().readUtf8());
 	}
 }
