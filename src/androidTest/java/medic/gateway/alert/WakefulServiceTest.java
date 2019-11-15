@@ -63,7 +63,11 @@ public class WakefulServiceTest extends AndroidTestCase {
 				"message-0003", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
 
 		RecordedRequest request = http.server.takeRequest();
-		assertEquals("{}", request.getBody().readUtf8());
+		assertEquals("{[\"messages\":[" +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1001\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1002\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1003\"}", +
+								"],\"updates\":[]]}", request.getBody().readUtf8());
 	}
 
 	@Test
@@ -115,9 +119,27 @@ public class WakefulServiceTest extends AndroidTestCase {
 				"message-1016", "FORWARDED", ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
 
 		RecordedRequest firstRequest = http.server.takeRequest();
-		assertEquals("{}", firstRequest.getBody().readUtf8());
+		assertEquals("{[\"messages\":[" +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1001\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1002\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1003\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1004\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1005\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1006\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1007\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1008\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1009\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1010\"}", +
+								"],\"updates\":[]]}", request.getBody().readUtf8());
 
 		RecordedRequest secondRequest = http.server.takeRequest();
-		assertEquals("{}", secondRequest.getBody().readUtf8());
+		assertEquals("{[\"messages\":[" +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1011\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1012\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1013\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1014\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1015\"}", +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":"\+447890123123\",\"id\":\"message-1016\"}", +
+								"],\"updates\":[]]}", request.getBody().readUtf8());
 	}
 }
