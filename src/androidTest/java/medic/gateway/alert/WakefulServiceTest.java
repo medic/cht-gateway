@@ -64,9 +64,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 		RecordedRequest request = http.server.takeRequest();
 		assertEquals("{\"messages\":[" +
-								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1001\"}," +
-								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1002\"}," +
-								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1003\"}" +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-0001\"}," +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-0002\"}," +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-0003\"}" +
 								"],\"updates\":[]}", request.getBody().readUtf8());
 	}
 
