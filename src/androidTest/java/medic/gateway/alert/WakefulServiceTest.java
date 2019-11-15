@@ -66,7 +66,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 		assertEquals("{\"messages\":[" +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1001\"}," +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1002\"}," +
-								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1003\"}," +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1003\"}" +
 								"],\"updates\":[]}", request.getBody().readUtf8());
 	}
 
@@ -129,7 +129,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1007\"}," +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1008\"}," +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1009\"}," +
-								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1010\"}," +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1010\"}" +
 								"],\"updates\":[]}", firstRequest.getBody().readUtf8());
 
 		RecordedRequest secondRequest = http.server.takeRequest();
@@ -139,7 +139,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1013\"}," +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1014\"}," +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1015\"}," +
-								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1016\"}," +
+								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1016\"}" +
 								"],\"updates\":[]}", secondRequest.getBody().readUtf8());
 	}
 }
