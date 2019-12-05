@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.telephony.SmsMessage;
 
+import org.json.JSONException;
+
+import java.net.MalformedURLException;
+
 import static android.app.Activity.RESULT_OK;
 import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
 import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
@@ -66,9 +70,26 @@ public class IntentProcessor extends BroadcastReceiver {
 
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
 			boolean success = db.store(m);
+
 			if(!success) {
 				logEvent(ctx, "Failed to save received SMS to db: %s", m);
 			}
+		}
+
+		try {
+			WebappPoller poller = new WebappPoller(ctx);
+			SimpleResponse lastResponse = poller.pollWebapp();
+
+			if(lastResponse == null || lastResponse.isError()) {
+				LastPoll.failed(ctx);
+			} else {
+				LastPoll.succeeded(ctx);
+			}
+		} catch(Exception ex) {
+			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
+			LastPoll.failed(ctx);
+		} finally {
+			LastPoll.broadcast(ctx);
 		}
 
 		// android >= 1.6 && android < 4.4: SMS_RECEIVED_ACTION is an
