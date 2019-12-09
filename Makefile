@@ -29,7 +29,10 @@ clean:
 	rm -rf build/
 
 test:
-	${GRADLEW} clean check test connectedCheck
+	${GRADLEW} clean check test
+
+e2e:
+	${GRADLEW} assemble connectedCheck
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &

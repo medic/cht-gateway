@@ -198,7 +198,9 @@ Treatment of response codes below `200` and between `300` and `399` will _probab
 
 ### `medic-gateway`
 
-* JDK
+- JDK 8 is strongly recommended. Later JDKs will build the app but tests will fail to run with a reflection error.
+- The Android SDK and relevant libraries. Check `build.gradle`'s `compileSdkVersion` parameter for which one need to be installed
+- Either a physical or emulated device running Lolipop (AKA Android 5.1 AKA api 22). Later android versions may cause end to end tests to fail
 
 ### `demo-server`
 
@@ -210,9 +212,14 @@ To build locally and install to an attached android device:
 
 	make
 
-To run tests and static analysis tools locally:
+To run unit tests and static analysis tools locally:
 
 	make test
+
+To run end to end tests, first either connect a physical device, or start an emulated android device, and then:
+
+    make e2e
+
 
 ## `demo-server`
 
@@ -293,7 +300,7 @@ Since Android 6.0 (marshmallow), permissions for sending and receiving SMS must 
 
 ## Copyright
 
-Copyright 2013-2018 Medic Mobile, Inc. <hello@medicmobile.org>
+Copyright 2013-2020 Medic Mobile, Inc. <hello@medicmobile.org>
 
 ## License
 
