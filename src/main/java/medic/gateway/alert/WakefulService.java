@@ -28,12 +28,6 @@ public class WakefulService extends WakefulIntentService {
 		this.ctx = ctx;
 	}
 
-	WakefulService(Context ctx) {
-		super("WakefulService");
-
-		this.ctx = ctx;
-	}
-
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.NPathComplexity" })
 	public void doWakefulWork(Intent intent) {
 		boolean enableWifiAfterWork = false;
