@@ -15,6 +15,7 @@ import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
 import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
 import static android.telephony.SmsManager.RESULT_ERROR_NULL_PDU;
 import static android.telephony.SmsManager.RESULT_ERROR_RADIO_OFF;
+import static medic.gateway.alert.SmsCompatibility.SMS_DELIVER_ACTION;
 import static medic.gateway.alert.WoMessage.Status.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
@@ -25,6 +26,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	private IntentProcessor intentProcessor;
 
 	private DbTestHelper db;
+	private HttpTestHelper http;
 
 	@Before
 	public void setUp() throws Exception {
@@ -33,6 +35,9 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		this.db = new DbTestHelper(getContext());
 
 		this.intentProcessor = new IntentProcessor();
+
+		http = new HttpTestHelper();
+		http.configureAppSettings(getContext());
 	}
 
 	@After
@@ -40,6 +45,8 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		super.tearDown();
 
 		db.tearDown();
+
+		http.assertNoMoreRequests();
 	}
 
 //> REQUEST CONTENT TESTS
@@ -53,7 +60,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		aSendingReportArrivesFor(id);
 
 		// then
-		assertDbStatusOf(id, SENT);
+		assertWoDbStatusOf(id, SENT);
 	}
 
 	@Test
@@ -150,7 +157,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		aDeliveryReportArrivesFor(id);
 
 		// then
-		assertDbStatusOf(id, DELIVERED);
+		assertWoDbStatusOf(id, DELIVERED);
 	}
 
 	@Test
@@ -163,7 +170,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		aDeliveryReportArrivesFor(id);
 
 		// then
-		assertDbStatusOf(id, DELIVERED);
+		assertWoDbStatusOf(id, DELIVERED);
 	}
 
 	@Test
@@ -176,7 +183,20 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		aSendFailureReportArrivesFor(id);
 
 		// then
-		assertDbStatusOf(id, DELIVERED);
+		assertWoDbStatusOf(id, DELIVERED);
+	}
+
+	@Test
+	public void test_onDeliver_shouldNotCrashHorribly() throws Exception {
+		// given
+		http.nextResponseJson("{}");
+
+		// when
+		aWtSmsArrives();
+
+		// then
+		http.assertPostRequestMade_withJsonResponse();
+		assertWtDbStatus(WtMessage.Status.FORWARDED);
 	}
 
 //> HELPER METHODS
@@ -189,13 +209,29 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 				vals(id, status, 0, false));
 	}
 
-	private void assertDbStatusOf(String id, WoMessage.Status expectedStatus) {
+	private void assertWoDbStatusOf(String id, WoMessage.Status expectedStatus) {
 		Cursor c = db.raw.rawQuery("SELECT COUNT(_id) FROM wo_message WHERE _id=? AND status=?",
 				args(id, expectedStatus.toString()));
 		assertEquals(1, c.getCount());
 
 		c.moveToFirst();
 		assertEquals(1, c.getLong(0));
+
+		c.close();
+	}
+
+	private void assertWtDbStatus(WtMessage.Status expectedStatus) {
+		// Some in the expectedStatus
+		Cursor c = db.raw.rawQuery("SELECT status FROM wt_message", NO_ARGS);
+
+		c.moveToFirst();
+
+		assertTrue(c.getCount() > 0);
+
+		while (!c.isAfterLast()) {
+			assertEquals(expectedStatus.toString(), c.getString(0));
+			c.moveToNext();
+		}
 
 		c.close();
 	}
@@ -223,6 +259,13 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		Intent sendIntent = intentFor("medic.gateway.alert.SENDING_REPORT", id);
 		sendIntent.putExtra("errorCode", errorCode);
 		deliver(sendIntent, RESULT_ERROR_GENERIC_FAILURE);
+	}
+
+	private void aWtSmsArrives() {
+		Intent i = new Intent(SMS_DELIVER_ACTION);
+		i.putExtra("pdus", new Object[] {A_VALID_GSM_PDU});
+		i.putExtra("format", "3gpp");
+		deliver(i);
 	}
 
 	private Intent intentFor(String action, String id) {
