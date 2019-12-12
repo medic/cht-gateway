@@ -47,7 +47,6 @@ public class SettingsDialogActivityTest {
 	@After
 	public void tearDown() throws Exception {
 		clearAppSettings();
-		http.tearDown();
 	}
 
 
