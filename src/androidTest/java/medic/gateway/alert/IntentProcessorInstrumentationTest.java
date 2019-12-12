@@ -188,7 +188,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onDeliver_shouldNotCrashHorribly() throws Exception {
+	public void test_onDeliver_shouldForwardToApi() throws Exception {
 		// given
 		http.nextResponseJson("{}");
 
