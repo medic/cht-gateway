@@ -47,6 +47,7 @@ public class SettingsDialogActivityTest {
 	@After
 	public void tearDown() throws Exception {
 		clearAppSettings();
+		http.tearDown();
 	}
 
 
@@ -282,6 +283,12 @@ public class SettingsDialogActivityTest {
 	@Test
 	public void medic_shouldNotDisplayCancelButtonIfSettingsDoNotExist() {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		clearAppSettings();
+
+		// when
+		recreateActivityFor(activityTestRule);
 
 		// expect
 		onView(withId(id.btnCancelSettings))

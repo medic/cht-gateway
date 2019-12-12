@@ -45,6 +45,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		super.tearDown();
 
 		db.tearDown();
+		http.tearDown();
 
 		http.assertNoMoreRequests();
 	}
