@@ -80,6 +80,12 @@ public class IntentProcessor extends BroadcastReceiver {
 				LastPoll.failed(ctx);
 			} else {
 				LastPoll.succeeded(ctx);
+
+				try {
+					new SmsSender(ctx).sendUnsentSmses();
+				} catch(Exception ex) {
+					logException(ctx, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
+				}
 			}
 		} catch(Exception ex) {
 			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
