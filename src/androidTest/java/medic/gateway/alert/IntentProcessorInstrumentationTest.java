@@ -38,6 +38,8 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		http = new HttpTestHelper();
 		http.configureAppSettings(getContext());
+
+		dummySend(true);
 	}
 
 	@After
@@ -48,6 +50,16 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		http.tearDown();
 
 		http.assertNoMoreRequests();
+
+		dummySend(false);
+	}
+
+	public void dummySend(boolean dummySend) {
+		SharedPreferences.Editor ed = getContext()
+				.getSharedPreferences(SettingsStore.class.getName(), Context.MODE_PRIVATE)
+				.edit();
+		ed.putBoolean("dummy-send-enabled", dummySend);
+		assertTrue(ed.commit());
 	}
 
 //> REQUEST CONTENT TESTS
@@ -188,9 +200,13 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onDeliver_shouldForwardToApi() throws Exception {
+	public void test_onDeliver_shouldForwardToApiAndSendSMSResponses() throws Exception {
 		// given
-		http.nextResponseJson("{}");
+		// http.nextResponseJson("{}");
+		http.nextResponseJson("{ \"messages\": [ " +
+			"{ \"id\": \"aaa-111\", \"to\": \"+1\", \"content\": \"testing: one\" }," +
+		"] }");
+
 
 		// when
 		aWtSmsArrives();
@@ -198,6 +214,8 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		// then
 		http.assertPostRequestMade_withJsonResponse();
 		assertWtDbStatus(WtMessage.Status.FORWARDED);
+
+		assertWoDbStatusOf("aaa-111", WoMessage.Status.DELIVERED);
 	}
 
 //> HELPER METHODS
@@ -211,12 +229,11 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	private void assertWoDbStatusOf(String id, WoMessage.Status expectedStatus) {
-		Cursor c = db.raw.rawQuery("SELECT COUNT(_id) FROM wo_message WHERE _id=? AND status=?",
-				args(id, expectedStatus.toString()));
+		Cursor c = db.raw.rawQuery("SELECT status FROM wo_message WHERE _id=?", args(id));
 		assertEquals(1, c.getCount());
 
 		c.moveToFirst();
-		assertEquals(1, c.getLong(0));
+		assertEquals(expectedStatus.toString(), c.getString(0));
 
 		c.close();
 	}
