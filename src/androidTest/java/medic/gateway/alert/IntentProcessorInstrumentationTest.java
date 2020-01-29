@@ -211,6 +211,24 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		// when
 		aWtSmsArrives();
 
+		// we need to wait for an async task to complete
+		// this is hacky, but if we find we need it more we can formalise it
+		int attemptsLeft = 10;
+		while (true) {
+			try {
+				// we're using our last assertion to confirm the entire async flow has completed
+				assertWoDbStatusOf("aaa-111", WoMessage.Status.DELIVERED);
+				break;
+			} catch (Error e) { // junit failures extend Error
+				if (attemptsLeft == 0) {
+					throw e;
+				}
+
+				Thread.sleep(100);
+				attemptsLeft--;
+			}
+		}
+
 		// then
 		http.assertPostRequestMade_withJsonResponse();
 		assertWtDbStatus(WtMessage.Status.FORWARDED);

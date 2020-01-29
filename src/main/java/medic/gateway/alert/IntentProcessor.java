@@ -3,6 +3,7 @@ package medic.gateway.alert;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.telephony.SmsMessage;
 
 import static android.app.Activity.RESULT_OK;
@@ -72,6 +73,23 @@ public class IntentProcessor extends BroadcastReceiver {
 			}
 		}
 
+		new AsyncPoller().execute(ctx);
+
+		// android >= 1.6 && android < 4.4: SMS_RECEIVED_ACTION is an
+		// ordered broadcast, so if we cancel it then it should never
+		// reach the inbox.  On 4.4+, either (a) medic-gateway is the
+		// default SMS app, so the SMS will never reach the standard
+		// inbox, or (b) it is _not_ the default SMS app, in which case
+		// there is no way to delete the message.
+		abortBroadcast();
+	}
+}
+
+class AsyncPoller extends AsyncTask<Context, Void, Void> {
+	@Override
+	protected Void doInBackground(Context... contexts) {
+		Context ctx = contexts[0];
+		logEvent(ctx, "This code ran yo");
 		try {
 			WebappPoller poller = new WebappPoller(ctx);
 			SimpleResponse lastResponse = poller.pollWebapp();
@@ -94,13 +112,7 @@ public class IntentProcessor extends BroadcastReceiver {
 			LastPoll.broadcast(ctx);
 		}
 
-		// android >= 1.6 && android < 4.4: SMS_RECEIVED_ACTION is an
-		// ordered broadcast, so if we cancel it then it should never
-		// reach the inbox.  On 4.4+, either (a) medic-gateway is the
-		// default SMS app, so the SMS will never reach the standard
-		// inbox, or (b) it is _not_ the default SMS app, in which case
-		// there is no way to delete the message.
-		abortBroadcast();
+		return null;
 	}
 }
 
