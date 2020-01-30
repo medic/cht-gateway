@@ -89,7 +89,6 @@ class AsyncPoller extends AsyncTask<Context, Void, Void> {
 	@Override
 	protected Void doInBackground(Context... contexts) {
 		Context ctx = contexts[0];
-		logEvent(ctx, "This code ran yo");
 		try {
 			WebappPoller poller = new WebappPoller(ctx);
 			SimpleResponse lastResponse = poller.pollWebapp();
