@@ -88,6 +88,7 @@ public class ExternalLogTest extends AndroidTestCase {
 		if(CANNOT_RUN_TESTS) return;
 
 		// given
+		removeLogFile();
 		noExistingLog();
 		assertFalse(logFile().exists());
 

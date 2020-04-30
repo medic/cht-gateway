@@ -283,6 +283,12 @@ public class SettingsDialogActivityTest {
 	public void medic_shouldNotDisplayCancelButtonIfSettingsDoNotExist() {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
 
+		// given
+		clearAppSettings();
+
+		// when
+		recreateActivityFor(activityTestRule);
+
 		// expect
 		onView(withId(id.btnCancelSettings))
 				.check(matches(not(isDisplayed())));

@@ -13,6 +13,8 @@ import java.net.UnknownHostException;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 
+// TODO: WakefulIntentService is dead and should be replaced with official code in
+//       Android Jetpack. See: https://github.com/commonsguy/cwac-wakeful
 public class WakefulService extends WakefulIntentService {
 	private final Context ctx;
 

@@ -3,6 +3,7 @@ package medic.gateway.alert;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.telephony.SmsMessage;
 
 import static android.app.Activity.RESULT_OK;
@@ -66,10 +67,13 @@ public class IntentProcessor extends BroadcastReceiver {
 
 		for(SmsMessage m : getMessagesFromIntent(intent)) {
 			boolean success = db.store(m);
+
 			if(!success) {
 				logEvent(ctx, "Failed to save received SMS to db: %s", m);
 			}
 		}
+
+		new AsyncPoller().execute(ctx);
 
 		// android >= 1.6 && android < 4.4: SMS_RECEIVED_ACTION is an
 		// ordered broadcast, so if we cancel it then it should never
@@ -78,6 +82,36 @@ public class IntentProcessor extends BroadcastReceiver {
 		// inbox, or (b) it is _not_ the default SMS app, in which case
 		// there is no way to delete the message.
 		abortBroadcast();
+	}
+}
+
+class AsyncPoller extends AsyncTask<Context, Void, Void> {
+	@Override
+	protected Void doInBackground(Context... contexts) {
+		Context ctx = contexts[0];
+		try {
+			WebappPoller poller = new WebappPoller(ctx);
+			SimpleResponse lastResponse = poller.pollWebapp();
+
+			if(lastResponse == null || lastResponse.isError()) {
+				LastPoll.failed(ctx);
+			} else {
+				LastPoll.succeeded(ctx);
+
+				try {
+					new SmsSender(ctx).sendUnsentSmses();
+				} catch(Exception ex) {
+					logException(ctx, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
+				}
+			}
+		} catch(Exception ex) {
+			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
+			LastPoll.failed(ctx);
+		} finally {
+			LastPoll.broadcast(ctx);
+		}
+
+		return null;
 	}
 }
 
