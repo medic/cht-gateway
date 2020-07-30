@@ -87,17 +87,21 @@ public class SmsSender {
 					int totalParts = parts.size();
 					for(int partIndex=0; partIndex<totalParts; ++partIndex) {
 						String part = parts.get(partIndex);
-						smsManager.sendTextMessage(m.to, DEFAULT_SMSC,
+						smsManager.sendTextMessage(
+								m.to,
+								DEFAULT_SMSC,
 								part,
-								intentFor(SENDING_REPORT, m, partIndex, totalParts),
-								intentFor(DELIVERY_REPORT, m, partIndex, totalParts));
+								intentFor(SENDING_REPORT, m, partIndex, totalParts, IntentProcessor.class),
+								intentFor(DELIVERY_REPORT, m, partIndex, totalParts, IntentProcessor.class));
 					}
 				} else {
 					ArrayList<String> parts = smsManager.divideMessage(m.content);
-					smsManager.sendMultipartTextMessage(m.to, DEFAULT_SMSC,
+					smsManager.sendMultipartTextMessage(
+							m.to,
+							DEFAULT_SMSC,
 							parts,
-							intentsFor(SENDING_REPORT, m, parts),
-							intentsFor(DELIVERY_REPORT, m, parts));
+							intentsFor(SENDING_REPORT, m, parts, IntentProcessor.class),
+							intentsFor(DELIVERY_REPORT, m, parts, IntentProcessor.class));
 				}
 			} else {
 				logEvent(ctx, "Not sending SMS to '%s' because number appears invalid (content: '%s')",
@@ -114,17 +118,18 @@ public class SmsSender {
 		db.updateStatus(m, SENT, DELIVERED);
 	}
 
-	private ArrayList<PendingIntent> intentsFor(String intentType, WoMessage m, ArrayList<String> parts) {
+	private ArrayList<PendingIntent> intentsFor(String intentType, WoMessage m, ArrayList<String> parts, Class<?> receiverClass) {
 		int totalParts = parts.size();
 		ArrayList<PendingIntent> intents = new ArrayList<>(totalParts);
 		for(int partIndex=0; partIndex<totalParts; ++partIndex) {
-			intents.add(intentFor(intentType, m, partIndex, totalParts));
+			intents.add(intentFor(intentType, m, partIndex, totalParts, receiverClass));
 		}
 		return intents;
 	}
 
-	private PendingIntent intentFor(String intentType, WoMessage m, int partIndex, int totalParts) {
-		Intent intent = new Intent(intentType);
+	private PendingIntent intentFor(String intentType, WoMessage m, int partIndex, int totalParts,  Class<?> receiverClass) {
+		Intent intent = new Intent(ctx, receiverClass);
+		intent.setAction(intentType);
 		intent.putExtra("id", m.id);
 		intent.putExtra("partIndex", partIndex);
 		intent.putExtra("totalParts", totalParts);
