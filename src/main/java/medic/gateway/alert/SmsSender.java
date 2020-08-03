@@ -133,7 +133,7 @@ public class SmsSender {
 		intent.putExtra("partIndex", partIndex);
 		intent.putExtra("totalParts", totalParts);
 
-		return PendingIntent.getBroadcast(ctx, m.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT);
+		return PendingIntent.getBroadcast(ctx, m.id.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 
 	/**
