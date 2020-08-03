@@ -61,13 +61,11 @@ public class SmsSender {
 		} else {
 			logEvent(ctx, "Sending %d SMSs...", smsForSending.size());
 
-			for(int i = 0; i < smsForSending.size(); i++) {
-				WoMessage m = smsForSending.get(i);
-
+			for(WoMessage m : smsForSending) {
 				try {
 					trace(this, "sendUnsentSmses() :: attempting to send %s", m);
 					if(dummySendMode) sendSms_dummy(m);
-					else sendSms(m, i);
+					else sendSms(m);
 				} catch(Exception ex) {
 					logException(ex, "SmsSender.sendUnsentSmses() :: message=%s", m);
 					db.setFailed(m, String.format("Exception: %s; message: %s; cause: %s",
@@ -77,7 +75,7 @@ public class SmsSender {
 		}
 	}
 
-	private void sendSms(WoMessage m, int mIdx) {
+	private void sendSms(WoMessage m) {
 		logEvent(ctx, "sendSms() :: [%s] '%s'", m.to, m.content);
 
 		boolean statusUpdated = db.updateStatus(m, UNSENT, PENDING);
@@ -92,8 +90,8 @@ public class SmsSender {
 								m.to,
 								DEFAULT_SMSC,
 								part,
-								intentFor(SENDING_REPORT, m, mIdx, partIndex, totalParts, IntentProcessor.class),
-								intentFor(DELIVERY_REPORT, m, mIdx, partIndex, totalParts, IntentProcessor.class));
+								intentFor(SENDING_REPORT, m, partIndex, totalParts),
+								intentFor(DELIVERY_REPORT, m, partIndex, totalParts));
 					}
 				} else {
 					ArrayList<String> parts = smsManager.divideMessage(m.content);
@@ -101,8 +99,8 @@ public class SmsSender {
 							m.to,
 							DEFAULT_SMSC,
 							parts,
-							intentsFor(SENDING_REPORT, m, mIdx, parts, IntentProcessor.class),
-							intentsFor(DELIVERY_REPORT, m, mIdx, parts, IntentProcessor.class));
+							intentsFor(SENDING_REPORT, m, parts),
+							intentsFor(DELIVERY_REPORT, m, parts));
 				}
 			} else {
 				logEvent(ctx, "Not sending SMS to '%s' because number appears invalid (content: '%s')",
@@ -119,23 +117,23 @@ public class SmsSender {
 		db.updateStatus(m, SENT, DELIVERED);
 	}
 
-	private ArrayList<PendingIntent> intentsFor(String intentType, WoMessage m, int mIdx, ArrayList<String> parts, Class<?> receiverClass) {
+	private ArrayList<PendingIntent> intentsFor(String intentType, WoMessage m, ArrayList<String> parts) {
 		int totalParts = parts.size();
 		ArrayList<PendingIntent> intents = new ArrayList<>(totalParts);
 		for(int partIndex=0; partIndex<totalParts; ++partIndex) {
-			intents.add(intentFor(intentType, m, mIdx, partIndex, totalParts, receiverClass));
+			intents.add(intentFor(intentType, m, partIndex, totalParts));
 		}
 		return intents;
 	}
 
-	private PendingIntent intentFor(String intentType, WoMessage m, int mIdx, int partIndex, int totalParts, Class<?> receiverClass) {
-		Intent intent = new Intent(ctx, receiverClass);
+	private PendingIntent intentFor(String intentType, WoMessage m, int partIndex, int totalParts) {
+		Intent intent = new Intent(ctx, IntentProcessor.class);
 		intent.setAction(intentType);
 		intent.putExtra("id", m.id);
 		intent.putExtra("partIndex", partIndex);
 		intent.putExtra("totalParts", totalParts);
 
-		return PendingIntent.getBroadcast(ctx, mIdx, intent, PendingIntent.FLAG_ONE_SHOT);
+		return PendingIntent.getBroadcast(ctx, m.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 
 	/**
