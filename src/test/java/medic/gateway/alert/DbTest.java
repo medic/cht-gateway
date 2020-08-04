@@ -403,8 +403,8 @@ public class DbTest {
 		// given: there is a message in the database which does NOT need forwarding
 		String messageId = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id",        "status",                 "failure_reason", "last_action", "_to",          "content"),
-				vals(messageId,    WoMessage.Status.PENDING, null,             0,             A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",        "status",                 "failure_reason", "last_action", "_to",          "content", "retries"),
+				vals(messageId,    WoMessage.Status.PENDING, null,             0,             A_PHONE_NUMBER, SOME_CONTENT, 0));
 		dbHelper.insert("wom_status",
 				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
 				vals(messageId,    WoMessage.Status.PENDING, null,             0,           false));
@@ -414,7 +414,7 @@ public class DbTest {
 
 		// then: none of the message details have changed except last action and needs forwarding
 		dbHelper.assertTable("wo_message",
-				messageId, "PENDING", null, GT_ZERO, A_PHONE_NUMBER, SOME_CONTENT);
+				messageId, "PENDING", null, GT_ZERO, A_PHONE_NUMBER, SOME_CONTENT, 0);
 		// and: the message's status has been marked as "needs forwarding"
 		dbHelper.assertTable("wom_status",
 				ANY_NUMBER, messageId, "PENDING", null, 0, true);
@@ -438,8 +438,8 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "failure_reason", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.FAILED, "failure-reason", 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "failure_reason", "last_action", "_to", "content", "retries"),
+				vals(id, WoMessage.Status.FAILED, "failure-reason", 0, A_PHONE_NUMBER, SOME_CONTENT, 0));
 		dbHelper.insert("wom_status",
 				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
 				vals(id,           WoMessage.Status.FAILED,  null,             0,           false));
@@ -459,8 +459,8 @@ public class DbTest {
 		// given
 		String id = randomUuid();
 		dbHelper.insert("wo_message",
-				cols("_id", "status", "last_action", "_to", "content"),
-				vals(id, WoMessage.Status.PENDING, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "last_action", "_to", "content", "retries"),
+				vals(id, WoMessage.Status.PENDING, 0, A_PHONE_NUMBER, SOME_CONTENT, 0));
 		dbHelper.insert("wom_status",
 				cols("message_id", "status",                 "failure_reason", "timestamp", "needs_forwarding"),
 				vals(id,           WoMessage.Status.PENDING, null,             0,           false));
@@ -572,11 +572,11 @@ public class DbTest {
 	public void deleteOldData_shouldDeleteOldWoMessagesButNotNewOnes() {
 		// given
 		dbHelper.insert("wo_message",
-				cols("_id",        "status",                 "last_action", "_to",          "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, now(),         A_PHONE_NUMBER, "should keep 1"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete 1"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6),    A_PHONE_NUMBER, "should keep 2"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800),  A_PHONE_NUMBER, "should delete 2"));
+				cols("_id",        "status",                 "last_action", "_to",          "content", "retries"),
+				vals(randomUuid(), WoMessage.Status.PENDING, now(),         A_PHONE_NUMBER, "should keep 1", 0),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete 1", 0),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(6),    A_PHONE_NUMBER, "should keep 2", 0),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(800),  A_PHONE_NUMBER, "should delete 2", 0));
 		dbHelper.assertCount("wo_message", 4);
 
 		// when
@@ -585,8 +585,8 @@ public class DbTest {
 		// then
 		assertEquals(2, deletedCount);
 		dbHelper.assertTable("wo_message",
-				ANY_ID, "PENDING", null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 1",
-				ANY_ID, "PENDING", null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 2");
+				ANY_ID, "PENDING", null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 1", 0,
+				ANY_ID, "PENDING", null, ANY_NUMBER, A_PHONE_NUMBER, "should keep 2", 0);
 	}
 
 	@Test
@@ -617,8 +617,8 @@ public class DbTest {
 				cols("_id", "timestamp", "message"),
 				vals(1,     daysAgo(8),  "Should be deleted"));
 		dbHelper.insert("wo_message",
-				cols("_id",        "status",                 "last_action", "_to",          "content"),
-				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete"));
+				cols("_id",        "status",                 "last_action", "_to",          "content", "retries"),
+				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete", 0));
 		dbHelper.insert("wt_message",
 				cols("_id",        "status",                 "last_action", "_from",        "content",         "sms_sent", "sms_received"),
 				vals(randomUuid(), WoMessage.Status.PENDING, daysAgo(8),    A_PHONE_NUMBER, "should delete 1", 0,          0));
@@ -742,22 +742,22 @@ public class DbTest {
 	public void generateMessageReport_shouldCountThingsReliably() {
 		// given
 		dbHelper.insert("wo_message",
-				cols("_id",        "status",                  "last_action", "_to",          "content"),
-				vals(randomUuid(), WoMessage.Status.UNSENT,   0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.PENDING,  0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.PENDING,  0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""),
-				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, ""));
+				cols("_id",        "status",                  "last_action", "_to",          "content", "retries"),
+				vals(randomUuid(), WoMessage.Status.UNSENT,   0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.PENDING,  0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.PENDING,  0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.SENT,     0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.FAILED,   0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, "", 0),
+				vals(randomUuid(), WoMessage.Status.DELIVERED,0,             A_PHONE_NUMBER, "", 0));
 		dbHelper.insert("wt_message",
 				cols("_id",        "status",                   "last_action", "_from",        "content",    "sms_sent", "sms_received"),
 				vals(randomUuid(), WtMessage.Status.WAITING,   0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),

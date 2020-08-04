@@ -82,7 +82,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -91,7 +91,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,                    ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "generic; errorCode=99", ANY_NUMBER, true);
@@ -103,7 +103,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -112,7 +112,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,        ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "radio-off", ANY_NUMBER, true);
@@ -124,7 +124,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -133,7 +133,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,         ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "no-service", ANY_NUMBER, true);
@@ -145,7 +145,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -154,7 +154,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,       ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "null-pdu", ANY_NUMBER, true);
@@ -239,8 +239,8 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 //> HELPER METHODS
 	private void aWoMessageIsInDbWith(String id, WoMessage.Status status) {
 		db.insert("wo_message",
-				cols("_id", "status", "last_action", "_to", "content"),
-				vals(id, status, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "last_action", "_to", "content", "retries"),
+				vals(id, status, 0, A_PHONE_NUMBER, SOME_CONTENT, 0));
 		db.insert("wom_status",
 				cols("message_id", "status", "timestamp", "needs_forwarding"),
 				vals(id, status, 0, false));

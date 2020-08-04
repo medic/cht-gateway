@@ -48,8 +48,8 @@ public class SmsSenderTest {
 		for(Status s : Status.values()) {
 			// create a WoMessage with each status
 			db.insert("wo_message",
-					cols("_id",     "status", "failure_reason", "last_action", "_to", "content"),
-					vals("id-" + s, s,        null,             0,             "+1",  "testing: " + s));
+					cols("_id",     "status", "failure_reason", "last_action", "_to", "content", "retries"),
+					vals("id-" + s, s,        null,             0,             "+1",  "testing: " + s, 0));
 		}
 
 		// when
@@ -57,11 +57,11 @@ public class SmsSenderTest {
 
 		// then
 		db.assertTable("wo_message",
-				"id-UNSENT",    "PENDING",   null, ANY_NUMBER, "+1", "testing: UNSENT",
-				"id-PENDING",   "PENDING",   null, 0,          "+1", "testing: PENDING",
-				"id-SENT",      "SENT",      null, 0,          "+1", "testing: SENT",
-				"id-FAILED",    "FAILED",    null, 0,          "+1", "testing: FAILED",
-				"id-DELIVERED", "DELIVERED", null, 0,          "+1", "testing: DELIVERED");
+				"id-UNSENT",    "PENDING",   null, ANY_NUMBER, "+1", "testing: UNSENT", 0,
+				"id-PENDING",   "PENDING",   null, 0,          "+1", "testing: PENDING", 0,
+				"id-SENT",      "SENT",      null, 0,          "+1", "testing: SENT", 0,
+				"id-FAILED",    "FAILED",    null, 0,          "+1", "testing: FAILED", 0,
+				"id-DELIVERED", "DELIVERED", null, 0,          "+1", "testing: DELIVERED", 0);
 	}
 
 	@Test
@@ -70,8 +70,8 @@ public class SmsSenderTest {
 		for(Status s : Status.values()) {
 			// create a WoMessage with each status
 			db.insert("wo_message",
-					cols("_id",     "status", "last_action", "_to", "content"),
-					vals("id-" + s, s,        0,             "+1",  "testing: " + s));
+					cols("_id",     "status", "last_action", "_to", "content", "retries"),
+					vals("id-" + s, s,        0,             "+1",  "testing: " + s, 0));
 		}
 
 		// when
@@ -148,15 +148,15 @@ public class SmsSenderTest {
 		// given
 		enableDummySendMode();
 		db.insert("wo_message",
-				cols("_id",    "status", "failure_reason", "last_action", "_to", "content"),
-				vals("id-123", UNSENT,   null,             0,             "+1",  "testing"));
+				cols("_id",    "status", "failure_reason", "last_action", "_to", "content", "retries"),
+				vals("id-123", UNSENT,   null,             0,             "+1",  "testing", 0));
 
 		// when
 		smsSender.sendUnsentSmses();
 
 		// then
 		db.assertTable("wo_message",
-				"id-123", "DELIVERED", null, ANY_NUMBER, "+1", "testing");
+				"id-123", "DELIVERED", null, ANY_NUMBER, "+1", "testing", 0);
 		db.assertTable("wom_status",
 				ANY_ID, "id-123", "PENDING",   null, ANY_NUMBER, true,
 				ANY_ID, "id-123", "SENT",      null, ANY_NUMBER, true,
