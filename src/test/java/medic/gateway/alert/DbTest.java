@@ -932,7 +932,7 @@ public class DbTest {
 	}
 
 	private static WoMessage aMessageWith(String id, WoMessage.Status status) {
-		return new WoMessage(id, status, null, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT);
+		return new WoMessage(id, status, null, System.currentTimeMillis(), A_PHONE_NUMBER, SOME_CONTENT, 0);
 	}
 
 	private static SmsMessage anSmsWith(String from, String content) {

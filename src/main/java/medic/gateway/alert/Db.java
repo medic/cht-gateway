@@ -73,6 +73,7 @@ public final class Db extends SQLiteOpenHelper {
 	private static final String WOM_clmSTATUS = "status";
 	private static final String WOM_clmSTATUS_NEEDS_FORWARDING = "status_needs_forwarding";
 	private static final String WOM_clmFAILURE_REASON = "failure_reason";
+	private static final String WOM_clmRETRIES = "retries";
 	private static final String WOM_clmLAST_ACTION = "last_action";
 	private static final String WOM_clmTO = "_to";
 	private static final String WOM_clmCONTENT = "content";
@@ -152,8 +153,9 @@ public final class Db extends SQLiteOpenHelper {
 					"%s TEXT, " +
 					"%s INTEGER NOT NULL, " +
 					"%s TEXT NOT NULL, " +
-					"%s TEXT NOT NULL)",
-				tblWO_MESSAGE, WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT));
+					"%s TEXT NOT NULL, " +
+					"%s INTEGER NOT NULL)",
+				tblWO_MESSAGE, WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT, WOM_clmRETRIES));
 
 		migrate_createTable_WoMessageStatusUpdate(db, true);
 		migrate_createTable_WtMessageStatusUpdate(db, true);
@@ -334,21 +336,26 @@ public final class Db extends SQLiteOpenHelper {
 	}
 
 	void setFailed(WoMessage m, String failureReason) {
-		updateStatus(m, WoMessage.Status.PENDING, WoMessage.Status.FAILED, failureReason);
+		// Hard fail message and reset retries.
+		updateStatus(m, WoMessage.Status.PENDING, WoMessage.Status.FAILED, failureReason, 0);
 	}
 
 	boolean updateStatus(WoMessage m, WoMessage.Status newStatus) {
 		return updateStatus(m, m.status, newStatus);
 	}
 
+	boolean updateStatus(WoMessage m, WoMessage.Status newStatus, int retries) {
+		return updateStatus(m, m.status, newStatus,null, retries);
+	}
+
 	boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus) {
 		if(newStatus == WoMessage.Status.FAILED)
 			throw new IllegalArgumentException("updateStatus() should not be called with newStatus==FAILED.  Use setFailed().");
 
-		return updateStatus(m, oldStatus, newStatus, null);
+		return updateStatus(m, oldStatus, newStatus, null, m.retries);
 	}
 
-	private boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus, String failureReason) {
+	private boolean updateStatus(WoMessage m, WoMessage.Status oldStatus, WoMessage.Status newStatus, String failureReason, int retries) {
 		log("updateStatus() :: %s :: %s -> %s (%s)", m, oldStatus, newStatus, failureReason);
 
 		if((newStatus == WoMessage.Status.FAILED) == (failureReason == null))
@@ -363,6 +370,7 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WOM_clmSTATUS, newStatus.toString());
 		v.put(WOM_clmFAILURE_REASON, failureReason);
 		v.put(WOM_clmLAST_ACTION, timestamp);
+		v.put(WOM_clmRETRIES, retries);
 
 		int affected;
 		if(oldStatus == null) {
@@ -427,6 +435,7 @@ public final class Db extends SQLiteOpenHelper {
 		v.put(WOM_clmLAST_ACTION, System.currentTimeMillis());
 		v.put(WOM_clmTO, m.to);
 		v.put(WOM_clmCONTENT, m.content);
+		v.put(WOM_clmRETRIES, m.retries);
 		return v;
 	}
 
@@ -499,7 +508,7 @@ public final class Db extends SQLiteOpenHelper {
 
 	private Cursor getWoMessageCursor(String selection, String[] selectionArgs, SortDirection sort, int maxCount) {
 		return db.query(tblWO_MESSAGE,
-				cols(WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT),
+				cols(WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT, WOM_clmRETRIES),
 				selection, selectionArgs,
 				NO_GROUP, NO_GROUP,
 				sort == null? null: sort.apply(WOM_clmLAST_ACTION),
@@ -513,8 +522,9 @@ public final class Db extends SQLiteOpenHelper {
 		long lastAction = c.getLong(3);
 		String to = c.getString(4);
 		String content = c.getString(5);
+		int retries = c.getInt(6);
 
-		return new WoMessage(id, status, failureReason, lastAction, to, content);
+		return new WoMessage(id, status, failureReason, lastAction, to, content, retries);
 	}
 
 	private static WoMessage.StatusUpdate woMessageStatusUpdateFrom(Cursor c) {
