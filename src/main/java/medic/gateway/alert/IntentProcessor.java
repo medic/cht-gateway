@@ -11,8 +11,6 @@ import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
 import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
 import static android.telephony.SmsManager.RESULT_ERROR_NULL_PDU;
 import static android.telephony.SmsManager.RESULT_ERROR_RADIO_OFF;
-import static android.telephony.SmsManager.RESULT_SMS_SEND_RETRY_FAILED;
-import static android.telephony.SmsManager.RESULT_NETWORK_ERROR;
 import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.logException;
 import static medic.gateway.alert.SmsCompatibility.getMessagesFromIntent;
@@ -144,12 +142,6 @@ class SendingReportHandler {
 					break;
 				case RESULT_ERROR_NO_SERVICE:
 					this.softFail(db, m, "no-service");
-					break;
-				case RESULT_NETWORK_ERROR:
-					this.softFail(db, m, "network-error");
-					break;
-				case RESULT_SMS_SEND_RETRY_FAILED:
-					this.softFail(db, m, "send-retry-failed");
 					break;
 				case RESULT_ERROR_NULL_PDU:
 					this.softFail(db, m, "null-pdu");
