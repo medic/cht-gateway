@@ -177,7 +177,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		db.assertTable("wo_message",
 				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 1);
 		db.assertTable("wom_status",
-				ANY_NUMBER, id, "PENDING", null,         ANY_NUMBER, false,
+				ANY_NUMBER, id, "PENDING", null,        ANY_NUMBER, false,
 				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
 	}
 
