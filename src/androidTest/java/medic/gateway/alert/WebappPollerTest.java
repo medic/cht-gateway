@@ -119,7 +119,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		db.assertTable("wo_message",
 				ANY_ID, "DELIVERED", NO_REASON, 0, A_PHONE_NUMBER, SOME_CONTENT, 0);
 		db.assertTable("wom_status",
-				ANY_NUMBER, messageId, "DELIVERED", NO_REASON, 0, false);
+				ANY_NUMBER, messageId, "DELIVERED", NO_REASON, 0, true);
 	}
 
 	@Test
@@ -239,8 +239,8 @@ public class WebappPollerTest extends AndroidTestCase {
 				"aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "testing: one", 0,
 				"aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "testing: two", 0);
 		db.assertTable("wom_status",
-				ANY_NUMBER, "aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
-				ANY_NUMBER, "aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, false);
+				ANY_NUMBER, "aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, true,
+				ANY_NUMBER, "aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, true);
 	}
 
 	@Test
@@ -260,7 +260,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		db.assertTable("wo_message",
 				"abc-123", "UNSENT", NO_REASON, ANY_NUMBER, "+123", "testing: abc", 0);
 		db.assertTable("wom_status",
-				ANY_NUMBER, "abc-123", "UNSENT", NO_REASON, ANY_NUMBER, false);
+				ANY_NUMBER, "abc-123", "UNSENT", NO_REASON, ANY_NUMBER, true);
 	}
 
 	@Test
@@ -301,7 +301,7 @@ public class WebappPollerTest extends AndroidTestCase {
 				"ok-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "ok: one", 0,
 				"ok-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "ok: two", 0);
 		db.assertTable("wom_status",
-				ANY_NUMBER, "ok-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
-				ANY_NUMBER, "ok-222", "UNSENT", NO_REASON, ANY_NUMBER, false);
+				ANY_NUMBER, "ok-111", "UNSENT", NO_REASON, ANY_NUMBER, true,
+				ANY_NUMBER, "ok-222", "UNSENT", NO_REASON, ANY_NUMBER, true);
 	}
 }

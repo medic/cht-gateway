@@ -317,7 +317,7 @@ public final class Db extends SQLiteOpenHelper {
 			long id = db.insertOrThrow(tblWO_MESSAGE, null, getContentValues(m));
 
 			if(id != -1) {
-				storeStatusUpdate(m, m.status, null, m.lastAction, false);
+				storeStatusUpdate(m, m.status, null, m.lastAction);
 				return true;
 			} else {
 				return false;
@@ -380,7 +380,7 @@ public final class Db extends SQLiteOpenHelper {
 		}
 
 		if(affected > 0) {
-			storeStatusUpdate(m, newStatus, failureReason, timestamp, true);
+			storeStatusUpdate(m, newStatus, failureReason, timestamp);
 			return true;
 		} else {
 			return false;
@@ -419,9 +419,9 @@ public final class Db extends SQLiteOpenHelper {
 		}
 	}
 
-	private void storeStatusUpdate(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp, boolean needsForwarding) {
+	private void storeStatusUpdate(WoMessage m, WoMessage.Status newStatus, String failureReason, long timestamp) {
 		try {
-			db.insertOrThrow(tblWO_STATUS, null, getContentValues(m, newStatus, failureReason, timestamp, needsForwarding));
+			db.insertOrThrow(tblWO_STATUS, null, getContentValues(m, newStatus, failureReason, timestamp, true));
 		} catch(SQLException ex) {
 			warnException(ex, "Exception writing WO StatusUpdate [%s] to db for WoMessage: %s", newStatus, m);
 		}
