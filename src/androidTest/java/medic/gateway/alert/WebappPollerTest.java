@@ -119,7 +119,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		db.assertTable("wo_message",
 				ANY_ID, "DELIVERED", NO_REASON, 0, A_PHONE_NUMBER, SOME_CONTENT, 0);
 		db.assertTable("wom_status",
-				ANY_NUMBER, messageId, "DELIVERED", NO_REASON, 0, true);
+				ANY_NUMBER, messageId, "DELIVERED", NO_REASON, 0, false);
 	}
 
 	@Test
