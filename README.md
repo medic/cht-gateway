@@ -71,7 +71,7 @@ Bar array behaviour specified above, `medic-gateway` _must_ include fields speci
 
 ## Idempotence
 
-N.B. messages are cosidered duplicate by `medic-gateway` if they have identical values for `id`.  The webapp is expected to do the same.
+N.B. messages are considered duplicate by `medic-gateway` if they have identical values for `id`.  The webapp is expected to do the same.
 
 `medic-gateway` will not re-process duplicate webapp-originating messages.
 
@@ -191,6 +191,21 @@ The `message` property may be logged and/or displayed to users in the `medic-gat
 
 Treatment of response codes below `200` and between `300` and `399` will _probably_ be handled sensibly by Android.
 
+# SMS Retry Mechanism
+
+Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERROR_NO_SERVICE`, `RESULT_ERROR_NULL_PDU` and `RESULT_ERROR_RADIO_OFF`.
+
+1. A possible temporary error occurs and Gateway retries sending the SMS:
+    1.1 SMS status will be updated to `UNSENT`, so Gateway will find it and add it into the `send queue` automatically.
+    1.2 SMS' `retry counter` increases by 1.
+    1.3 Gateway logs that X error occurred and that will retry for the X time in X minutes.
+
+2. If the SMS retry limit is reached, then:
+    2.1 Gateway will hard fail the SMS by updating its status to `FAILED` and won't retry again.
+    2.2 Gateway logs error.
+
+3. At this point the user has the option of manually select the SMS and press `Retry` button.
+    3.1 If they do and SMS fails again, then the process will restart from step # 1.
 
 # Development
 
@@ -273,7 +288,7 @@ TODO walkthrough
 
 Some changes were made to the Android SMS APIs in 4.4 (Kitkat®).  The significant change was this:
 
-> from android 4.4 onwards, apps cannot delete messages from the device inbox _unless they are set, by the user, as the default messageing app for the device_
+> from android 4.4 onwards, apps cannot delete messages from the device inbox _unless they are set, by the user, as the default messaging app for the device_
 
 Some reading on this can be found at:
 
