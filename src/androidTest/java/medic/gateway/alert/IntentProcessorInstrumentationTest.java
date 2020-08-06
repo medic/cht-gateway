@@ -77,7 +77,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_GENERIC_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_GENERIC_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 0);
@@ -98,7 +98,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_RADIO_OFF_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_RADIO_OFF_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 21); // Hard fail
@@ -119,7 +119,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_RADIO_OFF_shouldUdpateSendStatusAndRetryAfterSoftFail() throws Exception {
+	public void test_onReceive_RADIO_OFF_shouldUpdateSendStatusAndRetryAfterSoftFail() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 0);
@@ -140,7 +140,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_NO_SERVICE_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_NO_SERVICE_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 21); // Hard fail
@@ -161,7 +161,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_NO_SERVICE_shouldUdpateSendStatusAndRetryAfterSoftFail() throws Exception {
+	public void test_onReceive_NO_SERVICE_shouldUpdateSendStatusAndRetryAfterSoftFail() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 0);
@@ -182,7 +182,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_NULL_PDU_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_NULL_PDU_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 21); // Hard fail
@@ -203,7 +203,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_NULL_PDU_shouldUdpateSendStatusAndRetryAfterSoftFail() throws Exception {
+	public void test_onReceive_NULL_PDU_shouldUpdateSendStatusAndRetryAfterSoftFail() throws Exception {
 		// given
 		String id = randomUuid();
 		aWoMessageIsInDbWith(id, PENDING, 0);
@@ -218,6 +218,27 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 		// then
 		db.assertTable("wo_message",
 				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 1);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,       ANY_NUMBER, false,
+				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
+	}
+
+	@Test
+	public void test_onReceive_NULL_PDU_shouldContinueRetryAfterSoftFail() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING, 10);
+		db.assertTable("wo_message",
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 10);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_NULL_PDU);
+
+		// then
+		db.assertTable("wo_message",
+				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 11);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,       ANY_NUMBER, false,
 				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
