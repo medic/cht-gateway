@@ -198,11 +198,12 @@ Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERRO
 1. A possible temporary error occurs and Gateway retries sending the SMS:
     1.1 SMS status will be updated to `UNSENT`, so Gateway will find it and add it into the `send queue` automatically.
     1.2 SMS' `retry counter` increases by 1.
-    1.3 Gateway logs that X error occurred and that will retry for the X time in X minutes.
+    1.3 The retry attempt is scheduled based on this formula: `SMS' last activity time + ( 3 minutes * retry counter )`. This means the time between retries is incremental.
+    1.4 Gateway logs: the error, the retry counter and the retry scheduled time. Sample: `Sending SMS to +1123123123 failed (cause: radio off) Retry #5 in 15 min`
 
-2. If the SMS retry limit is reached, then:
+2. Gateway has a maximum limit of attempts to retry sending SMS (currently 20), If this is reached then:
     2.1 Gateway will hard fail the SMS by updating its status to `FAILED` and won't retry again.
-    2.2 Gateway logs error.
+    2.2 Gateway logs error. Sample: `Sending message to +1123123123 failed (cause: radio off) Not retrying`
 
 3. At this point the user has the option of manually select the SMS and press `Retry` button.
     3.1 If they do and SMS fails again, then the process will restart from step # 1.
