@@ -19,7 +19,7 @@
 	<string-array name="spnWebappSubdomain" tools:ignore="InconsistentArrays"/>
 
 	<string name="cbxEnablePolling">Enable polling</string>
-
+	<string name="cbxWifiAutoEnable">Automatically enable Wi-Fi</string>
 	<string name="cbxEnableCdmaCompatMode">CDMA compatibility mode</string>
 	<string name="cbxEnableDummySendMode">Dummy send mode</string>
 

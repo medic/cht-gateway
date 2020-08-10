@@ -55,6 +55,7 @@ public class SettingsDialogActivity extends Activity {
 			populateWebappUrlFields(settings.webappUrl);
 			check(R.id.cbxEnablePolling, settings.pollingEnabled);
 			check(R.id.cbxEnableCdmaCompatMode, settings.cdmaCompatMode);
+			check(R.id.cbxWifiAutoEnable, settings.wifiAutoEnable);
 
 			if(IS_DUMMY_SEND_AVAILABLE)
 				check(R.id.cbxEnableDummySendMode, settings.dummySendMode);
@@ -175,6 +176,7 @@ public class SettingsDialogActivity extends Activity {
 	private void saveWithoutVerification() {
 		final String webappUrl = getWebappUrlFromFields();
 		final boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
+		final boolean wifiAutoEnable = checked(R.id.cbxWifiAutoEnable);
 		final boolean dummySendMode = isDummySendModeChecked();
 
 		thinking = Thinking.show(this,
@@ -182,7 +184,7 @@ public class SettingsDialogActivity extends Activity {
 
 		AsyncTask.execute(new Runnable() {
 			public void run() {
-				boolean savedOk = saveSettings(new Settings(webappUrl, false, cdmaCompatMode, dummySendMode));
+				boolean savedOk = saveSettings(new Settings(webappUrl, false, cdmaCompatMode, dummySendMode, wifiAutoEnable));
 
 				if(savedOk) startApp();
 				else {
@@ -230,12 +232,13 @@ public class SettingsDialogActivity extends Activity {
 
 	private void handleSaveResult(WebappUrlVerififcation result) {
 		boolean cdmaCompatMode = checked(R.id.cbxEnableCdmaCompatMode);
+		boolean wifiAutoEnable = checked(R.id.cbxWifiAutoEnable);
 		boolean dummySendMode = isDummySendModeChecked();
 
 		boolean savedOk = false;
 
 		if(result.isOk)
-			savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode, dummySendMode));
+			savedOk = saveSettings(new Settings(result.webappUrl, true, cdmaCompatMode, dummySendMode, wifiAutoEnable));
 		else
 			showError(IS_MEDIC_FLAVOUR ? R.id.txtWebappInstanceName : R.id.txtWebappUrl, result.failure);
 

@@ -29,6 +29,13 @@
 				android:layout_marginTop="16dp"
 				android:text="@string/cbxEnableCdmaCompatMode"
 				android:checked="false"/>
+		<CheckBox
+				android:id="@+id/cbxWifiAutoEnable"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:checked="false"
+				android:text="@string/cbxWifiAutoEnable"/>
 		<RelativeLayout
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"

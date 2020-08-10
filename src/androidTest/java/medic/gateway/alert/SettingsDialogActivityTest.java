@@ -59,6 +59,7 @@ public class SettingsDialogActivityTest {
 		assertVisible(id.txtWebappUrl);
 		assertVisible(id.cbxEnablePolling);
 		assertVisible(id.cbxEnableCdmaCompatMode);
+		assertVisible(id.cbxWifiAutoEnable);
 		assertVisible(id.btnSaveSettings);
 
 		assertDoesNotExist(id.txtWebappInstanceName);
@@ -70,7 +71,7 @@ public class SettingsDialogActivityTest {
 		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
 
 		// given
-		settingsStore().save(new Settings(http.url(), true, false, false));
+		settingsStore().save(new Settings(http.url(), true, false, false, false));
 
 		// when
 		recreateActivityFor(activityTestRule);
@@ -249,6 +250,42 @@ public class SettingsDialogActivityTest {
 		assertTrue(settings().cdmaCompatMode);
 	}
 
+	@Test
+	public void generic_wifiAutoEnable_shouldBeDisabledByDefault() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		assertFalse(settingsStore().hasSettings());
+		http.nextResponseJson("{ \"medic-gateway\": true }");
+		urlEnteredAs(http.url());
+		assertNotChecked(id.cbxWifiAutoEnable);
+
+		// when
+		saveClicked();
+
+		// then
+		assertTrue(settingsStore().hasSettings());
+		assertFalse(settings().wifiAutoEnable);
+	}
+
+	@Test
+	public void generic_wifiAutoEnable_shouldBeCheckable() {
+		if(NOT_GENERIC_FLAVOUR) /* test not applicable */ return;
+
+		// given
+		assertFalse(settingsStore().hasSettings());
+		http.nextResponseJson("{ \"medic-gateway\": true }");
+		urlEnteredAs(http.url());
+		checkWifiAutoEnabled();
+
+		// when
+		saveClicked();
+
+		// then
+		assertTrue(settingsStore().hasSettings());
+		assertTrue(settings().wifiAutoEnable);
+	}
+
 //> MEDIC FLAVOUR TESTS
 	@Test
 	public void medic_shouldDisplayCorrectFields() throws Exception {
@@ -260,6 +297,7 @@ public class SettingsDialogActivityTest {
 
 		assertVisible(id.cbxEnablePolling);
 		assertVisible(id.cbxEnableCdmaCompatMode);
+		assertVisible(id.cbxWifiAutoEnable);
 		assertVisible(id.btnSaveSettings);
 
 		assertDoesNotExist(id.txtWebappUrl);
@@ -270,7 +308,7 @@ public class SettingsDialogActivityTest {
 		if(NOT_MEDIC_FLAVOUR) /* test not applicable */ return;
 
 		// given
-		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true, false, false));
+		settingsStore().save(new Settings("https://uname:pword@test.dev.medicmobile.org/api/sms", true, false, false, false));
 
 		// when
 		recreateActivityFor(activityTestRule);
@@ -392,6 +430,11 @@ public class SettingsDialogActivityTest {
 
 	private void checkCdmaCompatEnabled() {
 		onView(allOf(withId(id.cbxEnableCdmaCompatMode), isNotChecked()))
+				.perform(click());
+	}
+
+	private void checkWifiAutoEnabled() {
+		onView(allOf(withId(id.cbxWifiAutoEnable), isNotChecked()))
 				.perform(click());
 	}
 

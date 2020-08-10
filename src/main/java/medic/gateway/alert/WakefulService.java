@@ -32,6 +32,8 @@ public class WakefulService extends WakefulIntentService {
 
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.NPathComplexity" })
 	public void doWakefulWork(Intent intent) {
+		Settings settings = Settings.in(ctx);
+		boolean wifiAutoEnableSetting = settings == null ? false : settings.wifiAutoEnable;
 		boolean enableWifiAfterWork = false;
 		WifiConnectionManager wifiMan = null;
 
@@ -49,14 +51,17 @@ public class WakefulService extends WakefulIntentService {
 				SimpleResponse lastResponse = poller.pollWebapp();
 
 				// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
-				if(lastResponse instanceof ExceptionResponse) {
+				if (lastResponse instanceof ExceptionResponse) {
 					ExceptionResponse exResponse = (ExceptionResponse) lastResponse;
-					if(exResponse.ex instanceof SocketTimeoutException ||
-							exResponse.ex instanceof UnknownHostException ||
-							exResponse.ex instanceof ConnectException ||
-							exResponse.ex instanceof NoRouteToHostException) {
+
+					if (exResponse.ex instanceof SocketTimeoutException
+							|| exResponse.ex instanceof UnknownHostException
+							|| exResponse.ex instanceof ConnectException
+							|| exResponse.ex instanceof NoRouteToHostException) {
+
 						wifiMan = new WifiConnectionManager(ctx);
-						if(wifiMan.isWifiActive()) {
+
+						if(wifiMan.isWifiActive() && wifiAutoEnableSetting) {
 							logEvent(ctx, "Disabling wifi and then retrying poll...");
 							enableWifiAfterWork = true;
 							wifiMan.disableWifi();
@@ -77,7 +82,7 @@ public class WakefulService extends WakefulIntentService {
 				 * value back, because otherwise we'd have to hardcode webapp's batch size in Gateway
 				 */
 			} while (poller.moreMessagesToSend());
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
 			LastPoll.failed(ctx);
 		} finally {
@@ -90,10 +95,12 @@ public class WakefulService extends WakefulIntentService {
 			logException(ctx, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
 		}
 
-		if(enableWifiAfterWork) try {
-			wifiMan.enableWifi();
-		} catch(Exception ex) {
-			logException(ctx, ex, "Exception caught trying to check wifi status: %s", ex.getMessage());
+		if (enableWifiAfterWork && wifiAutoEnableSetting) {
+			try {
+				wifiMan.enableWifi();
+			} catch(Exception ex) {
+				logException(ctx, ex, "Exception caught trying to check wifi status: %s", ex.getMessage());
+			}
 		}
 	}
 }
