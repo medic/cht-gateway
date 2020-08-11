@@ -62,7 +62,7 @@ public class WakefulService extends WakefulIntentService {
 
 						wifiMan = new WifiConnectionManager(ctx);
 
-						if (wifiMan.isWifiActive() && wifiAutoEnableSetting) {
+						if (wifiAutoEnableSetting && wifiMan.isWifiActive()) {
 							logEvent(ctx, "Disabling wifi and then retrying poll...");
 							enableWifiAfterWork = true;
 							wifiMan.disableWifi();
@@ -98,7 +98,7 @@ public class WakefulService extends WakefulIntentService {
 			logException(ctx, ex, "Exception caught trying to send SMSes: %s", ex.getMessage());
 		}
 
-		if (enableWifiAfterWork && wifiAutoEnableSetting) {
+		if (wifiAutoEnableSetting && enableWifiAfterWork) {
 			try {
 				wifiMan.enableWifi();
 			} catch(Exception ex) {

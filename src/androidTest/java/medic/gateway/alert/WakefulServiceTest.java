@@ -46,7 +46,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 	public void test_doWakefulWork_unsentMessagesShouldSendMessages() throws Exception {
 		// given
 		db.insert("wt_message",
-				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				cols("_id",         "status", "last_action", "_from",        "content",    "sms_sent", "sms_received"),
 				vals("message-0001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
 				vals("message-0002", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
 				vals("message-0003", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
@@ -75,7 +75,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 	public void test_doWakefulWork_unsentMessagesShouldSendMultipleBatches() throws Exception {
 		// given
 		db.insert("wt_message",
-				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				cols("_id",         "status", "last_action", "_from",        "content",    "sms_sent", "sms_received"),
 				vals("message-1001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
 				vals("message-1002", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
 				vals("message-1003", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
@@ -148,7 +148,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 	public void test_doWakefulWork_shouldStopSendBatchesWhenOneFails() throws Exception {
 		// Enough for 2 batches / requests to Webapp
 		db.insert("wt_message",
-				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				cols("_id",         "status", "last_action", "_from",        "content",    "sms_sent", "sms_received"),
 				vals("message-2001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
 				vals("message-2002", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
 				vals("message-2003", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),

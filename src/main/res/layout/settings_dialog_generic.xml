@@ -34,8 +34,8 @@
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="16dp"
-				android:checked="false"
-				android:text="@string/cbxWifiAutoEnable"/>
+				android:text="@string/cbxWifiAutoEnable"
+				android:checked="false"/>
 		<RelativeLayout
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
