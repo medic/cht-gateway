@@ -53,6 +53,11 @@ Some CDMA networks have limited support for multipart SMS messages.  This can oc
 * multipart messages sent to CDMA phones never arrive; or
 * multipart messages sent to CDMA phones are truncated
 
+### Automatically enable WiFi
+
+Gateway can receive exceptions when making requests to the Webapp endpoint like: socket timeout, unknown host or connection exception. When this happens Gateway will disable the WiFi and try to resend the request by using Mobile Data, once the job is done it will activate the WiFi again automatically.
+Check this box to enable this behaviour.
+
 # Passwords
 
 When using HTTP Basic Auth with gateway, all characters in the password must be chosen from the [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) characterset, excluding `#`, `/`, `?`, `@`.
