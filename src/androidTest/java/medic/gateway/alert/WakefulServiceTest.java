@@ -146,6 +146,7 @@ public class WakefulServiceTest extends AndroidTestCase {
 
 	@Test
 	public void test_doWakefulWork_shouldStopSendBatchesWhenOneFails() throws Exception {
+		// Enough for 2 batches / requests to Webapp
 		db.insert("wt_message",
 				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
 				vals("message-2001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
@@ -184,12 +185,14 @@ public class WakefulServiceTest extends AndroidTestCase {
 				"message-2012", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
 				"message-2013", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
 
+		// No more requests after 1 failed.
 		int requestCount = http.server.getRequestCount();
 		assertEquals(1, requestCount);
 
 		RecordedRequest request = http.server.takeRequest();
 		String body = request.getBody().readUtf8();
 
+		// Just double checking that no items from other batch are mixed in the failed request.
 		assertTrue(body.length() > 0);
 		assertTrue(body.contains("message-2001"));
 		assertTrue(body.contains("message-2002"));
@@ -201,5 +204,8 @@ public class WakefulServiceTest extends AndroidTestCase {
 		assertTrue(body.contains("message-2008"));
 		assertTrue(body.contains("message-2009"));
 		assertTrue(body.contains("message-2010"));
+		assertFalse(body.contains("message-2011"));
+		assertFalse(body.contains("message-2012"));
+		assertFalse(body.contains("message-2013"));
 	}
 }
