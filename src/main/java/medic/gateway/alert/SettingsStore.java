@@ -69,7 +69,7 @@ class Settings {
 	public static final Pattern URL_PATTERN = Pattern.compile(
 			"http[s]?://([^/:]*)(:\\d*)?(.*)");
 
-	public static final long POLL_INTERVAL = 30 * 1000L;
+	public static final long POLL_INTERVAL = 3 * 60 * 1000L; // 3 min in milliseconds
 
 	public final String webappUrl;
 	public final boolean pollingEnabled;

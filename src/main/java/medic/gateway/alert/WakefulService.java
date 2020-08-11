@@ -32,10 +32,12 @@ public class WakefulService extends WakefulIntentService {
 
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.NPathComplexity" })
 	public void doWakefulWork(Intent intent) {
+
 		Settings settings = Settings.in(ctx);
+		WifiConnectionManager wifiMan = null;
 		boolean wifiAutoEnableSetting = settings == null ? false : settings.wifiAutoEnable;
 		boolean enableWifiAfterWork = false;
-		WifiConnectionManager wifiMan = null;
+		boolean keepPollingWebapp = true;
 
 		try {
 			Db.getInstance(ctx).cleanLogs();
@@ -45,12 +47,11 @@ public class WakefulService extends WakefulIntentService {
 
 		try {
 			WebappPoller poller;
-			do {
 
+			while (keepPollingWebapp) {
 				poller = new WebappPoller(ctx);
 				SimpleResponse lastResponse = poller.pollWebapp();
 
-				// TODO check if we should be handling other failures in addition to timeouts e.g. java.net.SocketException
 				if (lastResponse instanceof ExceptionResponse) {
 					ExceptionResponse exResponse = (ExceptionResponse) lastResponse;
 
@@ -61,7 +62,7 @@ public class WakefulService extends WakefulIntentService {
 
 						wifiMan = new WifiConnectionManager(ctx);
 
-						if(wifiMan.isWifiActive() && wifiAutoEnableSetting) {
+						if (wifiMan.isWifiActive() && wifiAutoEnableSetting) {
 							logEvent(ctx, "Disabling wifi and then retrying poll...");
 							enableWifiAfterWork = true;
 							wifiMan.disableWifi();
@@ -70,7 +71,7 @@ public class WakefulService extends WakefulIntentService {
 					}
 				}
 
-				if(lastResponse == null || lastResponse.isError()) {
+				if (lastResponse == null || lastResponse.isError()) {
 					LastPoll.failed(ctx);
 				} else {
 					LastPoll.succeeded(ctx);
@@ -81,7 +82,9 @@ public class WakefulService extends WakefulIntentService {
 				 * more to send to us. To enable that feature correctly we should have webapp pass us this
 				 * value back, because otherwise we'd have to hardcode webapp's batch size in Gateway
 				 */
-			} while (poller.moreMessagesToSend());
+				keepPollingWebapp = poller.moreMessagesToSend(lastResponse);
+			}
+
 		} catch (Exception ex) {
 			logException(ctx, ex, "Exception caught trying to poll webapp: %s", ex.getMessage());
 			LastPoll.failed(ctx);

@@ -61,9 +61,12 @@ public class WebappPoller {
 		return response;
 	}
 
-	public Boolean moreMessagesToSend() {
-		return request.wtMessageCount() == MAX_WT_MESSAGES ||
-					request.statusUpdateCount() == MAX_WOM_STATUS_UPDATES;
+	public Boolean moreMessagesToSend(SimpleResponse lastResponse) {
+		if (lastResponse == null || lastResponse.isError()) {
+			return false;
+		}
+
+		return request.wtMessageCount() == MAX_WT_MESSAGES || request.statusUpdateCount() == MAX_WOM_STATUS_UPDATES;
 	}
 
 //> PRIVATE HELPERS
