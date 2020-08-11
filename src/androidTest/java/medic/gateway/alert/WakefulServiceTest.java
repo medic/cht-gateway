@@ -12,6 +12,7 @@ import medic.gateway.alert.test.DbTestHelper;
 import medic.gateway.alert.test.HttpTestHelper;
 import okhttp3.mockwebserver.RecordedRequest;
 
+import static medic.gateway.alert.WtMessage.Status.WAITING;
 import static medic.gateway.alert.test.DbTestHelper.cols;
 import static medic.gateway.alert.test.DbTestHelper.vals;
 import static medic.gateway.alert.test.TestUtils.ANY_NUMBER;
@@ -46,9 +47,9 @@ public class WakefulServiceTest extends AndroidTestCase {
 		// given
 		db.insert("wt_message",
 				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
-				vals("message-0001", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-0002", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-0003", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+				vals("message-0001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-0002", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-0003", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
 		http.nextResponseJson("{}");
 
 		// when
@@ -75,22 +76,22 @@ public class WakefulServiceTest extends AndroidTestCase {
 		// given
 		db.insert("wt_message",
 				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
-				vals("message-1001", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1002", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1003", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1004", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1005", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1006", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1007", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1008", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1009", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1010", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1011", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1012", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1013", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1014", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1015", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
-				vals("message-1016", WtMessage.Status.WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+				vals("message-1001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1002", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1003", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1004", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1005", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1006", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1007", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1008", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1009", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1010", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1011", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1012", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1013", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1014", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1015", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-1016", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
 		http.nextResponseJson("{}");
 		http.nextResponseJson("{}");
 
@@ -141,5 +142,64 @@ public class WakefulServiceTest extends AndroidTestCase {
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1015\"}," +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1016\"}" +
 								"],\"updates\":[]}", secondRequest.getBody().readUtf8());
+	}
+
+	@Test
+	public void test_doWakefulWork_shouldStopSendBatchesWhenOneFails() throws Exception {
+		db.insert("wt_message",
+				cols("_id",        "status",                 "last_action", "_from",        "content",    "sms_sent", "sms_received"),
+				vals("message-2001", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2002", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2003", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2004", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2005", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2006", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2007", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2008", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2009", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2010", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2011", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2012", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0),
+				vals("message-2013", WAITING, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0,          0));
+		http.nextResponseError(500);
+
+
+		Intent i = new Intent(getContext(), WakefulIntentService.class);
+		WakefulService wfs = new WakefulService(getContext());
+		wfs.doWakefulWork(i);
+
+
+		db.assertTable("wt_message",
+				"message-2001", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2002", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2003", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2004", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2005", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2006", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2007", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2008", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2009", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2010", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2011", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2012", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER,
+				"message-2013", WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, ANY_NUMBER, ANY_NUMBER);
+
+		int requestCount = http.server.getRequestCount();
+		assertEquals(1, requestCount);
+
+		RecordedRequest request = http.server.takeRequest();
+		String body = request.getBody().readUtf8();
+
+		assertTrue(body.length() > 0);
+		assertTrue(body.contains("message-2001"));
+		assertTrue(body.contains("message-2002"));
+		assertTrue(body.contains("message-2003"));
+		assertTrue(body.contains("message-2004"));
+		assertTrue(body.contains("message-2005"));
+		assertTrue(body.contains("message-2006"));
+		assertTrue(body.contains("message-2007"));
+		assertTrue(body.contains("message-2008"));
+		assertTrue(body.contains("message-2009"));
+		assertTrue(body.contains("message-2010"));
 	}
 }
