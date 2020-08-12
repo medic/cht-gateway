@@ -120,7 +120,7 @@ class WoMessage {
 	 * @return time in milliseconds
 	 */
 	public int calcWaitTimeRetry(int retries) {
-		return (int) ( WAIT_RETRY_SOFT_FAIL * Math.pow(retries, 1.5) );
+		return (int) (WAIT_RETRY_SOFT_FAIL * Math.pow(retries, 1.5));
 	}
 
 	public boolean canRetryAfterSoftFail() {
