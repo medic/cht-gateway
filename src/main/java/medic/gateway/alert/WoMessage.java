@@ -71,8 +71,8 @@ class WoMessage {
 	// Retries is a counter. After a soft fail the WoMessage's status is set to UNSENT, then Gateway will retry to send it.
 	// After limit is reached, WoMessage will hard fail. It can be retried manually later.
 	public final int retries;
-	private static final int MAX_RETRIES_SOFT_FAIL = 20; // Aprox 10H when WAIT_RETRY_SOFT_FAIL is 3min
-	private static final int WAIT_RETRY_SOFT_FAIL = 3 * 60 * 1000; // Milliseconds
+	private static final int MAX_RETRIES_SOFT_FAIL = 20; // Aprox 12H when WAIT_RETRY_SOFT_FAIL is 1min
+	private static final int WAIT_RETRY_SOFT_FAIL = 60 * 1000; // Milliseconds
 
 	public WoMessage(String id, String to, String content) {
 		this.id = id;
@@ -120,7 +120,7 @@ class WoMessage {
 	 * @return time in milliseconds
 	 */
 	public int calcWaitTimeRetry(int retries) {
-		return WAIT_RETRY_SOFT_FAIL * retries;
+		return (int) ( WAIT_RETRY_SOFT_FAIL * Math.pow(retries, 1.5) );
 	}
 
 	public boolean canRetryAfterSoftFail() {

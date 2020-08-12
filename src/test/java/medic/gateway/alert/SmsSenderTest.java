@@ -68,7 +68,7 @@ public class SmsSenderTest {
 	public void sendUnsentSmses_shouldRetryToSendUnsentSmsWhenItsTime() {
 		// given
 		long lastAction = System.currentTimeMillis();
-		long lastActionPast = lastAction - 540000; // 9 min in milliseconds
+		long lastActionPast = lastAction - 180000; // 3 min in milliseconds
 
 		db.insert("wo_message",
 				cols("_id", "status", "failure_reason", "last_action", "_to", "content", "retries"),
