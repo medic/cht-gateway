@@ -31,7 +31,7 @@ import static medic.gateway.alert.DebugUtils.randomSmsContent;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class Db extends SQLiteOpenHelper {
-	private static final int SCHEMA_VERSION = 6;
+	private static final int SCHEMA_VERSION = 7;
 
 	private static final String ALL = null, NO_GROUP = null;
 	private static final String[] NO_ARGS = {};
@@ -148,13 +148,13 @@ public final class Db extends SQLiteOpenHelper {
 				tblWT_MESSAGE, WTM_clmID, WTM_clmSTATUS, WTM_clmLAST_ACTION, WTM_clmFROM, WTM_clmCONTENT, WTM_clmSMS_SENT, WTM_clmSMS_RECEIVED));
 
 		db.execSQL(String.format("CREATE TABLE %s (" +
-					"%s TEXT NOT NULL PRIMARY KEY, " +
-					"%s TEXT NOT NULL, " +
-					"%s TEXT, " +
-					"%s INTEGER NOT NULL, " +
-					"%s TEXT NOT NULL, " +
-					"%s TEXT NOT NULL, " +
-					"%s INTEGER NOT NULL)",
+						"%s TEXT NOT NULL PRIMARY KEY, " +
+						"%s TEXT NOT NULL, " +
+						"%s TEXT, " +
+						"%s INTEGER NOT NULL, " +
+						"%s TEXT NOT NULL, " +
+						"%s TEXT NOT NULL, " +
+						"%s INTEGER NOT NULL DEFAULT(0))",
 				tblWO_MESSAGE, WOM_clmID, WOM_clmSTATUS, WOM_clmFAILURE_REASON, WOM_clmLAST_ACTION, WOM_clmTO, WOM_clmCONTENT, WOM_clmRETRIES));
 
 		migrate_createTable_WoMessageStatusUpdate(db, true);
@@ -162,28 +162,38 @@ public final class Db extends SQLiteOpenHelper {
 		migrate_createTable_WtMessagePart(db, true);
 	}
 
-	public void onUpgrade(SQLiteDatabase db,
-			int oldVersion,
-			int newVersion) {
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
 		trace(this, "onUpgrade() :: oldVersion=%s, newVersion=%s", oldVersion, newVersion);
-		if(oldVersion < 2) {
+
+		if (oldVersion < 2) {
 			migrate_createTable_WoMessageStatusUpdate(db, false);
 		}
-		if(oldVersion < 3) {
+		if (oldVersion < 3) {
 			migrate_create_WOS_clmNEEDS_FORWARDING(db);
 		}
-		if(oldVersion < 4) {
+		if (oldVersion < 4) {
 			migrate_createTable_WtMessageStatusUpdate(db, false);
 		}
-		if(oldVersion < 5) {
+		if (oldVersion < 5) {
 			migrate_create_WTM_clmSMS_SENT__clmSMS_RECEIVED(db);
 		}
-		if(oldVersion < 6) {
+		if (oldVersion < 6) {
 			migrate_createTable_WtMessagePart(db, false);
+		}
+		if (oldVersion < 7) {
+			migrate_addRetriesColumn_WoMessage(db);
 		}
 	}
 
 //> MIGRATIONS
+	static void migrate_addRetriesColumn_WoMessage(SQLiteDatabase db) {
+		trace(db, "onUpgrade() :: migrate_addRetriesColumn_WoMessage()");
+
+		db.execSQL(String.format("ALTER TABLE %s ADD COLUMN %s INTEGER NOT NULL DEFAULT(0)",
+				tblWO_MESSAGE, WOM_clmRETRIES));
+	}
+
 	static void migrate_createTable_WoMessageStatusUpdate(SQLiteDatabase db, boolean isCleanDb) {
 		trace(db, "onUpgrade() :: migrate_createTable_WoMessageStatusUpdate()");
 		db.execSQL(String.format("CREATE TABLE %s (" +

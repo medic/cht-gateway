@@ -801,6 +801,34 @@ public class DbTest {
 
 //> MIGRATION TESTS
 	@Test
+	public void migrate_addRetriesColumn_WoMessage_ShouldAddColumn() {
+		// given: some messages exist
+		DbTestHelper dbHelper = anEmptyDbHelper();
+		dbHelper.raw.execSQL("CREATE TABLE wo_message (" +
+				"'_id' TEXT NOT NULL PRIMARY KEY, " +
+				"'status' TEXT NOT NULL, " +
+				"'failure_reason' TEXT, " +
+				"'last_action' INTEGER NOT NULL, " +
+				"'_to' TEXT NOT NULL, " +
+				"'content' TEXT NOT NULL)");
+
+		dbHelper.insert("wo_message",
+				cols("_id", "status", "failure_reason", "last_action", "_to", "content"),
+				vals("m-1", WoMessage.Status.UNSENT, null, 0, A_PHONE_NUMBER, ""),
+				vals("m-2", WoMessage.Status.PENDING, null, 0, A_PHONE_NUMBER, ""),
+				vals("m-3", WoMessage.Status.SENT, null, 0, A_PHONE_NUMBER, ""));
+
+		// when
+		Db.migrate_addRetriesColumn_WoMessage(dbHelper.raw);
+
+		// then
+		dbHelper.assertTable("wo_message",
+				"m-1", WoMessage.Status.UNSENT, null, ANY_NUMBER, ANY_PHONE_NUMBER, "", 0,
+				"m-2", WoMessage.Status.PENDING, null, ANY_NUMBER, ANY_PHONE_NUMBER, "", 0,
+				"m-3", WoMessage.Status.SENT, null, ANY_NUMBER, ANY_PHONE_NUMBER, "", 0);
+	}
+
+	@Test
 	public void migrate_createTable_WoMessageStatusUpdate_shouldCreateStatusesFromTheWoMessageTable() {
 		// given: some messages exist
 		DbTestHelper dbHelper = anEmptyDbHelper();
