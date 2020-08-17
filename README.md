@@ -267,6 +267,12 @@ TODO walkthrough
 
 TODO walkthrough
 
+## Releasing
+
+1. Create a git tag for the version, eg: `v1.7.4`.
+2. Push the tag to the repo and travis will build and publish the apk to GitHub.
+3. Announce the release on the [CHT forum](https://forum.communityhealthtoolkit.org), under the "Product - Releases" category.
+
 # Android Version Support
 
 ## "Default SMS/Messaging app"
