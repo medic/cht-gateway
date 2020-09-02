@@ -39,7 +39,7 @@ Password: topSecret
 #### Generic-branded gateway
 
 ```
-WebappUrl: https://gateway:topSecret@myproject.some-subdomain.medicmobile.org
+WebappUrl: https://gateway:topSecret@myproject.some-subdomain.medicmobile.org/api/sms
 ```
 
 ### Other
