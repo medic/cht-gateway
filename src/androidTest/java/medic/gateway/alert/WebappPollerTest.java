@@ -75,9 +75,9 @@ public class WebappPollerTest extends AndroidTestCase {
 		String deliveredId = randomUuid();
 		String irrelevantId = randomUuid();
 		db.insert("wo_message",
-				cols("_id",        "status",                   "last_action", "_to",          "content"),
-				vals(deliveredId,  WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT),
-				vals(irrelevantId, WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",        "status",                   "last_action", "_to",          "content", "retries"),
+				vals(deliveredId,  WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0),
+				vals(irrelevantId, WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0));
 		db.insert("wom_status",
 				cols("message_id", "status",                   "timestamp", "needs_forwarding"),
 				vals(deliveredId,  WoMessage.Status.DELIVERED, 0,            true),
@@ -103,8 +103,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		// given
 		String messageId = randomUuid();
 		db.insert("wo_message",
-				cols("_id",     "status",                   "last_action", "_to",          "content"),
-				vals(messageId, WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",     "status",                   "last_action", "_to",          "content", "retries"),
+				vals(messageId, WoMessage.Status.DELIVERED, 0,             A_PHONE_NUMBER, SOME_CONTENT, 0));
 		db.insert("wom_status",
 				cols("message_id", "status",                   "timestamp", "needs_forwarding"),
 				vals(messageId,    WoMessage.Status.DELIVERED, 0,           true));
@@ -117,7 +117,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		http.assertPostRequestMade_withJsonResponse();
 		// and
 		db.assertTable("wo_message",
-				ANY_ID, "DELIVERED", NO_REASON, 0, A_PHONE_NUMBER, SOME_CONTENT);
+				ANY_ID, "DELIVERED", NO_REASON, 0, A_PHONE_NUMBER, SOME_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, messageId, "DELIVERED", NO_REASON, 0, false);
 	}
@@ -127,8 +127,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		// given
 		String messageId = randomUuid();
 		db.insert("wo_message",
-				cols("_id",     "status",                "failure_reason",  "last_action", "_to",          "content"),
-				vals(messageId, WoMessage.Status.FAILED, "something-awful", 0,             A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id",     "status",                "failure_reason",  "last_action", "_to",          "content", "retries"),
+				vals(messageId, WoMessage.Status.FAILED, "something-awful", 0,             A_PHONE_NUMBER, SOME_CONTENT, 0));
 		db.insert("wom_status",
 				cols("message_id", "status",                "failure_reason",  "timestamp", "needs_forwarding"),
 				vals(messageId,    WoMessage.Status.FAILED, "something-awful", 0,           true));
@@ -236,8 +236,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "testing: one",
-				"aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "testing: two");
+				"aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "testing: one", 0,
+				"aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "testing: two", 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, "aaa-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
 				ANY_NUMBER, "aaa-222", "UNSENT", NO_REASON, ANY_NUMBER, false);
@@ -258,7 +258,7 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"abc-123", "UNSENT", NO_REASON, ANY_NUMBER, "+123", "testing: abc");
+				"abc-123", "UNSENT", NO_REASON, ANY_NUMBER, "+123", "testing: abc", 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, "abc-123", "UNSENT", NO_REASON, ANY_NUMBER, false);
 	}
@@ -298,8 +298,8 @@ public class WebappPollerTest extends AndroidTestCase {
 		// then
 		http.assertSinglePostRequestMade();
 		db.assertTable("wo_message",
-				"ok-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "ok: one",
-				"ok-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "ok: two");
+				"ok-111", "UNSENT", NO_REASON, ANY_NUMBER, "+1", "ok: one", 0,
+				"ok-222", "UNSENT", NO_REASON, ANY_NUMBER, "+2", "ok: two", 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, "ok-111", "UNSENT", NO_REASON, ANY_NUMBER, false,
 				ANY_NUMBER, "ok-222", "UNSENT", NO_REASON, ANY_NUMBER, false);

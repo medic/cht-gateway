@@ -54,7 +54,7 @@ public class SmsSender {
 	}
 
 	public void sendUnsentSmses() {
-		List<WoMessage> smsForSending = db.getWoMessages(MAX_WO_MESSAGES, UNSENT);
+		List<WoMessage> smsForSending = this.getUnsentMessages();
 
 		if(smsForSending.isEmpty()) {
 			logEvent(ctx, "No SMS waiting to be sent.");
@@ -179,5 +179,22 @@ public class SmsSender {
 		for(int i=s.length()-1; i>=0; --i)
 			if(s.charAt(i) > 255) return false;
 		return true;
+	}
+
+	private List<WoMessage> getUnsentMessages() {
+		List<WoMessage> unsentSms = db.getWoMessages(MAX_WO_MESSAGES, UNSENT);
+		List<WoMessage> smsForSending = new ArrayList<>();
+
+		for(WoMessage sms : unsentSms) {
+			if (sms.retries > 0) {
+				if (sms.canRetryAfterSoftFail()) {
+					smsForSending.add(sms);
+				}
+			} else {
+				smsForSending.add(sms);
+			}
+		}
+
+		return smsForSending;
 	}
 }

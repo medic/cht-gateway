@@ -67,7 +67,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	public void test_onReceive_shouldUpdateSendStatusOfWoMessage() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, PENDING);
+		aWoMessageIsInDbWith(id, PENDING, 0);
 
 		// when
 		aSendingReportArrivesFor(id);
@@ -77,12 +77,12 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void test_onReceive_GENERIC_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_GENERIC_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, PENDING);
+		aWoMessageIsInDbWith(id, PENDING, 0);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -91,19 +91,19 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "generic; errorCode=99", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,                    ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "generic; errorCode=99", ANY_NUMBER, true);
 	}
 
 	@Test
-	public void test_onReceive_RADIO_OFF_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_RADIO_OFF_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, PENDING);
+		aWoMessageIsInDbWith(id, PENDING, 21); // Hard fail
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 21);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -112,19 +112,40 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "radio-off", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,        ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "radio-off", ANY_NUMBER, true);
 	}
 
 	@Test
-	public void test_onReceive_NO_SERVICE_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_RADIO_OFF_shouldUpdateSendStatusAndRetryAfterSoftFail() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, PENDING);
+		aWoMessageIsInDbWith(id, PENDING, 0);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_RADIO_OFF);
+
+		// then
+		db.assertTable("wo_message",
+				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 1);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,        ANY_NUMBER, false,
+				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
+	}
+
+	@Test
+	public void test_onReceive_NO_SERVICE_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING, 21); // Hard fail
+		db.assertTable("wo_message",
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 21);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -133,19 +154,40 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "no-service", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,         ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "no-service", ANY_NUMBER, true);
 	}
 
 	@Test
-	public void test_onReceive_NULL_PDU_shouldUdpateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+	public void test_onReceive_NO_SERVICE_shouldUpdateSendStatusAndRetryAfterSoftFail() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, PENDING);
+		aWoMessageIsInDbWith(id, PENDING, 0);
 		db.assertTable("wo_message",
-				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_NO_SERVICE);
+
+		// then
+		db.assertTable("wo_message",
+				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 1);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,        ANY_NUMBER, false,
+				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
+	}
+
+	@Test
+	public void test_onReceive_NULL_PDU_shouldUpdateSendStatusAndIncludeErrorCodeInReason() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING, 21); // Hard fail
+		db.assertTable("wo_message",
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 21);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
 
@@ -154,17 +196,59 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 
 		// then
 		db.assertTable("wo_message",
-				id, "FAILED", "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT);
+				id, "FAILED", "null-pdu", ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
 		db.assertTable("wom_status",
 				ANY_NUMBER, id, "PENDING", null,       ANY_NUMBER, false,
 				ANY_NUMBER, id, "FAILED",  "null-pdu", ANY_NUMBER, true);
 	}
 
 	@Test
+	public void test_onReceive_NULL_PDU_shouldUpdateSendStatusAndRetryAfterSoftFail() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING, 0);
+		db.assertTable("wo_message",
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 0);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_NULL_PDU);
+
+		// then
+		db.assertTable("wo_message",
+				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 1);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null,       ANY_NUMBER, false,
+				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
+	}
+
+	@Test
+	public void test_onReceive_NULL_PDU_shouldContinueRetryAfterSoftFail() throws Exception {
+		// given
+		String id = randomUuid();
+		aWoMessageIsInDbWith(id, PENDING, 10);
+		db.assertTable("wo_message",
+				id, "PENDING", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 10);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false);
+
+		// when
+		aSendFailureReportArrivesFor(id, RESULT_ERROR_NULL_PDU);
+
+		// then
+		db.assertTable("wo_message",
+				id, "UNSENT", null, ANY_NUMBER, ANY_PHONE_NUMBER, ANY_CONTENT, 11);
+		db.assertTable("wom_status",
+				ANY_NUMBER, id, "PENDING", null, ANY_NUMBER, false,
+				ANY_NUMBER, id, "UNSENT",  null, ANY_NUMBER, true);
+	}
+
+	@Test
 	public void test_onReceive_shouldUpdateDeliveryStatusOfSentWoMessage() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, SENT);
+		aWoMessageIsInDbWith(id, SENT, 0);
 
 		// when
 		aDeliveryReportArrivesFor(id);
@@ -177,7 +261,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	public void test_onReceive_shouldUpdateDeliveryStatusOfPendingWoMessage() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, PENDING);
+		aWoMessageIsInDbWith(id, PENDING, 0);
 
 		// when
 		aDeliveryReportArrivesFor(id);
@@ -190,7 +274,7 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	public void test_onReceive_shouldNotUpdateStatusOfAlreadyDeliveredMessage() throws Exception {
 		// given
 		String id = randomUuid();
-		aWoMessageIsInDbWith(id, DELIVERED);
+		aWoMessageIsInDbWith(id, DELIVERED, 0);
 
 		// when
 		aSendFailureReportArrivesFor(id);
@@ -237,10 +321,10 @@ public class IntentProcessorInstrumentationTest extends AndroidTestCase {
 	}
 
 //> HELPER METHODS
-	private void aWoMessageIsInDbWith(String id, WoMessage.Status status) {
+	private void aWoMessageIsInDbWith(String id, WoMessage.Status status, int retries) {
 		db.insert("wo_message",
-				cols("_id", "status", "last_action", "_to", "content"),
-				vals(id, status, 0, A_PHONE_NUMBER, SOME_CONTENT));
+				cols("_id", "status", "last_action", "_to", "content", "retries"),
+				vals(id, status, 0, A_PHONE_NUMBER, SOME_CONTENT, retries));
 		db.insert("wom_status",
 				cols("message_id", "status", "timestamp", "needs_forwarding"),
 				vals(id, status, 0, false));

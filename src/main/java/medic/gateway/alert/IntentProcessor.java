@@ -18,6 +18,7 @@ import static medic.gateway.alert.SmsCompatibility.SMS_DELIVER_ACTION;
 import static medic.gateway.alert.SmsCompatibility.SMS_RECEIVED_ACTION;
 import static medic.gateway.alert.WoMessage.Status.PENDING;
 import static medic.gateway.alert.WoMessage.Status.SENT;
+import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
 public class IntentProcessor extends BroadcastReceiver {
 	static final String SENDING_REPORT = "medic.gateway.alert.SENDING_REPORT";
@@ -129,31 +130,47 @@ class SendingReportHandler {
 
 		Db db = Db.getInstance(ctx);
 		WoMessage m = db.getWoMessage(id);
+
 		if(m == null) {
 			logEvent(ctx, "Could not find SMS %s in database for sending report.", id);
 		} else if(resultCode == RESULT_OK) {
 			db.updateStatus(m, PENDING, SENT);
 		} else {
-			String failureReason;
 			switch(resultCode) {
 				case RESULT_ERROR_GENERIC_FAILURE:
-					failureReason = getGenericFailureReason(intent);
+					this.hardFail(db, m, getGenericFailureReason(intent));
 					break;
 				case RESULT_ERROR_NO_SERVICE:
-					failureReason = "no-service";
+					this.softFail(db, m, "no-service");
 					break;
 				case RESULT_ERROR_NULL_PDU:
-					failureReason = "null-pdu";
+					this.softFail(db, m, "null-pdu");
 					break;
 				case RESULT_ERROR_RADIO_OFF:
-					failureReason = "radio-off";
+					this.softFail(db, m, "radio-off");
 					break;
 				default:
-					failureReason = "unknown; resultCode=" + resultCode;
+					this.hardFail(db, m, "unknown; resultCode=" + resultCode);
 			}
-			db.setFailed(m, failureReason);
-			logEvent(ctx, "Sending message to %s failed (cause: %s)", m.to, failureReason);
 		}
+	}
+
+	private void softFail(Db db, WoMessage m, String failureReason) {
+		if (m.isMaxRetriesSoftFail()) {
+			// After limit is reached, WoMessage will hard fail.
+			// It can be retried manually later, if it soft fail again then retry process will restart from 0.
+			this.hardFail(db, m, failureReason);
+		} else {
+			int retries = m.retries + 1;
+			int waitTime = (m.calcWaitTimeRetry(retries) / 60) / 1000; // To minutes
+			db.updateStatus(m, UNSENT, retries);
+			logEvent(ctx, "Sending SMS to %s failed (cause: %s) Retry # %s in %s min", m.to, failureReason, retries, waitTime);
+		}
+	}
+
+	private void hardFail(Db db, WoMessage m, String failureReason) {
+		db.setFailed(m, failureReason);
+		logEvent(ctx, "Sending message to %s failed (cause: %s) Not retrying", m.to, failureReason);
 	}
 
 	private String getGenericFailureReason(Intent intent) {
