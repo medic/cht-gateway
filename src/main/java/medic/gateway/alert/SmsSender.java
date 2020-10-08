@@ -21,7 +21,6 @@ import static medic.gateway.alert.WoMessage.Status.UNSENT;
 
 @SuppressWarnings("PMD.LooseCoupling")
 public class SmsSender {
-	private static final int UNUSED_REQUEST_CODE = 0;
 	private static final int MAX_WO_MESSAGES = 10;
 	private static final String DEFAULT_SMSC = null;
 
@@ -87,14 +86,18 @@ public class SmsSender {
 					int totalParts = parts.size();
 					for(int partIndex=0; partIndex<totalParts; ++partIndex) {
 						String part = parts.get(partIndex);
-						smsManager.sendTextMessage(m.to, DEFAULT_SMSC,
+						smsManager.sendTextMessage(
+								m.to,
+								DEFAULT_SMSC,
 								part,
 								intentFor(SENDING_REPORT, m, partIndex, totalParts),
 								intentFor(DELIVERY_REPORT, m, partIndex, totalParts));
 					}
 				} else {
 					ArrayList<String> parts = smsManager.divideMessage(m.content);
-					smsManager.sendMultipartTextMessage(m.to, DEFAULT_SMSC,
+					smsManager.sendMultipartTextMessage(
+							m.to,
+							DEFAULT_SMSC,
 							parts,
 							intentsFor(SENDING_REPORT, m, parts),
 							intentsFor(DELIVERY_REPORT, m, parts));
@@ -124,12 +127,13 @@ public class SmsSender {
 	}
 
 	private PendingIntent intentFor(String intentType, WoMessage m, int partIndex, int totalParts) {
-		Intent intent = new Intent(intentType);
+		Intent intent = new Intent(ctx, IntentProcessor.class);
+		intent.setAction(intentType);
 		intent.putExtra("id", m.id);
 		intent.putExtra("partIndex", partIndex);
 		intent.putExtra("totalParts", totalParts);
 
-		return PendingIntent.getBroadcast(ctx, UNUSED_REQUEST_CODE, intent, PendingIntent.FLAG_ONE_SHOT);
+		return PendingIntent.getBroadcast(ctx, m.id.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 
 	/**

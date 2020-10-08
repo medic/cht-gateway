@@ -60,8 +60,6 @@
 			<intent-filter android:priority="999">
 				<action android:name="android.provider.Telephony.SMS_DELIVER"/>
 				<action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-				<action android:name="medic.gateway.alert.SENDING_REPORT"/>
-				<action android:name="medic.gateway.alert.DELIVERY_REPORT"/>
 			</intent-filter>
 		</receiver>
 		<!-- Android 4.4+ (kitkat) SMS support -->
