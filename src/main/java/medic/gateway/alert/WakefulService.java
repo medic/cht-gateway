@@ -6,7 +6,6 @@ import android.content.Intent;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 import static medic.gateway.alert.GatewayLog.logException;
-import static medic.gateway.alert.GatewayLog.logEvent;
 
 // TODO: WakefulIntentService is dead and should be replaced with official code in
 //       Android Jetpack. See: https://github.com/commonsguy/cwac-wakeful
@@ -37,13 +36,9 @@ public class WakefulService extends WakefulIntentService {
 			WebappPoller poller;
 			boolean keepPollingWebapp = true;
 
-			logEvent(ctx, "Holaaa will try to poll from webapp again");
-
 			while (keepPollingWebapp) {
 				poller = new WebappPoller(ctx);
 				SimpleResponse lastResponse = poller.pollWebapp();
-
-				logEvent(ctx, "Holaaa done the lastResponse,", lastResponse);
 
 				if (lastResponse == null || lastResponse.isError()) {
 					LastPoll.failed(ctx);
