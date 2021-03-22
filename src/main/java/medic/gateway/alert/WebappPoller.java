@@ -38,7 +38,8 @@ public class WebappPoller {
 
 		request = new GatewayRequest(
 				db.getWtMessages(MAX_WT_MESSAGES, WtMessage.Status.WAITING),
-				db.getWoMessageStatusUpdates(MAX_WOM_STATUS_UPDATES));
+				db.getWoMessageStatusUpdates(MAX_WOM_STATUS_UPDATES)
+		);
 
 		webappUrl = Settings.in(ctx).webappUrl;
 	}
@@ -48,11 +49,14 @@ public class WebappPoller {
 		logEvent(ctx, "Polling webapp (forwarding %d messages & %d status updates)...",
 				request.wtMessageCount(), request.statusUpdateCount());
 
-		SimpleResponse response = new SimpleJsonClient2().post(
-				uriEncodeAuth(webappUrl), request.getJson());
-		if(DEBUG) log(response.toString());
+		SimpleResponse response = new SimpleJsonClient2()
+				.post(uriEncodeAuth(webappUrl), request.getJson());
 
-		if(response.isError()) {
+		if (DEBUG) {
+			log(response.toString());
+		}
+
+		if (response.isError()) {
 			handleError(response);
 		} else {
 			handleOkResponse(request, ((JsonResponse) response).json);
@@ -61,30 +65,33 @@ public class WebappPoller {
 		return response;
 	}
 
-	public Boolean moreMessagesToSend() {
-		return request.wtMessageCount() == MAX_WT_MESSAGES ||
-					request.statusUpdateCount() == MAX_WOM_STATUS_UPDATES;
+	public Boolean moreMessagesToSend(SimpleResponse lastResponse) {
+		if (lastResponse == null || lastResponse.isError()) {
+			return false;
+		}
+
+		return request.wtMessageCount() == MAX_WT_MESSAGES || request.statusUpdateCount() == MAX_WOM_STATUS_UPDATES;
 	}
 
 //> PRIVATE HELPERS
 	private void handleOkResponse(GatewayRequest request, JSONObject response) throws JSONException {
-		for(WtMessage m : request.messages) {
+		for (WtMessage m : request.messages) {
 			try {
 				db.updateStatusFrom(WtMessage.Status.WAITING, m);
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				logException(ctx, ex, "WebappPoller::Error updating WT message %s status: %s", m.id, ex.getMessage());
 			}
 		}
 
-		for(WoMessage.StatusUpdate u : request.statusUpdates) {
+		for (WoMessage.StatusUpdate u : request.statusUpdates) {
 			try {
 				db.setStatusForwarded(u);
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				logException(ctx, ex, "WebappPoller::Error updating WO message status %s as forwarded: %s", u, ex.getMessage());
 			}
 		}
 
-		if(response.isNull("messages")) {
+		if (response.isNull("messages")) {
 			return;
 		}
 
@@ -92,10 +99,10 @@ public class WebappPoller {
 
 		logEvent(ctx, "Received %d SMS from server for sending.", messages.length());
 
-		for(int i=0; i<messages.length(); ++i) {
+		for (int i=0; i < messages.length(); ++i) {
 			try {
 				saveMessage(messages.getJSONObject(i));
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				logException(ex, "WebappPoller.handleOkResponse()");
 			}
 		}
@@ -104,15 +111,19 @@ public class WebappPoller {
 	private void handleError(SimpleResponse response) throws JSONException {
 		CharSequence description = "unknown";
 
-		if(response instanceof JsonResponse) {
+		if (response instanceof JsonResponse) {
 			JsonResponse jsonResponse = (JsonResponse) response;
-			if(jsonResponse.json.has("message")) description = jsonResponse.json.getString("message");
-		} else if(response instanceof ExceptionResponse) {
+
+			if (jsonResponse.json.has("message")) {
+				description = jsonResponse.json.getString("message");
+			}
+
+		} else if (response instanceof ExceptionResponse) {
 			description = ((ExceptionResponse) response).ex.toString();
-		} else if(response instanceof TextResponse) {
+
+		} else if (response instanceof TextResponse) {
 			description = ((TextResponse) response).text;
 		}
-
 
 		logEvent(ctx, "Received error from server: %s: %s", response.status, description);
 	}
@@ -122,9 +133,14 @@ public class WebappPoller {
 		WoMessage m = new WoMessage(
 				json.getString("id"),
 				normalisePhoneNumber(json.getString("to")),
-				json.getString("content"));
+				json.getString("content")
+		);
+
 		boolean success = db.store(m);
-		if(!success) logEvent(ctx, "Failed to save WO message: %s", json);
+
+		if (!success) {
+			logEvent(ctx, "Failed to save WO message: %s", json);
+		}
 	}
 
 	private void log(String message, Object...extras) {
@@ -154,7 +170,7 @@ class GatewayRequest {
 	private JSONArray getMessagesJson() {
 		JSONArray json = new JSONArray();
 
-		for(WtMessage m : messages) {
+		for (WtMessage m : messages) {
 			try {
 				json.put(json(
 					"id", m.id,
@@ -164,7 +180,7 @@ class GatewayRequest {
 					"sms_received", m.smsReceived
 				));
 				m.setStatus(WtMessage.Status.FORWARDED);
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				logException(ex, "GatewayRequest.getMessagesJson()");
 				m.setStatus(WtMessage.Status.FAILED);
 			}
@@ -176,17 +192,17 @@ class GatewayRequest {
 	private JSONArray getStatusUpdateJson() {
 		JSONArray json = new JSONArray();
 
-		for(WoMessage.StatusUpdate u : statusUpdates) {
+		for (WoMessage.StatusUpdate u : statusUpdates) {
 			try {
 				JSONObject deliveryUpdate = json(
 					"id", u.messageId,
 					"status", u.newStatus.toString()
 				);
-				if(u.newStatus == WoMessage.Status.FAILED) {
+				if (u.newStatus == WoMessage.Status.FAILED) {
 					deliveryUpdate.put("reason", u.failureReason);
 				}
 				json.put(deliveryUpdate);
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				logException(ex, "GatewayRequest.getStatusUpdateJson()");
 			}
 		}
@@ -221,7 +237,7 @@ class LastPoll {
 	static LastPoll getFrom(Context ctx) {
 		SharedPreferences prefs = prefs(ctx);
 
-		if(!prefs.contains(PREF_LAST_TIMESTAMP) || !prefs.contains(PREF_LAST_WAS_SUCCESSFUL)) {
+		if (!prefs.contains(PREF_LAST_TIMESTAMP) || !prefs.contains(PREF_LAST_WAS_SUCCESSFUL)) {
 			return null;
 		} else {
 			return new LastPoll(prefs.getLong(PREF_LAST_TIMESTAMP, 0),
