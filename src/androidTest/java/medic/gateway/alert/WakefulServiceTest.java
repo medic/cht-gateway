@@ -162,7 +162,6 @@ public class WakefulServiceTest extends AndroidTestCase {
 				vals("message-1012", WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT, 0, 0),
 				vals("message-1013", WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT, 0, 0));
 		http.nextResponseError(500);
-		http.nextResponseJson("{}");
 
 
 		// when
