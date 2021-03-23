@@ -161,12 +161,15 @@ public class WakefulServiceTest extends AndroidTestCase {
 				vals("message-1011", WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT, 0, 0),
 				vals("message-1012", WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT, 0, 0),
 				vals("message-1013", WtMessage.Status.WAITING, 0, A_PHONE_NUMBER, SOME_CONTENT, 0, 0));
-		http.nextResponseError(500);
+		http.nextResponseJson("{}");
+		http.nextResponseJson("{}");
+
 
 		// when
 		Intent i = new Intent(getContext(), WakefulIntentService.class);
 		WakefulService wfs = new WakefulService(getContext());
 		wfs.doWakefulWork(i);
+
 
 		//then
 		db.assertTable("wt_message",
@@ -184,12 +187,6 @@ public class WakefulServiceTest extends AndroidTestCase {
 				"message-1012", WtMessage.Status.WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, 0, 0,
 				"message-1013", WtMessage.Status.WAITING, ANY_NUMBER, A_PHONE_NUMBER, SOME_CONTENT, 0, 0);
 
-		int requestCount = http.server.getRequestCount();
-		assertEquals(0, requestCount);
-
-		http.assertSinglePostRequestMade();
-
-/*
 		RecordedRequest request = http.server.takeRequest();
 		assertEquals("{\"messages\":[" +
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1001\"}," +
@@ -204,6 +201,6 @@ public class WakefulServiceTest extends AndroidTestCase {
 								"{\"sms_received\":0,\"sms_sent\":0,\"content\":\"Hello.\",\"from\":\"+447890123123\",\"id\":\"message-1010\"}" +
 								"],\"updates\":[]}", request.getBody().readUtf8());
 
-*/
+
 	}
 }
