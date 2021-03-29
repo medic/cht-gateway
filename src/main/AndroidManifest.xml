@@ -16,10 +16,6 @@
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
 
-	<!-- Wifi management permissions -->
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
 	<!-- File permissions for log of unprocessed WT messages.  READ is implied by WRITE. -->
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
