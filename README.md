@@ -322,7 +322,7 @@ Since Android 6.0 (marshmallow), permissions for sending and receiving SMS must 
 
 ## Copyright
 
-Copyright 2013-2020 Medic Mobile, Inc. <hello@medicmobile.org>
+Copyright 2013-2021 Medic Mobile, Inc. <hello@medicmobile.org>
 
 ## License
 
