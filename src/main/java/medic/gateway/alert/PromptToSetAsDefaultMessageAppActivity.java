@@ -2,20 +2,21 @@ package medic.gateway.alert;
 
 import android.app.Activity;
 import android.annotation.TargetApi;
+import android.app.role.RoleManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony.Sms.Intents;
 import android.view.View;
 
-import static medic.gateway.alert.GatewayLog.logEvent;
 import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.getAppName;
 import static medic.gateway.alert.Utils.setText;
 
 @TargetApi(19)
 public class PromptToSetAsDefaultMessageAppActivity extends Activity {
-	private static final int REQUEST_CHANGE_DEFAULT_MESSAGING_APP = 1;
 
+	private static final int REQUEST_CHANGE_DEFAULT_MESSAGING_APP = 1;
 	private final Capabilities app;
 
 	public PromptToSetAsDefaultMessageAppActivity() {
@@ -25,28 +26,21 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 	}
 
 //> EVENT HANDLERS
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		log("Starting...");
 
-		String currentDefaultSmsApp = android.provider.Settings.Secure.getString(getContentResolver(),
-				// this string is copied from android.provider.Settings.Secure.SMS_DEFAULT_APPLICATION
-				// because directly referencing this constant throws a compile error, presumably
-				// because of legacy support.
-				"sms_default_application");
-		log("Current default SMS app is %s", currentDefaultSmsApp);
+	protected void onCreate(Bundle savedInstanceState) {
+		log("Starting view for PromptToSetAsDefaultMessageAppActivity...");
+
+		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.set_as_default_messaging_app);
-
 		String appName = getAppName(this);
 		setText(this, R.id.txtDefaultMessageAppWarning, R.string.txtDefaultMessageAppWarning, appName);
 		setText(this, R.id.txtDefaultMessageAppPrompt, R.string.txtDefaultMessageAppPrompt, appName);
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
+		switch (requestCode) {
 			case REQUEST_CHANGE_DEFAULT_MESSAGING_APP:
-				logEvent(this, "onActivityResult() :: returned from SMS app settings.  resultCode=%s, data=%s", resultCode, data);
 				// we should now know if we're the default SMS app from the value of
 				// resultCode, but it seems a little odd to trust that result when we
 				// can just check a method.
@@ -54,23 +48,50 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 					continueToSettings();
 				}
 				break;
-			default: trace(this, "onActivityResult() :: No handling for requestCode: %s", requestCode);
+			default:
+				log("PromptToSetAsDefaultMessageAppActivity :: onActivityResult() :: No handling for requestCode: %s", requestCode);
 		}
 	}
 
 //> CUSTOM EVENT HANDLERS
-	public void dismissActivity(View v) {
+
+	public void dismissActivity(View view) {
 		continueToSettings();
 	}
 
-	public void openDefaultMessageAppSettings(View v) {
-		Intent i = new Intent(Intents.ACTION_CHANGE_DEFAULT);
-		i.putExtra(Intents.EXTRA_PACKAGE_NAME, getPackageName());
-		startActivityForResult(i, REQUEST_CHANGE_DEFAULT_MESSAGING_APP);
+	public void openDefaultMessageAppSettings(View view) {
+		log("Trying to open SMS Dialog requesting default app. SDK: %s", Build.VERSION.SDK_INT);
+
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+			// For SDK 28 or earlier
+			Intent intent = new Intent(Intents.ACTION_CHANGE_DEFAULT)
+					.putExtra(Intents.EXTRA_PACKAGE_NAME, getPackageName());
+			startActivityForResult(intent, REQUEST_CHANGE_DEFAULT_MESSAGING_APP);
+			return;
+		}
+
+		// For SDK 29+
+		RoleManager roleManager = getSystemService(RoleManager.class);
+
+		if (!roleManager.isRoleAvailable(RoleManager.ROLE_SMS)) {
+			log("SMS Role is not available in the system. Check the phone settings.");
+			return;
+		}
+
+
+		if (roleManager.isRoleHeld(RoleManager.ROLE_SMS)) {
+			log("Gateway is already the default app for SMS.");
+			return;
+		}
+
+		Intent intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS);
+		startActivityForResult(intent, REQUEST_CHANGE_DEFAULT_MESSAGING_APP);
 	}
 
 //> PRIVATE HELPERS
+
 	private void continueToSettings() {
+		log("Navigating to Settings View.");
 		startActivity(new Intent(this, SettingsDialogActivity.class));
 		finish();
 	}
