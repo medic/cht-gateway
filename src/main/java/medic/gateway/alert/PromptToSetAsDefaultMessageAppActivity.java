@@ -1,7 +1,8 @@
 package medic.gateway.alert;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.role.RoleManager;
 import android.content.Intent;
 import android.os.Build;
@@ -13,7 +14,6 @@ import static medic.gateway.alert.GatewayLog.trace;
 import static medic.gateway.alert.Utils.getAppName;
 import static medic.gateway.alert.Utils.setText;
 
-@TargetApi(19)
 public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 
 	private static final int REQUEST_CHANGE_DEFAULT_MESSAGING_APP = 1;
@@ -28,9 +28,8 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 //> EVENT HANDLERS
 
 	protected void onCreate(Bundle savedInstanceState) {
-		log("Starting view for PromptToSetAsDefaultMessageAppActivity...");
-
 		super.onCreate(savedInstanceState);
+		log("Starting view for PromptToSetAsDefaultMessageAppActivity...");
 
 		setContentView(R.layout.set_as_default_messaging_app);
 		String appName = getAppName(this);
@@ -59,18 +58,27 @@ public class PromptToSetAsDefaultMessageAppActivity extends Activity {
 		continueToSettings();
 	}
 
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	@SuppressLint({"ObsoleteSdkInt", "InlinedApi"})
 	public void openDefaultMessageAppSettings(View view) {
 		log("Trying to open SMS Dialog requesting default app. SDK: %s", Build.VERSION.SDK_INT);
 
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-			// For SDK 28 or earlier
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			startIntentToSetSMSRoleHolder();
+			return;
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			Intent intent = new Intent(Intents.ACTION_CHANGE_DEFAULT)
 					.putExtra(Intents.EXTRA_PACKAGE_NAME, getPackageName());
 			startActivityForResult(intent, REQUEST_CHANGE_DEFAULT_MESSAGING_APP);
 			return;
 		}
+	}
 
-		// For SDK 29+
+	@TargetApi(Build.VERSION_CODES.Q)
+	@SuppressLint({"ObsoleteSdkInt", "InlinedApi"})
+	void startIntentToSetSMSRoleHolder() {
 		RoleManager roleManager = getSystemService(RoleManager.class);
 
 		if (!roleManager.isRoleAvailable(RoleManager.ROLE_SMS)) {
