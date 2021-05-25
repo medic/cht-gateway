@@ -16,7 +16,7 @@ For each device, please fill in a column of the **Device(s) tested** table.
 
 key | value(s)
 ---|---
-medic-gateway version | _e.g. 0.1.2_
+cht-gateway version | _e.g. 0.1.2_
 device make | _e.g. Nokia_
 device model | _e.g. 5110_
 can the problem be recreated on this device? | _yes or no_

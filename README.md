@@ -1,16 +1,16 @@
-`medic-gateway`
+`CHT-gateway`
 ===============
 
-<a href="https://travis-ci.org/medic/medic-gateway"><img src="https://travis-ci.org/medic/medic-gateway.svg?branch=master"/></a>
+<a href="https://travis-ci.org/medic/cht-gateway"><img src="https://travis-ci.org/medic/cht-gateway.svg?branch=master"/></a>
 
-Download APKs from: https://github.com/medic/medic-gateway/releases
+Download APKs from: https://github.com/medic/cht-gateway/releases
 
 -----
 
 An SMS gateway for Android.  Send and receive SMS from your webapp via an Android phone.
 
 	+--------+                 +-----------+
-	|  web   |                 |  medic-   | <-------- SMS
+	|  web   |                 |  cht-     | <-------- SMS
 	| server | <---- HTTP ---- |  gateway  |
 	|        |                 | (android) | --------> SMS
 	+--------+                 +-----------+
@@ -19,13 +19,13 @@ An SMS gateway for Android.  Send and receive SMS from your webapp via an Androi
 
 ## Installation
 
-Install the latest APK from https://github.com/medic/medic-gateway/releases.
+Install the latest APK from https://github.com/medic/cht-gateway/releases.
 
 ## Configuration
 
 ### Medic Mobile
 
-If you're configuring `medic-gateway` for use with hosted [`medic-webapp`](https://github.com/medic/medic-webapp), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `gateway` and a password of `topSecret`, fill in the settings as follows:
+If you're configuring `cht-gateway` for use with hosted [`CHT-Core`](https://github.com/medic/cht-core), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `gateway` and a password of `topSecret`, fill in the settings as follows:
 
 #### Medic-branded gateway
 
@@ -48,7 +48,7 @@ If you're configuring `medic-gateway` for use with other services, you will need
 
 ### CDMA Compatibility Mode
 
-Some CDMA networks have limited support for multipart SMS messages.  This can occur within the same network, or only when sending SMS from a GSM network to a CDMA network.  Check this box if `medic-gateway` is running on a GSM network and:
+Some CDMA networks have limited support for multipart SMS messages.  This can occur within the same network, or only when sending SMS from a GSM network to a CDMA network.  Check this box if `cht-gateway` is running on a GSM network and:
 
 * multipart messages sent to CDMA phones never arrive; or
 * multipart messages sent to CDMA phones are truncated
@@ -59,7 +59,7 @@ When using HTTP Basic Auth with gateway, all characters in the password must be 
 
 # API
 
-This is the API specification for communications between `medic-gateway` and a web server.  Messages in both directions are `application/json`.
+This is the API specification for communications between `cht-gateway` and a web server.  Messages in both directions are `application/json`.
 
 Where a list of values is expected but there are no values provided, it is acceptable to:
 
@@ -67,7 +67,7 @@ Where a list of values is expected but there are no values provided, it is accep
 * provide an empty array (`[]`); or
 * omit the field completely
 
-Bar array behaviour specified above, `medic-gateway` _must_ include fields specified in this document, and the web server _must_ include all expected fields in its responses.  Either party _may_ include extra fields as they see fit.
+Bar array behaviour specified above, `cht-gateway` _must_ include fields specified in this document, and the web server _must_ include all expected fields in its responses.  Either party _may_ include extra fields as they see fit.
 
 ## Idempotence
 

@@ -78,7 +78,7 @@ public class IntentProcessor extends BroadcastReceiver {
 
 		// android >= 1.6 && android < 4.4: SMS_RECEIVED_ACTION is an
 		// ordered broadcast, so if we cancel it then it should never
-		// reach the inbox.  On 4.4+, either (a) medic-gateway is the
+		// reach the inbox.  On 4.4+, either (a) cht-gateway is the
 		// default SMS app, so the SMS will never reach the standard
 		// inbox, or (b) it is _not_ the default SMS app, in which case
 		// there is no way to delete the message.

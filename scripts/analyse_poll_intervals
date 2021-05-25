@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * Analyse poll requests from the demo server to see if medic-gateway is waking
+ * Analyse poll requests from the demo server to see if cht-gateway is waking
  * up as expected on a particular device.
  *
  * Use:
