@@ -190,7 +190,7 @@ public class ExternalLogTest extends AndroidTestCase {
 
 //> PRIVATE HELPERS
 	private File logFile() {
-		return new File(new File(Environment.getExternalStorageDirectory(), "Documents"), ".medic-gateway.json.log");
+		return new File(new File(Environment.getExternalStorageDirectory(), "Documents"), ".cht-gateway.json.log");
 	}
 
 	private void removeLogFile() {

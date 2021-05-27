@@ -114,7 +114,7 @@ android {
 	}
 
 	applicationVariants.all {
-		buildConfigField "String", "LOG_TAG", '"MedicGateway"'
+		buildConfigField "String", "LOG_TAG", '"CHTGateway"'
 		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
 
 		buildConfigField "boolean", "TRAVIS", "Boolean.parseBoolean(\"${System.env.TRAVIS}\")";
