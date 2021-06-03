@@ -19,7 +19,7 @@ An SMS gateway for Android.  Send and receive SMS from your webapp via an Androi
 
 ## Installation
 
-Install the latest APK from https://github.com/medic/cht-gateway/releases.
+Install the latest APK from https://github.com/medic/cht-gateway/releases .
 
 ## Configuration
 
