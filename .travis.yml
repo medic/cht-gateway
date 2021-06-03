@@ -44,5 +44,5 @@ deploy:
   file: ./build/outputs/apk/**/release/*.apk
   on:
     tags: true
-    repo: medic/medic-gateway
+    repo: medic/cht-gateway
     branch: master

@@ -5,9 +5,9 @@ import static medic.gateway.alert.GatewayLog.trace;
 /**
  * WoMessage - Webapp-Originating Messages
  *
- * These are messages which originate at the webapp which medic-gateway is
+ * These are messages which originate at the webapp which cht-gateway is
  * acting as SMS gateway for... or occasionally they may actually originate from
- * medic-gateway itself, when medic-gateway is acting as the default messaging
+ * cht-gateway itself, when cht-gateway is acting as the default messaging
  * app on the device.
  */
 class WoMessage {

@@ -1,7 +1,7 @@
 {
   "name": "gateway-demo-server",
   "version": "1.0.0",
-  "description": "A demo server to interact with medic-gateway's JSON API.",
+  "description": "A demo server to interact with cht-gateway's JSON API.",
   "main": "demo-server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -47,7 +47,7 @@ class ExternalLog {
 			if(!dirCreated && !directory.exists())
 				warn("Failed to create directory for saving external logfile at %s.  External logging probably won't work.", directory.getAbsolutePath());
 
-			File f = new File(directory, ".medic-gateway.json.log");
+			File f = new File(directory, ".cht-gateway.json.log");
 			_instance = new ExternalLog(f);
 		}
 		return _instance;

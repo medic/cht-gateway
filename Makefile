@@ -17,7 +17,7 @@ default:
 all: clean build-all deploy-all
 
 force: build uninstall
-	adb install -r build/outputs/apk/medic-gateway-SNAPSHOT-medic-debug.apk
+	adb install -r build/outputs/apk/cht-gateway-SNAPSHOT-medic-debug.apk
 
 build:
 	${GRADLEW} assembleMedicDebug
@@ -39,7 +39,7 @@ emulator:
 	${ADB} wait-for-device
 
 logs:
-	${ADB} logcat MedicGateway:V AndroidRuntime:E '*:S' | tee android.log
+	${ADB} logcat CHTGateway:V AndroidRuntime:E '*:S' | tee android.log
 
 deploy:
 	${GRADLEW} installMedicDebug

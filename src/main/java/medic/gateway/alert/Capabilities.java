@@ -27,7 +27,7 @@ public class Capabilities {
 	}
 
 	/**
-	 * Check if medic-gateway can be the default messaging app on this device.
+	 * Check if cht-gateway can be the default messaging app on this device.
 	 * This feature is only available on Android 4.4 (kitkat®) or later.
 	 */
 	@SuppressLint("ObsoleteSdkInt") // lint seems to think checking for > KITKAT is unnecessary: "Error: Unnecessary; SDK_INT is never < 16", but I think KITKAT is version 19 or 20
