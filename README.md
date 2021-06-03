@@ -1,4 +1,4 @@
-`CHT-gateway`
+`CHT Gateway App`
 ===============
 
 <a href="https://travis-ci.org/medic/cht-gateway"><img src="https://travis-ci.org/medic/cht-gateway.svg?branch=master"/></a>
