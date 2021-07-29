@@ -23,7 +23,7 @@ Install the latest APK from https://github.com/medic/cht-gateway/releases.
 
 ## Configuration
 
-### Medic Mobile
+### CHT
 
 If you're configuring `cht-gateway` for use with hosted [`CHT-Core`](https://github.com/medic/cht-core), with a URL of e.g. `https://myproject.dev.medicmobile.org` and a username of `gateway` and a password of `topSecret`, fill in the settings as follows:
 
