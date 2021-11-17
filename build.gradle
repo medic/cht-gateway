@@ -6,10 +6,10 @@ buildscript {
 		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.2.0', {
+		classpath 'com.android.tools.build:gradle:4.1.3', {
 			exclude module: 'xmlpull'
 		}
-		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e', {
+		classpath 'com.noveogroup.android:check:1.2.5', {
 			exclude module: 'xmlpull'
 		}
 		classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
@@ -95,7 +95,7 @@ def getVersionName = {
 
 android {
 	compileSdkVersion 30
-	buildToolsVersion '30.0.0'
+	buildToolsVersion '30.0.3'
 
 	packagingOptions {
 		exclude 'META-INF/LICENSE'
