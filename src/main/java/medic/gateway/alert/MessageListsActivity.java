@@ -187,7 +187,7 @@ public class MessageListsActivity extends TabActivity {
 			super(a);
 		}
 
-		protected Integer doInBackground(String..._) {
+		protected Integer doInBackground(String... s) {
 			try {
 				MessageListsActivity ctx = getRequiredCtx("DeleteTask.doInBackground()");
 				return Db.getInstance(ctx).deleteOldData();
