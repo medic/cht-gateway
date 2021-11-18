@@ -214,7 +214,7 @@ Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERRO
 
 ### `cht-gateway`
 
-- JDK 8 is strongly recommended. Later JDKs will build the app but tests will fail to run with a reflection error.
+- JDK 11.
 - The Android SDK and relevant libraries. Check `build.gradle`'s `compileSdkVersion` parameter for which one need to be installed
 - Either a physical or emulated device running Lolipop (AKA Android 5.1 AKA api 22). Later android versions may cause end to end tests to fail
 
