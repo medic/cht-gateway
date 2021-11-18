@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -93,6 +94,7 @@ public class MessageListsActivity extends TabActivity {
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.mnuMessageStats:

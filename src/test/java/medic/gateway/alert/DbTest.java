@@ -91,9 +91,18 @@ public class DbTest {
 		db.updateStatusFrom(WtMessage.Status.WAITING, messageWithUpdatedStatus);
 
 		// then
-		Cursor c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
-		assertEquals("FORWARDED", c.getString(0));
-		assertEquals(0, c.getLong(1));
+		Cursor c = null;
+		try {
+			c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
+			assertEquals("FORWARDED", c.getString(0));
+			assertEquals(0, c.getLong(1));
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+		}
 	}
 
 	@Test
@@ -109,9 +118,18 @@ public class DbTest {
 		db.updateStatusFrom(WtMessage.Status.WAITING, messageWithUpdatedStatus);
 
 		// then
-		Cursor c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
-		assertEquals("FORWARDED", c.getString(0));
-		assertNotEquals(0, c.getLong(1));
+		Cursor c = null;
+		try {
+			c = dbHelper.selectById("wt_message", cols("status", "last_action"), id);
+			assertEquals("FORWARDED", c.getString(0));
+			assertNotEquals(0, c.getLong(1));
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+		}
 	}
 
 //> WtMessage.StatusUpdate TESTS
@@ -449,9 +467,18 @@ public class DbTest {
 		db.updateStatus(messageWithUpdatedStatus, WoMessage.Status.PENDING, WoMessage.Status.DELIVERED);
 
 		// then
-		Cursor c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
-		assertEquals("FAILED", c.getString(0));
-		assertEquals(0, c.getLong(1));
+		Cursor c = null;
+		try {
+			c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
+			assertEquals("FAILED", c.getString(0));
+			assertEquals(0, c.getLong(1));
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+		}
 	}
 
 	@Test
@@ -470,9 +497,18 @@ public class DbTest {
 		db.updateStatus(messageWithUpdatedStatus, WoMessage.Status.PENDING, WoMessage.Status.DELIVERED);
 
 		// then
-		Cursor c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
-		assertEquals("DELIVERED", c.getString(0));
-		assertNotEquals(0, c.getLong(1));
+		Cursor c = null;
+		try {
+			c = dbHelper.selectById("wo_message", cols("status", "last_action"), id);
+			assertEquals("DELIVERED", c.getString(0));
+			assertNotEquals(0, c.getLong(1));
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+		}
 	}
 
 //> WoMessage.StatusUpdate TESTS

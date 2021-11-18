@@ -6,13 +6,13 @@ buildscript {
 		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:7.0.3', {
-			exclude module: 'xmlpull'
-		}
+		classpath 'com.android.tools.build:gradle:7.0.3'
 		classpath 'com.noveogroup.android:check:1.2.5', {
+			exclude module: 'checkstyle'
 			exclude module: 'xmlpull'
 		}
-		classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
+		classpath 'com.puppycrawl.tools:checkstyle:7.8.1'
+		classpath 'com.github.bjoernq:unmockplugin:0.7.9'
 	}
 }
 apply plugin: 'com.android.application'
@@ -32,7 +32,6 @@ gradle.projectsEvaluated {
 repositories {
 	maven { url "${System.env.ANDROID_HOME}/extras/android/m2repository/" }
 	mavenCentral()
-	jcenter()
 	maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
 	google()
 }
@@ -171,7 +170,9 @@ android {
 		lintConfig = new File('config/lint.xml')
 
 		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
-		disable 'GradleDependency' // TODO update to latest support-v4 lib and re-enable this rule
+		disable 'GradleDependency'
+		disable 'JcenterRepositoryObsolete'
+		disable 'RtlHardcoded'
 
 		warningsAsErrors true
 		// abortOnError false

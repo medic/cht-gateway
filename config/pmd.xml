@@ -4,16 +4,19 @@
 PMD Configuration
 Severity: HARD
 -->
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="ruleset"
-	xmlns="http://pmd.sf.net/ruleset/1.0.0"
-	xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd"
-	xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd">
+<ruleset name="PMD ruleset for Checkstyle"
+	xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+                             http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
 	<description>POM rule set file</description>
 
 	<rule ref="rulesets/java/android.xml"/>
 
-	<rule ref="rulesets/java/basic.xml"/>
+	<rule ref="rulesets/java/basic.xml">
+		<exclude name="SimplifiedTernary" />
+	</rule>
 
 	<rule ref="rulesets/java/clone.xml"/>
 
@@ -32,6 +35,7 @@ Severity: HARD
 	<rule ref="rulesets/java/comments.xml">
 		<exclude name="CommentRequired"/>
 		<exclude name="CommentSize"/>
+		<exclude name="CommentDefaultAccessModifier" />
 	</rule>
 
 	<rule ref="rulesets/java/controversial.xml">
@@ -61,6 +65,7 @@ Severity: HARD
 		<exclude name="ConstructorCallsOverridableMethod"/>
 		<exclude name="MissingBreakInSwitch"/>
 		<exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
+		<exclude name="AccessorMethodGeneration" />
 	</rule>
 
 	<rule ref="rulesets/java/empty.xml"/>
@@ -74,6 +79,7 @@ Severity: HARD
 	<rule ref="rulesets/java/junit.xml">
 		<exclude name="JUnitAssertionsShouldIncludeMessage"/>
 		<exclude name="JUnitTestContainsTooManyAsserts"/>
+		<exclude name="JUnitTestsShouldIncludeAssert" />
 	</rule>
 
 	<rule ref="rulesets/java/logging-jakarta-commons.xml">
@@ -112,7 +118,9 @@ Severity: HARD
 		<exclude name="LooseCoupling"/>
 	</rule>
 
-	<rule ref="rulesets/java/unnecessary.xml"/>
+	<rule ref="rulesets/java/unnecessary.xml">
+		<exclude name="UselessQualifiedThis" />
+	</rule>
 
 	<rule ref="rulesets/java/unusedcode.xml"/>
 
