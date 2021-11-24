@@ -1,8 +1,8 @@
 package medic.gateway.alert;
 
-import android.support.test.espresso.*;
-import android.support.test.rule.*;
-import android.support.test.runner.*;
+import androidx.test.espresso.*;
+import androidx.test.rule.*;
+import androidx.test.ext.junit.runners.*;
 import android.view.*;
 import android.widget.*;
 
@@ -13,17 +13,15 @@ import medic.gateway.alert.test.*;
 import org.junit.*;
 import org.junit.runner.*;
 
-import static android.support.test.InstrumentationRegistry.*;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.*;
-import static android.support.test.espresso.assertion.ViewAssertions.*;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static androidx.test.InstrumentationRegistry.*;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.*;
+import static androidx.test.espresso.assertion.ViewAssertions.*;
+import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.R.*;
-import static medic.gateway.alert.test.DbTestHelper.*;
-import static medic.gateway.alert.test.TestUtils.*;
 import static medic.gateway.alert.test.InstrumentationTestUtils.*;
 
 @RunWith(AndroidJUnit4.class)

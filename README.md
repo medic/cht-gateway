@@ -214,9 +214,7 @@ Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERRO
 
 ### `cht-gateway`
 
-- JDK 11.
-- The Android SDK and relevant libraries. Check `build.gradle`'s `compileSdkVersion` parameter for which one need to be installed
-- Either a physical or emulated device running Lolipop (AKA Android 5.1 AKA api 22). Later android versions may cause end to end tests to fail
+Development guides are available in the "Android" section of the [Community Health Toolkit Docs Site](https://docs.communityhealthtoolkit.org/core/guides/android/). You will find instructions of how to setup your development environment, build and test new features, creates new branded apps, release, publish... and so on.
 
 ### `demo-server`
 

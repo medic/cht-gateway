@@ -2,7 +2,7 @@ package medic.gateway.alert.test;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 
 import java.util.Iterator;
 
@@ -10,7 +10,7 @@ import medic.gateway.alert.*;
 
 import org.json.*;
 
-import static android.support.test.InstrumentationRegistry.*;
+import static androidx.test.InstrumentationRegistry.*;
 import static org.junit.Assert.*;
 
 public final class InstrumentationTestUtils {
