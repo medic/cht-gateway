@@ -24,12 +24,17 @@ build:
 build-all:
 	${GRADLEW} assembleDebug
 
+assemble-release:
+	${GRADLEW} assembleRelease
+
 clean:
 	rm -rf src/main/assets/
 	rm -rf build/
 
 test:
-	${GRADLEW} clean check test
+	IS_GENERIC_FLAVOUR=false \
+	IS_MEDIC_FLAVOUR=true \
+		${GRADLEW} androidCheckstyle testMedicDebugUnitTest
 
 e2e:
 	${GRADLEW} assemble connectedCheck
@@ -74,6 +79,8 @@ changelog:
 	./scripts/changelog
 
 travis: stats
-	${GRADLEW} --stacktrace check test assemble
+	IS_GENERIC_FLAVOUR=false \
+	IS_MEDIC_FLAVOUR=true \
+		${GRADLEW} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
 	./scripts/start_emulator
 	${GRADLEW} connectedCheck

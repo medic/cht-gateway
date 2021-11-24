@@ -1,27 +1,16 @@
 package medic.gateway.alert;
 
 import android.content.*;
-import android.provider.*;
-import android.telephony.*;
-
-import java.util.*;
-
+import androidx.test.core.app.ApplicationProvider;
 import medic.gateway.alert.test.*;
-
 import org.junit.*;
 import org.junit.runner.*;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
-import org.robolectric.shadows.*;
-
 import static android.provider.Telephony.Sms.Intents.*;
-import static medic.gateway.alert.WoMessage.Status.*;
-import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
 import static medic.gateway.alert.test.UnitTestUtils.*;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.robolectric.Shadows.*;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=26)
@@ -34,7 +23,7 @@ public class IntentProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		db = new DbTestHelper(RuntimeEnvironment.application);
+		db = new DbTestHelper(ApplicationProvider.getApplicationContext());
 
 		intentProcessor = new IntentProcessor();
 		mockCapabilities = mockCapabilities(intentProcessor);
@@ -42,6 +31,7 @@ public class IntentProcessorTest {
 
 	@After
 	public void tearDown() throws Exception {
+		Thread.sleep(500);
 		db.tearDown();
 	}
 
@@ -120,11 +110,11 @@ public class IntentProcessorTest {
 	private void kitkatPlus() { when(mockCapabilities.canBeDefaultSmsProvider()).thenReturn(true); }
 
 	private void isNotDefaultSmsApp() {
-		when(mockCapabilities.isDefaultSmsProvider(RuntimeEnvironment.application))
+		when(mockCapabilities.isDefaultSmsProvider(ApplicationProvider.getApplicationContext()))
 				.thenReturn(false);
 	}
 	private void isDefaultSmsApp() {
-		when(mockCapabilities.isDefaultSmsProvider(RuntimeEnvironment.application))
+		when(mockCapabilities.isDefaultSmsProvider(ApplicationProvider.getApplicationContext()))
 				.thenReturn(true);
 	}
 
@@ -148,6 +138,6 @@ public class IntentProcessorTest {
 	}
 
 	private void deliver(Intent i) {
-		intentProcessor.onReceive(RuntimeEnvironment.application, i);
+		intentProcessor.onReceive(ApplicationProvider.getApplicationContext(), i);
 	}
 }

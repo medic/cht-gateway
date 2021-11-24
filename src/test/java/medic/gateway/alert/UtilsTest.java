@@ -3,6 +3,8 @@ package medic.gateway.alert;
 import android.app.*;
 import android.content.*;
 
+import androidx.test.core.app.ApplicationProvider;
+
 import org.junit.*;
 import org.junit.runner.*;
 import org.robolectric.*;
@@ -32,7 +34,7 @@ public class UtilsTest {
 
 	@Before
 	public void setUp() {
-		Application ctx = RuntimeEnvironment.application;
+		Application ctx = ApplicationProvider.getApplicationContext();
 		shadowApplication = shadowOf(ctx);
 
 		messageListsActivity = Robolectric.buildActivity(MessageListsActivity.class).create().get();

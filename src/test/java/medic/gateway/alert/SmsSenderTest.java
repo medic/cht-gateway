@@ -2,6 +2,8 @@ package medic.gateway.alert;
 
 import android.telephony.*;
 
+import androidx.test.core.app.ApplicationProvider;
+
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -32,9 +34,9 @@ public class SmsSenderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		db = new DbTestHelper(RuntimeEnvironment.application);
+		db = new DbTestHelper(ApplicationProvider.getApplicationContext());
 
-		smsSender = new SmsSender(RuntimeEnvironment.application);
+		smsSender = new SmsSender(ApplicationProvider.getApplicationContext());
 	}
 
 	@After

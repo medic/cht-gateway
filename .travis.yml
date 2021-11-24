@@ -25,7 +25,7 @@ jobs:
   - stage: test
     script: make travis
   - stage: build
-    script: ./gradlew assembleRelease
+    script: make assemble-release
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
