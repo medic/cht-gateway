@@ -1,19 +1,14 @@
 package medic.gateway.alert;
 
 import androidx.test.espresso.*;
-import androidx.test.rule.*;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.*;
 import android.view.*;
 import android.widget.*;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import medic.gateway.alert.test.*;
-
 import org.junit.*;
 import org.junit.runner.*;
-
-import static androidx.test.InstrumentationRegistry.*;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.*;
 import static androidx.test.espresso.assertion.ViewAssertions.*;
@@ -23,6 +18,7 @@ import static org.junit.Assert.*;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.R.*;
 import static medic.gateway.alert.test.InstrumentationTestUtils.*;
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 @RunWith(AndroidJUnit4.class)
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert", "PMD.GodClass", "PMD.TooManyMethods"})
@@ -31,8 +27,8 @@ public class SettingsDialogActivityTest {
 	private static final boolean NOT_GENERIC_FLAVOUR = IS_MEDIC_FLAVOUR;
 
 	@Rule @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
-	public ActivityTestRule<SettingsDialogActivity> activityTestRule =
-			new ActivityTestRule<>(SettingsDialogActivity.class);
+	public ActivityScenarioRule<SettingsDialogActivity> activityTestRule =
+			new ActivityScenarioRule<>(SettingsDialogActivity.class);
 
 	private HttpTestHelper http;
 
@@ -408,7 +404,7 @@ public class SettingsDialogActivityTest {
 	}
 
 	private void assertErrorDisplayed(int componentId, int errorMessageResourceId) {
-		String errorString = getTargetContext().getResources().getString(errorMessageResourceId);
+		String errorString = getApplicationContext().getResources().getString(errorMessageResourceId);
 		assertErrorDisplayed(componentId, errorString);
 	}
 
@@ -439,10 +435,10 @@ public class SettingsDialogActivityTest {
 	}
 
 	private Settings settings() {
-		return Settings.in(getTargetContext());
+		return Settings.in(getApplicationContext());
 	}
 
 	private SettingsStore settingsStore() {
-		return SettingsStore.in(getTargetContext());
+		return SettingsStore.in(getApplicationContext());
 	}
 }

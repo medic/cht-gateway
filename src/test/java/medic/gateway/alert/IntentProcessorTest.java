@@ -1,13 +1,13 @@
 package medic.gateway.alert;
 
 import android.content.*;
-import androidx.test.core.app.ApplicationProvider;
 import medic.gateway.alert.test.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 import static android.provider.Telephony.Sms.Intents.*;
+import static androidx.test.core.app.ApplicationProvider.*;
 import static medic.gateway.alert.test.TestUtils.*;
 import static medic.gateway.alert.test.UnitTestUtils.*;
 import static org.mockito.Mockito.*;
@@ -23,7 +23,7 @@ public class IntentProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		db = new DbTestHelper(ApplicationProvider.getApplicationContext());
+		db = new DbTestHelper(getApplicationContext());
 
 		intentProcessor = new IntentProcessor();
 		mockCapabilities = mockCapabilities(intentProcessor);
@@ -110,11 +110,11 @@ public class IntentProcessorTest {
 	private void kitkatPlus() { when(mockCapabilities.canBeDefaultSmsProvider()).thenReturn(true); }
 
 	private void isNotDefaultSmsApp() {
-		when(mockCapabilities.isDefaultSmsProvider(ApplicationProvider.getApplicationContext()))
+		when(mockCapabilities.isDefaultSmsProvider(getApplicationContext()))
 				.thenReturn(false);
 	}
 	private void isDefaultSmsApp() {
-		when(mockCapabilities.isDefaultSmsProvider(ApplicationProvider.getApplicationContext()))
+		when(mockCapabilities.isDefaultSmsProvider(getApplicationContext()))
 				.thenReturn(true);
 	}
 
@@ -138,6 +138,6 @@ public class IntentProcessorTest {
 	}
 
 	private void deliver(Intent i) {
-		intentProcessor.onReceive(ApplicationProvider.getApplicationContext(), i);
+		intentProcessor.onReceive(getApplicationContext(), i);
 	}
 }

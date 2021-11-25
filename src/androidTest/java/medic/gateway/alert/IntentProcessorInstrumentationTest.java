@@ -3,13 +3,9 @@ package medic.gateway.alert;
 import android.content.*;
 import android.database.*;
 import android.test.*;
-
 import java.lang.reflect.*;
-
 import medic.gateway.alert.test.*;
-
 import org.junit.*;
-
 import static android.app.Activity.RESULT_OK;
 import static android.telephony.SmsManager.RESULT_ERROR_GENERIC_FAILURE;
 import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
@@ -19,7 +15,6 @@ import static medic.gateway.alert.SmsCompatibility.SMS_DELIVER_ACTION;
 import static medic.gateway.alert.WoMessage.Status.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
-import static org.junit.Assert.*;
 
 @SuppressWarnings({"PMD", "PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
 public class IntentProcessorInstrumentationTest extends AndroidTestCase {

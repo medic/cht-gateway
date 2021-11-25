@@ -234,6 +234,7 @@ To run end to end tests, first either connect a physical device, or start an emu
 
     make e2e
 
+End to end tests only run in devices with Android _4.4 - 9.0_.
 
 ## `demo-server`
 

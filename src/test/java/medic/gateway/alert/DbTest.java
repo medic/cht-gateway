@@ -3,20 +3,16 @@ package medic.gateway.alert;
 import android.database.*;
 import android.database.sqlite.*;
 import android.telephony.*;
-import androidx.test.core.app.ApplicationProvider;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
-
 import medic.gateway.alert.test.*;
-
 import org.junit.*;
 import org.junit.runner.*;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
-
+import static androidx.test.core.app.ApplicationProvider.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
@@ -39,7 +35,7 @@ public class DbTest {
 
 	@Before
 	public void setUp() throws Exception {
-		dbHelper = new DbTestHelper(ApplicationProvider.getApplicationContext());
+		dbHelper = new DbTestHelper(getApplicationContext());
 		db = dbHelper.getDb();
 
 		db.setLogEntryLimit(50);
@@ -1046,7 +1042,7 @@ public class DbTest {
 	private static DbTestHelper anEmptyDbHelper() {
 		@SuppressWarnings("PMD.UncommentedEmptyMethodBody")
 		SQLiteOpenHelper openHelper = new SQLiteOpenHelper(
-				ApplicationProvider.getApplicationContext(), "test_db", null, 1) {
+				getApplicationContext(), "test_db", null, 1) {
 			public void onCreate(SQLiteDatabase db) {}
 			public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 		};

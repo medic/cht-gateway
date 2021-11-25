@@ -2,22 +2,18 @@ package medic.gateway.alert.test;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.test.rule.ActivityTestRule;
-
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import java.util.Iterator;
-
 import medic.gateway.alert.*;
-
 import org.json.*;
-
-import static androidx.test.InstrumentationRegistry.*;
+import static androidx.test.platform.app.InstrumentationRegistry.*;
 import static org.junit.Assert.*;
 
 public final class InstrumentationTestUtils {
 	private InstrumentationTestUtils() {}
 
 	public static void clearAppSettings() {
-		SharedPreferences prefs = getTargetContext().getSharedPreferences(
+		SharedPreferences prefs = getInstrumentation().getTargetContext().getSharedPreferences(
 				SettingsStore.class.getName(),
 				Context.MODE_PRIVATE);
 		SharedPreferences.Editor ed = prefs.edit();
@@ -25,12 +21,15 @@ public final class InstrumentationTestUtils {
 		assertTrue(ed.commit());
 	}
 
-	public static void recreateActivityFor(final ActivityTestRule testRule) {
-		getInstrumentation().runOnMainSync(new Runnable() {
-			public void run() {
-				testRule.getActivity().recreate();
-			}
-		});
+	public static void recreateActivityFor(final ActivityScenarioRule testRule) {
+		//getInstrumentation().waitForIdle(() -> testRule.getScenario().recreate());
+//		try {
+//			UiThreadStatement.runOnUiThread(() -> testRule.getScenario().recreate());
+//		} catch (Throwable throwable) {
+//			throw new RuntimeException("recreateActivityFor", throwable);
+//		}
+		getInstrumentation().runOnMainSync(() -> testRule.getScenario().recreate());
+		//testRule.getScenario().recreate();
 	}
 
 	public static void assertJson(String expected, String actual) throws JSONException {
