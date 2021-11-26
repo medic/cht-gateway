@@ -234,7 +234,14 @@ To run end to end tests, first either connect a physical device, or start an emu
 
     make e2e
 
-End to end tests only run in devices with Android _4.4 - 9.0_.
+End to end tests only run in devices with Android _4.4 - 9.0_. Also it's possible that at the end of the tests when the SDK tries to uninstall the app from the device the following error is shown:
+
+```
+com.android.build.gradle.internal.testing.ConnectedDevice > runTests[4034G - 6.0] FAILED 
+        com.android.builder.testing.api.DeviceException: com.android.ddmlib.InstallException: INSTALL_FAILED_VERSION_DOWNGRADE
+```
+
+Don't worry about that, it means the tests ran OK, but the SDK went out of memory when trying to remove the app.
 
 ## `demo-server`
 

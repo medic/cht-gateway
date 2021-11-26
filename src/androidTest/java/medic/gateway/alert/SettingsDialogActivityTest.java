@@ -63,6 +63,7 @@ public class SettingsDialogActivityTest {
 
 		// given
 		settingsStore().save(new Settings(http.url(), true, false, false));
+		Thread.sleep(2000);
 
 		// when
 		recreateActivityFor(activityTestRule);

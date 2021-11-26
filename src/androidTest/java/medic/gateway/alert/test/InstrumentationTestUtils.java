@@ -5,9 +5,7 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
 import androidx.lifecycle.Lifecycle;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.NoMatchingViewException;
-import androidx.test.espresso.PerformException;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import java.util.Iterator;
@@ -40,14 +38,7 @@ public final class InstrumentationTestUtils {
 	}
 
 	public static void recreateActivityFor(final ActivityScenarioRule testRule) {
-		//getInstrumentation().waitForIdle(() -> testRule.getScenario().recreate());
-//		try {
-//			UiThreadStatement.runOnUiThread(() -> testRule.getScenario().recreate());
-//		} catch (Throwable throwable) {
-//			throw new RuntimeException("recreateActivityFor", throwable);
-//		}
-		getInstrumentation().runOnMainSync(() -> testRule.getScenario().recreate());
-		//testRule.getScenario().recreate();
+		testRule.getScenario().moveToState(Lifecycle.State.RESUMED).recreate();
 	}
 
 	public static void assertJson(String expected, String actual) throws JSONException {
@@ -137,13 +128,7 @@ public final class InstrumentationTestUtils {
 	}
 
 	public static void assertVisible(int viewId) {
-		try {
-			onView(withId(viewId)).perform(scrollTo()).check(matches(isDisplayed()));
-		} catch (PerformException e) {
-			// The view is fully visible, and the element
-			// should be displayed without the need to scroll down
-			onView(withId(viewId)).check(matches(isDisplayed()));
-		}
+		onView(withId(viewId)).perform(scrollTo()).check(matches(isDisplayed()));
 	}
 
 	@SuppressWarnings("PMD.EmptyCatchBlock")
