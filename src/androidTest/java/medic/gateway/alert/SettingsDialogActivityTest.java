@@ -1,10 +1,8 @@
 package medic.gateway.alert;
 
-import androidx.test.espresso.*;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.*;
-import android.view.*;
-import android.widget.*;
+import androidx.test.filters.LargeTest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import medic.gateway.alert.test.*;
 import org.junit.*;
@@ -18,8 +16,8 @@ import static org.junit.Assert.*;
 import static medic.gateway.alert.BuildConfig.IS_MEDIC_FLAVOUR;
 import static medic.gateway.alert.R.*;
 import static medic.gateway.alert.test.InstrumentationTestUtils.*;
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
+@LargeTest
 @RunWith(AndroidJUnit4.class)
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert", "PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsDialogActivityTest {
@@ -370,11 +368,6 @@ public class SettingsDialogActivityTest {
 		enterText(id.txtWebappPassword, password);
 	}
 
-	private void enterText(int componentId, String text) {
-		onView(withId(componentId))
-				.perform(typeText(text), closeSoftKeyboard());
-	}
-
 	private void checkPollingEnabled() {
 		onView(allOf(withId(id.cbxEnablePolling), isChecked()));
 	}
@@ -389,56 +382,8 @@ public class SettingsDialogActivityTest {
 				.perform(click());
 	}
 
-	private void assertNotChecked(int cbxId) {
-		onView(withId(cbxId)).check(matches(isNotChecked()));
-	}
-
 	private void saveClicked() {
 		onView(withId(id.btnSaveSettings))
 				.perform(click());
-	}
-
-	private void assertErrorDisplayed(int errorMessageResourceId) {
-		int componentId = IS_MEDIC_FLAVOUR ? id.txtWebappInstanceName : id.txtWebappUrl;
-		assertErrorDisplayed(componentId, errorMessageResourceId);
-	}
-
-	private void assertErrorDisplayed(int componentId, int errorMessageResourceId) {
-		String errorString = getApplicationContext().getResources().getString(errorMessageResourceId);
-		assertErrorDisplayed(componentId, errorString);
-	}
-
-	private void assertErrorDisplayed(int componentId, final String expectedMessage) {
-		onView(withId(componentId))
-				.check(new ViewAssertion() {
-					public void check(View view, NoMatchingViewException noViewFoundException) {
-						if(!(view instanceof TextView))
-							fail("Supplied view is not a TextView, so does not have an error property.");
-						TextView tv = (TextView) view;
-						assertEquals(expectedMessage, tv.getError());
-					}
-				});
-	}
-
-	private void assertVisible(int viewId) {
-		onView(withId(viewId)).perform(scrollTo()).check(matches(isDisplayed()));
-	}
-
-	@SuppressWarnings("PMD.EmptyCatchBlock")
-	private void assertDoesNotExist(int viewId) {
-		try {
-			onView(withId(viewId)).check(matches(isDisplayed()));
-			fail("Found view which should not exist!");
-		} catch(NoMatchingViewException ex) {
-			// expected
-		}
-	}
-
-	private Settings settings() {
-		return Settings.in(getApplicationContext());
-	}
-
-	private SettingsStore settingsStore() {
-		return SettingsStore.in(getApplicationContext());
 	}
 }
