@@ -1,43 +1,49 @@
 ADB = ${ANDROID_HOME}/platform-tools/adb
 EMULATOR = ${ANDROID_HOME}/tools/emulator
-GRADLEW = ./gradlew --daemon --parallel
+GRADLE = ./gradlew
+GRADLE_OPTS = --daemon --parallel
+flavor = Medic
+flavor_lower = $(shell echo ${flavor} | tr '[:upper:]' '[:lower:]')
 
 ifdef ComSpec	 # Windows
   # Use `/` for all paths, except `.\`
   ADB := $(subst \,/,${ADB})
   EMULATOR := $(subst \,/,${EMULATOR})
-  GRADLEW := $(subst /,\,${GRADLEW})
+  GRADLEW := $(subst /,\,${GRADLE} ${GRADLE_OPTS})
 endif
 
-.PHONY: default build clean test deploy uninstall emulator kill logs force
-.PHONY: all build-all deploy-all uninstall-all
+.PHONY: default assemble clean lint test deploy uninstall emulator kill logs force
+.PHONY: all assemble-all assemble-release deploy-all uninstall-all
 
 default:
-	@ADB='${ADB}' ./scripts/build_and_maybe_deploy
-all: clean build-all deploy-all
+	@ADB='${ADB}' ./scripts/assemble_and_maybe_deploy
+all: clean assemble-all deploy-all
 
-force: build uninstall
-	adb install -r build/outputs/apk/cht-gateway-SNAPSHOT-medic-debug.apk
+force: assemble uninstall
+	adb install -r build/outputs/apk/${flavor_lower}/debug/cht-gateway-SNAPSHOT-${flavor_lower}-debug.apk
 
-build:
-	${GRADLEW} assembleMedicDebug
-build-all:
-	${GRADLEW} assembleDebug
+assemble:
+	${GRADLE} ${GRADLE_OPTS} assemble${flavor}Debug
+assemble-all:
+	${GRADLE} ${GRADLE_OPTS} assembleDebug
 
 assemble-release:
-	${GRADLEW} assembleRelease
+	${GRADLE} ${GRADLE_OPTS} assembleRelease
 
 clean:
 	rm -rf src/main/assets/
 	rm -rf build/
 
-test:
+lint:
+	${GRADLE} ${GRADLE_OPTS} androidCheckstyle
+
+test: lint
 	IS_GENERIC_FLAVOUR=false \
 	IS_MEDIC_FLAVOUR=true \
-		${GRADLEW} androidCheckstyle testMedicDebugUnitTest
+		${GRADLE} ${GRADLE_OPTS} test${flavor}DebugUnitTest
 
 e2e:
-	${GRADLEW} assemble connectedCheck
+	${GRADLE} ${GRADLE_OPTS} assemble connectedCheck
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
@@ -47,8 +53,8 @@ logs:
 	${ADB} logcat CHTGateway:V AndroidRuntime:E '*:S' | tee android.log
 
 deploy:
-	${GRADLEW} installMedicDebug
-deploy-all: build-all
+	${GRADLE} ${GRADLE_OPTS} install${flavor}Debug
+deploy-all: assemble-all
 	find build/outputs/apk -name \*-debug.apk | \
 		xargs -n1 ${ADB} install -r
 
@@ -81,6 +87,6 @@ changelog:
 travis: stats
 	IS_GENERIC_FLAVOUR=false \
 	IS_MEDIC_FLAVOUR=true \
-		${GRADLEW} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
+		${GRADLE} ${GRADLE_OPTS} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
 	./scripts/start_emulator
-	${GRADLEW} connectedCheck
+	${GRADLE} ${GRADLE_OPTS} connectedCheck
