@@ -212,9 +212,7 @@ Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERRO
 
 ## Requirements
 
-### `cht-gateway`
-
-Development guides are available in the "Android" section of the [Community Health Toolkit Docs Site](https://docs.communityhealthtoolkit.org/core/guides/android/). You will find instructions of how to setup your development environment, build and test new features, creates new branded apps, release, publish... and so on.
+Development guides are available in the "Android" section of the [Community Health Toolkit Docs Site](https://docs.communityhealthtoolkit.org/core/guides/android/). You will find instructions of how to setup your development environment, build and test new features, how to work with "flavor" apps, release, publish... and so on.
 
 ### `demo-server`
 
@@ -222,9 +220,15 @@ Development guides are available in the "Android" section of the [Community Heal
 
 ## Building locally
 
+More details of how to setup and build the app [here](https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/). The following are the most common tasks:
+
+### Build and install
+
 To build locally and install to an attached android device:
 
 	make
+
+### Tests
 
 To run unit tests and static analysis tools locally:
 
@@ -232,7 +236,7 @@ To run unit tests and static analysis tools locally:
 
 To run end to end tests, first either connect a physical device, or start an emulated android device, and then:
 
-    make e2e
+    make test-ui
 
 End to end tests only run in devices with Android _4.4 - 9.0_. Also it's possible that at the end of the tests when the SDK tries to uninstall the app from the device the following error is shown:
 

@@ -42,7 +42,7 @@ test: lint
 	IS_MEDIC_FLAVOUR=true \
 		${GRADLE} ${GRADLE_OPTS} test${flavor}DebugUnitTest
 
-e2e:
+test-ui:
 	${GRADLE} ${GRADLE_OPTS} assemble connectedCheck
 
 emulator:
