@@ -108,7 +108,7 @@ android {
 
 	defaultConfig {
 		minSdkVersion 16
-		targetSdkVersion 30
+		targetSdkVersion 29	// 30+ causes instrumentation tests to fail when uninstalling the app from the device
 
 		versionCode getVersionCode()
 		versionName getVersionName()
