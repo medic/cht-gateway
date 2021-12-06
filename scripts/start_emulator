@@ -1,17 +1,23 @@
 #!/bin/bash -eux
 # start the emulator
 
+#
+# TODO: once CI is moved from Travis to Github Actions, this script can be removed,
+#       along with the reference in Makefile
+#
+
 echo "[start_emulator] Listing installed android SDK libs..."
-android list sdk --extended --no-ui --all
+sdkmanager --list
 
 echo "[start_emulator] Listing available ABIs..."
-android list targets
+sdkmanager --list_installed
 
 echo "[start_emulator] Creating ABI..."
-echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a --sdcard 200M
+sdkmanager --install 'system-images;android-29;default;x86' > /dev/null
+echo no | avdmanager create avd --force -n test -k 'system-images;android-29;default;x86' --sdcard 200M
 
 echo "[start_emulator] Starting emulator..."
-QEMU_AUDIO_DRV=none emulator -avd test -no-window &
+QEMU_AUDIO_DRV=none $ANDROID_HOME/tools/emulator -avd test -no-window &
 
 echo "[start_emulator] Waiting for emulator..."
 android-wait-for-emulator

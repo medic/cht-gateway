@@ -1,19 +1,16 @@
 package medic.gateway.alert;
 
 import android.telephony.*;
-
 import java.lang.reflect.*;
 import java.util.*;
-
 import medic.gateway.alert.WoMessage.Status;
 import medic.gateway.alert.test.*;
-
 import org.junit.*;
 import org.junit.runner.*;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 import org.robolectric.shadows.*;
-
+import static androidx.test.core.app.ApplicationProvider.*;
 import static medic.gateway.alert.WoMessage.Status.*;
 import static medic.gateway.alert.test.DbTestHelper.*;
 import static medic.gateway.alert.test.TestUtils.*;
@@ -32,9 +29,9 @@ public class SmsSenderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		db = new DbTestHelper(RuntimeEnvironment.application);
+		db = new DbTestHelper(getApplicationContext());
 
-		smsSender = new SmsSender(RuntimeEnvironment.application);
+		smsSender = new SmsSender(getApplicationContext());
 	}
 
 	@After

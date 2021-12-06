@@ -327,7 +327,7 @@ public class SettingsDialogActivity extends Activity {
 			super(ctx);
 		}
 
-		protected WebappUrlVerififcation doInBackground(Void..._) {
+		protected WebappUrlVerififcation doInBackground(Void... v) {
 			SettingsDialogActivity a = getRequiredCtx("SaveTask.doInBackground()");
 			String webappUrl = a.getWebappUrlFromFields();
 			return new WebappUrlVerifier(a).verify(webappUrl);

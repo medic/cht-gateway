@@ -2,13 +2,12 @@ package medic.gateway.alert;
 
 import android.app.*;
 import android.content.*;
-
 import org.junit.*;
 import org.junit.runner.*;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 import org.robolectric.shadows.*;
-
+import static androidx.test.core.app.ApplicationProvider.*;
 import static medic.gateway.alert.test.UnitTestUtils.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -32,7 +31,7 @@ public class UtilsTest {
 
 	@Before
 	public void setUp() {
-		Application ctx = RuntimeEnvironment.application;
+		Application ctx = getApplicationContext();
 		shadowApplication = shadowOf(ctx);
 
 		messageListsActivity = Robolectric.buildActivity(MessageListsActivity.class).create().get();

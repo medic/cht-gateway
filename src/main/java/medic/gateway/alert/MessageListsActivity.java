@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -93,6 +94,7 @@ public class MessageListsActivity extends TabActivity {
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.mnuMessageStats:
@@ -187,7 +189,7 @@ public class MessageListsActivity extends TabActivity {
 			super(a);
 		}
 
-		protected Integer doInBackground(String..._) {
+		protected Integer doInBackground(String... s) {
 			try {
 				MessageListsActivity ctx = getRequiredCtx("DeleteTask.doInBackground()");
 				return Db.getInstance(ctx).deleteOldData();
