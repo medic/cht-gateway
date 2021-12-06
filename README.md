@@ -245,7 +245,7 @@ com.android.build.gradle.internal.testing.ConnectedDevice > runTests[4034G - 6.0
         com.android.builder.testing.api.DeviceException: com.android.ddmlib.InstallException: INSTALL_FAILED_VERSION_DOWNGRADE
 ```
 
-Don't worry about that, it means the tests ran OK, but the SDK went out of memory when trying to remove the app.
+Don't worry about that, it means the tests ran OK, but the SDK failed to remove the app for compatibility issues with your device, but this error only happens with the tests.
 
 ## `demo-server`
 
