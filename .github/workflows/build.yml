@@ -25,3 +25,17 @@ jobs:
       - run: yes | sdkmanager 'platforms;android-28'
       - run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
       - run: make travis
+
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - uses: android-actions/setup-android@v2
+      - run: yes | sdkmanager 'platforms;android-28' # can we avoid copying those two lines?
+      - run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d # can we avoid copying those two lines?
+      - run: ./gradlew assembleRelease
