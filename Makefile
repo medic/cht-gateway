@@ -42,8 +42,8 @@ test: lint
 	IS_MEDIC_FLAVOUR=true \
 		${GRADLE} ${GRADLE_OPTS} test${flavor}DebugUnitTest
 
-test-ui:
-	${GRADLE} ${GRADLE_OPTS} assemble connectedCheck
+test-ui: assemble
+	${GRADLE} ${GRADLE_OPTS} connectedGenericDebugAndroidTest
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
