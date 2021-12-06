@@ -1,7 +1,7 @@
 `CHT-gateway`
 ===============
 
-<a href="https://travis-ci.org/medic/cht-gateway"><img src="https://travis-ci.org/medic/cht-gateway.svg?branch=master"/></a>
+[![cht-gateway build](https://github.com/medic/cht-gateway/actions/workflows/build.yml/badge.svg)](https://github.com/medic/cht-gateway/actions/workflows/build.yml)
 
 Download APKs from: https://github.com/medic/cht-gateway/releases
 
