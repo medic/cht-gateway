@@ -62,7 +62,7 @@ demo-server:
 	npm install && npm start
 
 
-.PHONY: avd changelog stats travis
+.PHONY: avd changelog stats ci
 
 avd:
 	nohup android avd > /dev/null &
@@ -73,7 +73,7 @@ stats:
 changelog:
 	./scripts/changelog
 
-travis: stats
+ci: stats
 	${GRADLEW} --stacktrace check test assemble
 	./scripts/start_emulator
 	${GRADLEW} connectedCheck

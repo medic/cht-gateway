@@ -23,7 +23,7 @@ jobs:
       - run: yes | sdkmanager 'platforms;android-28'
       - name: Decrypt keystore
         run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
-      - run: make travis
+      - run: make ci
 
   build:
     name: Build
