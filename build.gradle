@@ -70,11 +70,11 @@ dependencies {
 
 def getVersionCode = {
   int versionCode = 1
-  if(System.env.TRAVIS == 'true' && System.env.TRAVIS_TAG && System.env.TRAVIS_TAG.startsWith('v')) {
-    def versionParts = System.env.TRAVIS_TAG.split(/[\.v]/)
+  if(System.env.CI == 'true' && System.env.GIT_TAG && System.env.GIT_TAG.startsWith('v')) {
+    def versionParts = System.env.GIT_TAG.split(/[\.v]/)
 
     if (versionParts.length != 4)
-      throw new RuntimeException("Unexpected version number - should be of formatted as 'v0.0.0', but was: $System.env.TRAVIS_TAG")
+      throw new RuntimeException("Unexpected version number - should be of formatted as 'v0.0.0', but was: $System.env.GIT_TAG")
 
     versionParts = versionParts.drop(1).collect { Integer.parseInt(it) }
 
@@ -90,7 +90,7 @@ def getVersionCode = {
 }
 
 def getVersionName = {
-  System.env.TRAVIS_TAG ?: 'SNAPSHOT'
+  System.env.GIT_TAG ?: 'SNAPSHOT'
 }
 
 android {
@@ -117,7 +117,7 @@ android {
 		buildConfigField "String", "LOG_TAG", '"CHTGateway"'
 		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
 
-		buildConfigField "boolean", "TRAVIS", "Boolean.parseBoolean(\"${System.env.TRAVIS}\")";
+		buildConfigField "boolean", "CI", "Boolean.parseBoolean(\"${System.env.CI}\")";
 		buildConfigField "boolean", "FORCE_SEED", "Boolean.parseBoolean(\"${System.env.FORCE_SEED}\")";
 		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")";
 
@@ -165,7 +165,7 @@ android {
 
 		xmlReport false
 
-		if(System.env.TRAVIS == 'true') {
+		if(System.env.CI == 'true') {
 			abortOnError true
 			htmlReport false
 			textReport true

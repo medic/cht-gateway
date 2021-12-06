@@ -40,7 +40,7 @@ jobs:
       - run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d # can we avoid copying those two lines?
       - run: ./gradlew assembleRelease
         env:
-          TRAVIS_TAG: ${{ github.ref_name }}
+          GIT_TAG: ${{ github.ref_name }}
       - name: Deploy
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
