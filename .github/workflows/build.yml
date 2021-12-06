@@ -20,10 +20,11 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - uses: android-actions/setup-android@v2
       - run: yes | sdkmanager 'platforms;android-28'
-      - run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
+      - name: Decrypt keystore
+        run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
       - run: make travis
 
   build:
@@ -34,10 +35,11 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '8'
+          java-version: '11'
       - uses: android-actions/setup-android@v2
-      - run: yes | sdkmanager 'platforms;android-28' # can we avoid copying those two lines?
-      - run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d # can we avoid copying those two lines?
+      - run: yes | sdkmanager 'platforms;android-28
+      - name: Decrypt keystore
+        run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
       - run: ./gradlew assembleRelease
         env:
           GIT_TAG: ${{ github.ref_name }}
