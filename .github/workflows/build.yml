@@ -19,11 +19,12 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
-      - uses: android-actions/setup-android@v2
-      - run: yes | sdkmanager 'platforms;android-28'
       - name: Decrypt keystore
         run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
-      - run: make ci
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 28
+          script: make ci
 
   build:
     name: Build

@@ -88,5 +88,4 @@ ci: stats
 	IS_GENERIC_FLAVOUR=false \
 	IS_MEDIC_FLAVOUR=true \
 		${GRADLE} ${GRADLE_OPTS} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
-	./scripts/start_emulator
 	${GRADLE} ${GRADLE_OPTS} connectedCheck
