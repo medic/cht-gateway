@@ -1,7 +1,7 @@
 ADB = ${ANDROID_HOME}/platform-tools/adb
 EMULATOR = ${ANDROID_HOME}/tools/emulator
-GRADLE = ./gradlew
 GRADLE_OPTS = --daemon --parallel
+GRADLE = ./gradlew
 flavor = Medic
 flavor_lower = $(shell echo ${flavor} | tr '[:upper:]' '[:lower:]')
 
@@ -89,3 +89,6 @@ ci: stats
 	IS_MEDIC_FLAVOUR=true \
 		${GRADLE} ${GRADLE_OPTS} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
 	${GRADLE} ${GRADLE_OPTS} connectedCheck
+
+version:
+	${GRADLE} --version

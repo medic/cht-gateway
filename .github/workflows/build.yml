@@ -11,6 +11,7 @@ env:
 
 jobs:
   test:
+    if: ${{ false }}
     name: Test
     runs-on: ubuntu-20.04
     steps:
@@ -39,7 +40,9 @@ jobs:
       - run: yes | sdkmanager 'platforms;android-28'
       - name: Decrypt keystore
         run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
+      - run: make version
       - run: make assemble-release
+        if: ${{ false }}
         env:
           GIT_TAG: ${{ github.ref_name }}
       - name: Deploy
