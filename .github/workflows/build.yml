@@ -38,13 +38,21 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
-      - uses: reactivecircus/android-emulator-runner@v2
+      - name: Run unit and instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 28
           target: default
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: make ci
+      - name: Archive results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test report
+          path: |
+            build/reports/
+        if: ${{ failure() }}
 
   build:
     name: Build
