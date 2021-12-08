@@ -1,6 +1,7 @@
 ADB = ${ANDROID_HOME}/platform-tools/adb
 EMULATOR = ${ANDROID_HOME}/tools/emulator
 GRADLE = ./gradlew
+GRADLE_OPTS = --daemon --parallel
 flavor = Medic
 flavor_lower = $(shell echo ${flavor} | tr '[:upper:]' '[:lower:]')
 
@@ -8,7 +9,7 @@ ifdef ComSpec	 # Windows
   # Use `/` for all paths, except `.\`
   ADB := $(subst \,/,${ADB})
   EMULATOR := $(subst \,/,${EMULATOR})
-  GRADLEW := $(subst /,\,${GRADLE} --daemon --parallel)
+  GRADLEW := $(subst /,\,${GRADLE} ${GRADLE_OPTS})
 endif
 
 .PHONY: default assemble clean lint test deploy uninstall emulator kill logs force
@@ -22,27 +23,27 @@ force: assemble uninstall
 	adb install -r build/outputs/apk/${flavor_lower}/debug/cht-gateway-SNAPSHOT-${flavor_lower}-debug.apk
 
 assemble:
-	${GRADLE} --daemon --parallel assemble${flavor}Debug
+	${GRADLE} ${GRADLE_OPTS} assemble${flavor}Debug
 assemble-all:
-	${GRADLE} --daemon --parallel assembleDebug
+	${GRADLE} ${GRADLE_OPTS} assembleDebug
 
 assemble-release:
-	${GRADLE} --daemon --parallel assembleRelease
+	${GRADLE} ${GRADLE_OPTS} assembleRelease
 
 clean:
 	rm -rf src/main/assets/
 	rm -rf build/
 
 lint:
-	${GRADLE} --daemon --parallel androidCheckstyle
+	${GRADLE} ${GRADLE_OPTS} androidCheckstyle
 
 test: lint
 	IS_GENERIC_FLAVOUR=false \
 	IS_MEDIC_FLAVOUR=true \
-		${GRADLE} --daemon --parallel test${flavor}DebugUnitTest
+		${GRADLE} ${GRADLE_OPTS} test${flavor}DebugUnitTest
 
 test-ui: assemble
-	${GRADLE} --daemon --parallel connectedGenericDebugAndroidTest
+	${GRADLE} ${GRADLE_OPTS} connectedGenericDebugAndroidTest
 
 emulator:
 	nohup ${EMULATOR} -avd test -wipe-data > emulator.log 2>&1 &
@@ -52,7 +53,7 @@ logs:
 	${ADB} logcat CHTGateway:V AndroidRuntime:E '*:S' | tee android.log
 
 deploy:
-	${GRADLE} --daemon --parallel install${flavor}Debug
+	${GRADLE} ${GRADLE_OPTS} install${flavor}Debug
 deploy-all: assemble-all
 	find build/outputs/apk -name \*-debug.apk | \
 		xargs -n1 ${ADB} install -r
@@ -86,8 +87,8 @@ changelog:
 ci: stats
 	IS_GENERIC_FLAVOUR=false \
 	IS_MEDIC_FLAVOUR=true \
-		${GRADLE} --daemon --parallel --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
-	${GRADLE} --daemon --parallel connectedCheck
+		${GRADLE} ${GRADLE_OPTS} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
+	${GRADLE} ${GRADLE_OPTS} connectedCheck
 
 version:
-	${GRADLE} --version
+	${GRADLE} ${GRADLE_OPTS} --version

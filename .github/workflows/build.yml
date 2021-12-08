@@ -3,7 +3,6 @@ name: cht-gateway build
 on: [push, pull_request]
 
 env:
-  GRADLE_OPTS: "-XX:MaxPermSize=512m"
   ANDROID_KEY_ALIAS: medicmobile
   ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
   ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
