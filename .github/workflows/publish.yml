@@ -1,0 +1,35 @@
+name: cht-gateway publish
+
+on:
+  push:
+    tags:
+      - v*.*.*
+
+env:
+  ANDROID_KEY_ALIAS: medicmobile
+  ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+  ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+  ANDROID_KEYSTORE_PATH: ./medic-official.keystore
+
+jobs:
+  deploy:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - uses: android-actions/setup-android@v2
+      - run: yes | sdkmanager 'platforms;android-28'
+      - name: Decrypt keystore
+        run: openssl aes-256-cbc -K ${{ secrets.ANDROID_SECRETS_KEY }} -iv ${{ secrets.ANDROID_SECRETS_IV }} -in medic-official.keystore.enc -out medic-official.keystore -d
+      - run: make assemble-release
+        env:
+          GIT_TAG: ${{ github.ref_name }}
+      - name: GitHub release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ./build/outputs/apk/**/release/*.apk
