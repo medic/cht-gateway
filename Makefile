@@ -89,6 +89,3 @@ ci: stats
 	IS_MEDIC_FLAVOUR=true \
 		${GRADLE} ${GRADLE_OPTS} --stacktrace androidCheckstyle testMedicDebugUnitTest assemble
 	${GRADLE} ${GRADLE_OPTS} connectedCheck
-
-version:
-	${GRADLE} ${GRADLE_OPTS} --version
