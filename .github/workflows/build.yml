@@ -27,12 +27,12 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-28-default
+          key: avd-26-default
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 28
+          api-level: 26
           target: default
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
@@ -43,7 +43,7 @@ jobs:
       - name: Run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 28
+          api-level: 26
           target: default
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
