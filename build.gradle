@@ -75,17 +75,18 @@ dependencies {
 def getVersionCode = {
   int versionCode = 1
   if(System.env.CI == 'true' && System.env.GIT_TAG && System.env.GIT_TAG.startsWith('v')) {
-    def versionParts = System.env.GIT_TAG.split(/[\.v]/)
+    def versionParts = System.env.GIT_TAG.split(/[^0-9]+/)
 
-    if (versionParts.length != 4)
-      throw new RuntimeException("Unexpected version number - should be of formatted as 'v0.0.0', but was: $System.env.GIT_TAG")
+    if (versionParts.length != 4 && versionParts.length != 5)
+      throw new RuntimeException("Unexpected version number - should be of formatted as 'v1.2.3' or 'v1.2.3-alpha.4', but was: $System.env.GIT_TAG")
 
     versionParts = versionParts.drop(1).collect { Integer.parseInt(it) }
+    int alphaPart = versionParts.size() == 4 ? versionParts[3] : 99;
 
-    if (versionParts[1] > 999 || versionParts[2] > 999)
-      throw new RuntimeException('Version part greater than 999 not allowed.')
+    if (versionParts[1] > 99 || versionParts[2] > 99 || alphaPart > 99)
+      throw new RuntimeException('Version part greater than 99 not allowed.')
 
-    versionCode = (1000 * 1000 * versionParts[0]) + 1000 * versionParts[1] + versionParts[2]
+    versionCode = (100 * 100 * 100 * versionParts[0]) + (100 * 100 * versionParts[1]) + (100 * versionParts[2]) + alphaPart
     if (versionCode > 2100000000 / 10)
       throw new RuntimeException('versionCode bigger than max allowed by Google Play.')
   }
