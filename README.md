@@ -1,7 +1,7 @@
 `CHT-gateway`
 ===============
 
-<a href="https://travis-ci.org/medic/cht-gateway"><img src="https://travis-ci.org/medic/cht-gateway.svg?branch=master"/></a>
+[![cht-gateway build](https://github.com/medic/cht-gateway/actions/workflows/build.yml/badge.svg)](https://github.com/medic/cht-gateway/actions/workflows/build.yml)
 
 Download APKs from: https://github.com/medic/cht-gateway/releases
 
@@ -296,7 +296,7 @@ TODO walkthrough
 ## Releasing
 
 1. Create a git tag for the version, eg: `v1.7.4`.
-2. Push the tag to the repo and travis will build and publish the apk to GitHub.
+2. Push the tag to the repo and GitHub Actions will build and publish the apk to GitHub.
 3. Announce the release on the [CHT forum](https://forum.communityhealthtoolkit.org), under the "Product - Releases" category.
 
 # Android Version Support
