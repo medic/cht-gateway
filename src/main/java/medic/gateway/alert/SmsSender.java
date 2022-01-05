@@ -1,5 +1,6 @@
 package medic.gateway.alert;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -126,6 +127,7 @@ public class SmsSender {
 		return intents;
 	}
 
+	@SuppressLint("UnspecifiedImmutableFlag")
 	private PendingIntent intentFor(String intentType, WoMessage m, int partIndex, int totalParts) {
 		Intent intent = new Intent(ctx, IntentProcessor.class);
 		intent.setAction(intentType);

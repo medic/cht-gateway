@@ -11,7 +11,7 @@ import static medic.gateway.alert.GatewayLog.trace;
  * app on the device.
  */
 class WoMessage {
-	public static enum Status {
+	public enum Status {
 		UNSENT, PENDING, SENT, FAILED, DELIVERED;
 		boolean canBeRetried() { return this != UNSENT && this != SENT && this != DELIVERED; }
 	}

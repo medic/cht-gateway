@@ -17,7 +17,8 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
 
 	<!-- File permissions for log of unprocessed WT messages.  READ is implied by WRITE. -->
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+		tools:ignore="ScopedStorage" />
 
 	<!-- Required internally for sending multipart UCS2 messages - see:
 	       https://github.com/medic/cht-gateway/issues/103 -->
@@ -29,6 +30,7 @@
 			android:supportsRtl="false"
 			tools:ignore="GoogleAppIndexingWarning">
 		<activity android:name="StartupActivity"
+				android:exported="true"
 				android:configChanges="orientation|screenSize"
 				android:theme="@android:style/Theme.NoDisplay"
 				>
@@ -46,7 +48,8 @@
 		<activity android:name="WoListActivity"/>
 		<activity android:name="WtListActivity"/>
 		<receiver android:name="IntentProcessor" android:label="@string/app_name"
-				android:permission="android.permission.BROADCAST_SMS">
+				android:permission="android.permission.BROADCAST_SMS"
+				android:exported="true">
 			<!--
 			  priority is set here so that on supported android
 			  versions we can abort SMS_RECEIVED broadcasts - we
@@ -60,13 +63,15 @@
 		</receiver>
 		<!-- Android 4.4+ (kitkat) SMS support -->
 		<receiver android:name="MmsIntentProcessor" android:label="@string/app_name"
-				android:permission="android.permission.BROADCAST_WAP_PUSH">
+				android:permission="android.permission.BROADCAST_WAP_PUSH"
+				android:exported="true">
 			<intent-filter>
 				<action android:name="android.provider.Telephony.WAP_PUSH_DELIVER"/>
 				<data android:mimeType="application/vnd.wap.mms-message"/>
 			</intent-filter>
 		</receiver>
-		<receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver">
+		<receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver"
+				android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED"/>
 				<!--
@@ -86,7 +91,8 @@
 		     Activity that allows the user to send new SMS/MMS messages -->
 		<activity android:name="ComposeSmsActivity"
 				android:windowSoftInputMode="adjustResize"
-				android:enabled="@bool/kitkat_plus">
+				android:enabled="@bool/kitkat_plus"
+				android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.SEND"/>
 				<action android:name="android.intent.action.SENDTO"/>

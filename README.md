@@ -1,7 +1,7 @@
 `CHT-gateway`
 ===============
 
-<a href="https://travis-ci.org/medic/cht-gateway"><img src="https://travis-ci.org/medic/cht-gateway.svg?branch=master"/></a>
+[![cht-gateway build](https://github.com/medic/cht-gateway/actions/workflows/build.yml/badge.svg)](https://github.com/medic/cht-gateway/actions/workflows/build.yml)
 
 Download APKs from: https://github.com/medic/cht-gateway/releases
 
@@ -212,11 +212,7 @@ Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERRO
 
 ## Requirements
 
-### `cht-gateway`
-
-- JDK 8 is strongly recommended. Later JDKs will build the app but tests will fail to run with a reflection error.
-- The Android SDK and relevant libraries. Check `build.gradle`'s `compileSdkVersion` parameter for which one need to be installed
-- Either a physical or emulated device running Lolipop (AKA Android 5.1 AKA api 22). Later android versions may cause end to end tests to fail
+Development guides are available in the "Android" section of the [Community Health Toolkit Docs Site](https://docs.communityhealthtoolkit.org/core/guides/android/). You will find instructions of how to setup your development environment, build and test new features, how to work with "flavor" apps, release, publish... and so on.
 
 ### `demo-server`
 
@@ -224,9 +220,15 @@ Gateway will retry to send the SMS when any of these errors occurs: `RESULT_ERRO
 
 ## Building locally
 
+More details of how to setup and build the app [here](https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/). The following are the most common tasks:
+
+### Build and install
+
 To build locally and install to an attached android device:
 
 	make
+
+### Tests
 
 To run unit tests and static analysis tools locally:
 
@@ -234,8 +236,16 @@ To run unit tests and static analysis tools locally:
 
 To run end to end tests, first either connect a physical device, or start an emulated android device, and then:
 
-    make e2e
+    make test-ui
 
+End to end tests only run in devices with Android _4.4 - 9.0_. Also it's possible that at the end of the tests when the SDK tries to uninstall the app from the device the following error is shown:
+
+```
+com.android.build.gradle.internal.testing.ConnectedDevice > runTests[4034G - 6.0] FAILED 
+        com.android.builder.testing.api.DeviceException: com.android.ddmlib.InstallException: INSTALL_FAILED_VERSION_DOWNGRADE
+```
+
+Don't worry about that, it means the tests ran OK, but the SDK failed to remove the app for compatibility issues with your device, but this error only happens with the tests.
 
 ## `demo-server`
 
@@ -286,7 +296,7 @@ TODO walkthrough
 ## Releasing
 
 1. Create a git tag for the version, eg: `v1.7.4`.
-2. Push the tag to the repo and travis will build and publish the apk to GitHub.
+2. Push the tag to the repo and GitHub Actions will build and publish the apk to GitHub.
 3. Announce the release on the [CHT forum](https://forum.communityhealthtoolkit.org), under the "Product - Releases" category.
 
 # Android Version Support

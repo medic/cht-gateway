@@ -13,7 +13,7 @@ import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static org.junit.Assert.*;
 
 @SuppressLint("CommitPrefEdits")
-@SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"PMD.SignatureDeclareThrowsException"})
 public class AlarmListenerTest extends AndroidTestCase {
 
 	@Test

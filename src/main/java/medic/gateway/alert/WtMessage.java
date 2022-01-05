@@ -6,7 +6,7 @@ import static medic.gateway.alert.Utils.randomUuid;
  * WtMessage - Webapp-Terminating Messages
  */
 class WtMessage {
-	public static enum Status {
+	public enum Status {
 		WAITING, FORWARDED, FAILED;
 		boolean canBeRetried() { return this == FAILED; }
 	}

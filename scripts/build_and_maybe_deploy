@@ -5,7 +5,7 @@ if [[ "$adb_state" = "device" ]]; then
 	make deploy
 	make logs
 else
-	make build
+	make assemble
 	echo "[$0] Cannot deploy - no android device or multiple devices are connected."
 	echo "[$0] To deploy, make sure exactly one android device is connected."
 fi

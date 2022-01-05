@@ -6,13 +6,13 @@ buildscript {
 		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.2.0', {
+		classpath 'com.android.tools.build:gradle:7.0.3'
+		classpath 'com.noveogroup.android:check:1.2.5', {
+			exclude module: 'checkstyle'
 			exclude module: 'xmlpull'
 		}
-		classpath 'com.github.alxndrsn:android-check:1f87548c0686d823e5f1490a2053b70bd9f5022e', {
-			exclude module: 'xmlpull'
-		}
-		classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
+		classpath 'com.puppycrawl.tools:checkstyle:7.8.1'
+		classpath 'com.github.bjoernq:unmockplugin:0.7.9'
 	}
 }
 apply plugin: 'com.android.application'
@@ -32,7 +32,6 @@ gradle.projectsEvaluated {
 repositories {
 	maven { url "${System.env.ANDROID_HOME}/extras/android/m2repository/" }
 	mavenCentral()
-	jcenter()
 	maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
 	google()
 }
@@ -47,18 +46,21 @@ def excludeKxml2 = {
 }
 
 dependencies {
+	testImplementation 'androidx.test:core:1.4.0'
 	testImplementation 'com.google.android:android-test:4.1.1.4'
-	testImplementation 'org.robolectric:robolectric:3.8'
+	testImplementation 'org.robolectric:robolectric:4.7'
 	testImplementation 'com.squareup.okhttp3:mockwebserver:3.2.0'
-	testImplementation 'org.mockito:mockito-core:1.10.19'
+	testImplementation 'org.mockito:mockito-core:4.0.0'
+	testImplementation 'junit:junit:4.13.2'
 
 	androidTestImplementation 'com.google.android:android-test:4.1.1.4'
-	androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.2.0'
-	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2', excludeKxml2
-	androidTestImplementation 'com.android.support.test:rules:1.0.2', excludeKxml2
+	androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.9.2'
+	androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+	androidTestImplementation 'androidx.test:rules:1.4.0'
+	androidTestImplementation 'androidx.test.ext:junit:1.1.3'
 
-	implementation 'com.android.support:support-core-ui:28.0.0'
-	implementation 'com.android.support:support-fragment:28.0.0'
+	implementation 'androidx.legacy:legacy-support-core-ui:1.0.0'
+	implementation 'androidx.fragment:fragment:1.0.0'
 	implementation 'com.commonsware.cwac:wakeful:1.1.0'
 	implementation 'com.google.code.findbugs:annotations:3.0.1', {
 		// Need to exclude these, or build is broken by:
@@ -66,22 +68,25 @@ dependencies {
 		exclude module: 'jsr305'
 		exclude module: 'jcip-annotations'
 	}
+
+	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
 
 def getVersionCode = {
   int versionCode = 1
-  if(System.env.TRAVIS == 'true' && System.env.TRAVIS_TAG && System.env.TRAVIS_TAG.startsWith('v')) {
-    def versionParts = System.env.TRAVIS_TAG.split(/[\.v]/)
+  if(System.env.CI == 'true' && System.env.GIT_TAG && System.env.GIT_TAG.startsWith('v')) {
+    def versionParts = System.env.GIT_TAG.split(/[^0-9]+/)
 
-    if (versionParts.length != 4)
-      throw new RuntimeException("Unexpected version number - should be of formatted as 'v0.0.0', but was: $System.env.TRAVIS_TAG")
+    if (versionParts.length != 4 && versionParts.length != 5)
+      throw new RuntimeException("Unexpected version number - should be of formatted as 'v1.2.3' or 'v1.2.3-alpha.4', but was: $System.env.GIT_TAG")
 
     versionParts = versionParts.drop(1).collect { Integer.parseInt(it) }
+    int alphaPart = versionParts.size() == 4 ? versionParts[3] : 99;
 
-    if (versionParts[1] > 999 || versionParts[2] > 999)
-      throw new RuntimeException('Version part greater than 999 not allowed.')
+    if (versionParts[1] > 99 || versionParts[2] > 99 || alphaPart > 99)
+      throw new RuntimeException('Version part greater than 99 not allowed.')
 
-    versionCode = (1000 * 1000 * versionParts[0]) + 1000 * versionParts[1] + versionParts[2]
+    versionCode = (100 * 100 * 100 * versionParts[0]) + (100 * 100 * versionParts[1]) + (100 * versionParts[2]) + alphaPart
     if (versionCode > 2100000000 / 10)
       throw new RuntimeException('versionCode bigger than max allowed by Google Play.')
   }
@@ -90,12 +95,12 @@ def getVersionCode = {
 }
 
 def getVersionName = {
-  System.env.TRAVIS_TAG ?: 'SNAPSHOT'
+  System.env.GIT_TAG ?: 'SNAPSHOT'
 }
 
 android {
 	compileSdkVersion 30
-	buildToolsVersion '30.0.0'
+	buildToolsVersion '30.0.3'
 
 	packagingOptions {
 		exclude 'META-INF/LICENSE'
@@ -104,24 +109,33 @@ android {
 
 	defaultConfig {
 		minSdkVersion 16
-		targetSdkVersion 30
+		targetSdkVersion 29	// 30+ causes instrumentation tests to fail when uninstalling the app from the device
 
 		versionCode getVersionCode()
 		versionName getVersionName()
 		archivesBaseName = "${project.name}-${versionName}"
 
 		testInstrumentationRunner 'medic.gateway.alert.test.WakingJUnitRunner'
+
+		multiDexEnabled true
 	}
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+    // Flag to enable support for the new language APIs
+    coreLibraryDesugaringEnabled true
+  }
 
 	applicationVariants.all {
 		buildConfigField "String", "LOG_TAG", '"CHTGateway"'
-		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")";
+		buildConfigField "boolean", "DISABLE_APP_URL_VALIDATION", "Boolean.parseBoolean(\"${System.env.DISABLE_APP_URL_VALIDATION}\")"
 
-		buildConfigField "boolean", "TRAVIS", "Boolean.parseBoolean(\"${System.env.TRAVIS}\")";
-		buildConfigField "boolean", "FORCE_SEED", "Boolean.parseBoolean(\"${System.env.FORCE_SEED}\")";
-		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")";
+		buildConfigField "boolean", "CI", "Boolean.parseBoolean(\"${System.env.CI}\")"
+		buildConfigField "boolean", "FORCE_SEED", "Boolean.parseBoolean(\"${System.env.FORCE_SEED}\")"
+		buildConfigField "boolean", "LOAD_SEED_DATA", "Boolean.parseBoolean(\"${System.env.LOAD_SEED_DATA}\")"
 
-		buildConfigField "boolean", "IS_DUMMY_SEND_AVAILABLE", "Boolean.parseBoolean(\"${System.env.ENABLE_DUMMY_SEND_OPTION}\")";
+		buildConfigField "boolean", "IS_DUMMY_SEND_AVAILABLE", "Boolean.parseBoolean(\"${System.env.ENABLE_DUMMY_SEND_OPTION}\")"
 	}
 
 	sourceSets {
@@ -158,14 +172,16 @@ android {
 		lintConfig = new File('config/lint.xml')
 
 		disable 'UnusedResources' // linter can't handle static imports, so just skip this test
-		disable 'GradleDependency' // TODO update to latest support-v4 lib and re-enable this rule
+		disable 'GradleDependency'
+		disable 'JcenterRepositoryObsolete'
+		disable 'RtlHardcoded'
 
 		warningsAsErrors true
 		// abortOnError false
 
 		xmlReport false
 
-		if(System.env.TRAVIS == 'true') {
+		if(System.env.CI == 'true') {
 			abortOnError true
 			htmlReport false
 			textReport true
