@@ -11,7 +11,7 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
@@ -58,7 +58,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
