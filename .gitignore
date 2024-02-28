@@ -9,3 +9,4 @@ secrets.tar.gz
 medic-official.keystore
 playstore-secret.json
 *.iml
+*.jks
