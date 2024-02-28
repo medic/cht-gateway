@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">SMS Gateway</string>
+	<string name="cancelledScan">Cancelled scan.</string>
+	<string name="txtPermissionsPrompt_cameraAccess">
+		<![CDATA[
+		<b>Warning: <i>%1$s</i> does not currently have permissions to access the camera.</b><br>
+		<br>This permission is required so you can configure the CHT-Core URL with a QR code.
+		]]>
+	</string>
+	<string name="scanQrCode">Scan Qr code</string>
 </resources>

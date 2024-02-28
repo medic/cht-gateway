@@ -27,10 +27,22 @@ public class PromptForPermissionsActivity extends Activity implements ActivityCo
 	private static final String X_IS_DEMAND = "isDemand";
 	private static final String X_PERMISSIONS_TYPE = "permissionsType";
 
-	private static final Object[][] PERMISSIONS_REQUESTS = {
-		/* sms */ { R.string.txtPermissionsPrompt_sms, new String[] { permission.SEND_SMS, permission.RECEIVE_SMS, permission.READ_PHONE_STATE } },
-		/* file access */ { R.string.txtPermissionsPrompt_fileAccess, new String[] { permission.WRITE_EXTERNAL_STORAGE } },
-	};
+	private static final Object[][] PERMISSIONS_REQUESTS = buildPermissionsRequests();
+	private static Object[][] buildPermissionsRequests() {
+		if (IS_MEDIC_FLAVOUR) {
+			return new Object[][]{
+					/* sms */ {R.string.txtPermissionsPrompt_sms, new String[]{permission.SEND_SMS, permission.RECEIVE_SMS, permission.READ_PHONE_STATE}},
+					/* file access */ {R.string.txtPermissionsPrompt_fileAccess, new String[]{permission.WRITE_EXTERNAL_STORAGE}},
+					// No camera permission needed for MEDIC flavour
+			};
+		} else {
+			return new Object[][]{
+					/* sms */ {R.string.txtPermissionsPrompt_sms, new String[]{permission.SEND_SMS, permission.RECEIVE_SMS, permission.READ_PHONE_STATE}},
+					/* file access */ {R.string.txtPermissionsPrompt_fileAccess, new String[]{permission.WRITE_EXTERNAL_STORAGE}},
+					/* camera access */ {R.string.txtPermissionsPrompt_cameraAccess, new String[]{permission.CAMERA}},
+			};
+		}
+	}
 
 	private boolean isDemand;
 	private boolean deniedBefore;
