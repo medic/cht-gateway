@@ -35,7 +35,7 @@ public final class GatewayLog {
 
 	public static void trace(Object caller, String message, Object... extras) {
 		if(!DEBUG) return;
-		message = String.format(message, extras);
+		message = String.format(message.replace("%", "%%"), extras);
 		Class callerClass = caller instanceof Class ? (Class) caller : caller.getClass();
 		d(LOG_TAG, String.format("%s :: %s", callerClass.getName(), message));
 	}
